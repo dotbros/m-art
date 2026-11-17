@@ -17,7 +17,9 @@ const slides = [
 ];
 
 function Brand({ footer = false }: { footer?: boolean }) {
-  return <span className={`brand ${footer ? "brand-footer" : ""}`}><span className="brand-wordmark">M.art</span><span className="brand-caption">PRACOWNIA BIŻUTERII</span></span>;
+  // Logo pracowni (okrągła pieczęć) z public/brand/logo.svg
+  // eslint-disable-next-line @next/next/no-img-element
+  return <span className={`brand ${footer ? "brand-footer" : ""}`}><img className="brand-logo" src="/brand/logo.svg" alt="M.art — Pracownia Biżuterii" width={1290} height={1219} fetchPriority={footer ? "auto" : "high"} loading={footer ? "lazy" : "eager"}/></span>;
 }
 
 export function Shop({ products, categories: categoryNames }: { products: Product[]; categories: string[] }) {

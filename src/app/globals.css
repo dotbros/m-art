@@ -742,3 +742,12 @@ svg{flex-shrink:0}
   .footer-column{gap:0}
   .footer-column>button,.footer-column>a{padding-block:11px}
 }
+
+/* Logo pracowni (pieczęć) zamiast napisu ze wzoru */
+.brand{min-width:0}
+.brand-logo{display:block;height:74px;width:auto}
+.brand-footer .brand-logo{height:104px}
+@media(max-width:760px){
+  .brand-logo{height:62px}
+  .brand-footer .brand-logo{height:88px}
+}
