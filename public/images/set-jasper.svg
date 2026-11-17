@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 700" width="560" height="700"><defs>
+  <radialGradient id="bgsj" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="#f4ede2"/><stop offset="1" stop-color="#e6dccb"/></radialGradient>
+  <radialGradient id="stsj" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#e7b98d"/><stop offset=".55" stop-color="#c98a5a"/><stop offset="1" stop-color="#8e5434"/></radialGradient>
+  <linearGradient id="goldsj" x1="0" x2="1"><stop offset="0" stop-color="#b8945a"/><stop offset=".5" stop-color="#e2c78f"/><stop offset="1" stop-color="#a7834b"/></linearGradient>
+  <filter id="shsj" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#5a4128" flood-opacity=".18"/></filter>
+</defs>
+<rect width="560" height="700" fill="url(#bgsj)"/><g opacity="0.35" stroke="#a89474" fill="none" stroke-width="1.4" transform="translate(40 120) rotate(-20)"><path d="M0 0c40-30 90-30 130 0-40 30-90 30-130 0Z"/><path d="M0 0h130"/></g><g opacity="0.35" stroke="#a89474" fill="none" stroke-width="1.4" transform="translate(390 580) rotate(160)"><path d="M0 0c40-30 90-30 130 0-40 30-90 30-130 0Z"/><path d="M0 0h130"/></g>
+<path d="M90 60 C 110 385.00000000000006, 450 385.00000000000006, 470 60" fill="none" stroke="url(#goldsj)" stroke-width="3" stroke-dasharray="7 5"/>
+<g filter="url(#shsj)"><circle cx="280" cy="329" r="10" fill="none" stroke="url(#goldsj)" stroke-width="4"/>
+<ellipse cx="280" cy="420" rx="62" ry="78" fill="url(#goldsj)"/><ellipse cx="280" cy="420" rx="52" ry="68" fill="url(#stsj)"/>
+<ellipse cx="262" cy="394" rx="14" ry="9" fill="#fff" opacity=".35"/></g></svg>

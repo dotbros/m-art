@@ -1,0 +1,34 @@
+# zależności
+node_modules/
+
+# build Next.js
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+
+# lokalne dane — NIGDY do repozytorium
+data/
+storage/
+*.lock
+!package-lock.json
+
+# sekrety
+.env
+.env.local
+.env.*.local
+
+# testy
+test-results/
+playwright-report/
+blob-report/
+coverage/
+
+# system / edytory
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.claude/settings.local.json

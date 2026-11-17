@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 700" width="560" height="700"><defs>
+  <radialGradient id="bgrp" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="#f4ede2"/><stop offset="1" stop-color="#e6dccb"/></radialGradient>
+  <radialGradient id="strp" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#f7f2ea"/><stop offset="1" stop-color="#d8cfc1"/></radialGradient>
+  <linearGradient id="goldrp" x1="0" x2="1"><stop offset="0" stop-color="#b8945a"/><stop offset=".5" stop-color="#e2c78f"/><stop offset="1" stop-color="#a7834b"/></linearGradient>
+  <filter id="shrp" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#5a4128" flood-opacity=".18"/></filter>
+</defs><rect width="560" height="700" fill="url(#bgrp)"/><g opacity="0.35" stroke="#a89474" fill="none" stroke-width="1.4" transform="translate(50 550) rotate(-15)"><path d="M0 0c40-30 90-30 130 0-40 30-90 30-130 0Z"/><path d="M0 0h130"/></g><g filter="url(#shrp)"><ellipse cx="280" cy="406" rx="110" ry="52" fill="none" stroke="url(#goldrp)" stroke-width="16"/><circle cx="244" cy="344" r="30" fill="url(#strp)"/><circle cx="316" cy="344" r="30" fill="url(#strp)"/></g></svg>

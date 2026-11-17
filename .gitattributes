@@ -1,0 +1,6 @@
+# Jednolite końce linii (LF) na Windows, macOS i Linux
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.eps binary

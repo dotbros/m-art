@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400" width="1200" height="1400"><defs>
+  <radialGradient id="bgat" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="#ece3d4"/><stop offset="1" stop-color="#d6c7ae"/></radialGradient>
+  <radialGradient id="stat" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#e7b98d"/><stop offset=".55" stop-color="#c98a5a"/><stop offset="1" stop-color="#8e5434"/></radialGradient>
+  <linearGradient id="goldat" x1="0" x2="1"><stop offset="0" stop-color="#b8945a"/><stop offset=".5" stop-color="#e2c78f"/><stop offset="1" stop-color="#a7834b"/></linearGradient>
+  <filter id="shat" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#5a4128" flood-opacity=".18"/></filter>
+</defs><rect width="1200" height="1400" fill="url(#bgat)"/>
+<rect x="150" y="760" width="900" height="420" rx="18" fill="#c9b493" opacity=".45"/>
+<circle cx="330" cy="930" r="36" fill="url(#stjasper)"/><circle cx="520" cy="990" r="34" fill="url(#stpearl)"/><circle cx="710" cy="930" r="32" fill="url(#stagate)"/><circle cx="880" cy="990" r="30" fill="url(#stjasper)"/>
+<defs><radialGradient id="stjasper" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#e7b98d"/><stop offset=".55" stop-color="#c98a5a"/><stop offset="1" stop-color="#8e5434"/></radialGradient><radialGradient id="stpearl" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#f7f2ea"/><stop offset="1" stop-color="#d8cfc1"/></radialGradient><radialGradient id="stagate" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#c3cfb2"/><stop offset=".55" stop-color="#8fa07c"/><stop offset="1" stop-color="#5d6e4f"/></radialGradient></defs>
+<path d="M260 700 C 420 520, 760 520, 940 700" fill="none" stroke="url(#goldat)" stroke-width="4" stroke-dasharray="9 6"/>
+<g opacity="0.45" stroke="#a89474" fill="none" stroke-width="1.4" transform="translate(120 260) rotate(-20)"><path d="M0 0c40-30 90-30 130 0-40 30-90 30-130 0Z"/><path d="M0 0h130"/></g><g opacity="0.45" stroke="#a89474" fill="none" stroke-width="1.4" transform="translate(900 330) rotate(170)"><path d="M0 0c40-30 90-30 130 0-40 30-90 30-130 0Z"/><path d="M0 0h130"/></g>
+<text x="600" y="430" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="120" fill="#7d6545" opacity=".55">M.art</text></svg>
