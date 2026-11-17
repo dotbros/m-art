@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { ALL_CATEGORIES, ALL_STONES, FREE_SHIPPING_FROM, MAX_PER_PRODUCT, money, type Product } from "@/lib/catalog";
 import { Icon, type IconName } from "./icons";
 import { Overlay } from "./overlay";
@@ -64,6 +64,20 @@ export function Shop({ products, categories: categoryNames }: { products: Produc
     const timer = setTimeout(() => setToast(null), 4200);
     return () => clearTimeout(timer);
   }, [toast, panel]);
+  // Gest / przycisk „wstecz” (Android, iPhone) zamyka otwarte okno zamiast opuszczać sklep.
+  // Otwarcie okna dodaje jeden wpis do historii; przełączanie między oknami (produkt → koszyk) go nie mnoży.
+  const historyEntry = useRef(false);
+  useEffect(() => {
+    if (panel && !historyEntry.current) { window.history.pushState({ martPanel: true }, ""); historyEntry.current = true; }
+    else if (!panel && historyEntry.current) { historyEntry.current = false; window.history.back(); }
+  }, [panel]);
+  useEffect(() => {
+    // Ręczne przywracanie przewijania: cofnięcie wpisu okna nie może przewinąć strony z powrotem.
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+    const onPop = () => { if (historyEntry.current) { historyEntry.current = false; setPanel(null); } };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
   useEffect(() => {
     if (!navOpen) return;
     const outside = (event: PointerEvent) => { if (!(event.target as Element).closest(".nav-dropdown-wrap")) setNavOpen(false); };

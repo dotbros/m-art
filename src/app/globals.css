@@ -751,3 +751,12 @@ svg{flex-shrink:0}
   .brand-logo{height:62px}
   .brand-footer .brand-logo{height:88px}
 }
+
+/* Uchwyt arkusza: sygnał, że okno można przeciągnąć w dół, by je zamknąć (tylko telefony) */
+.sheet-handle{display:none}
+@media(max-width:760px){
+  .overlay-heading{position:sticky}
+  .sheet-handle{display:block;position:absolute;top:7px;left:50%;width:40px;height:4px;margin-left:-20px;border-radius:2px;background:#cdbfac}
+  .overlay-heading{padding-top:24px}
+  .product-modal>.overlay-heading{padding-top:20px}
+}

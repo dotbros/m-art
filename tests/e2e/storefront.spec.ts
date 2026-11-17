@@ -51,6 +51,41 @@ test.describe("Sklep — klient na telefonie i komputerze", () => {
     await expect(page.locator(".cart-count")).toHaveText("1");
   });
 
+  test("gest/przycisk „wstecz” zamyka okno zamiast opuszczać sklep", async ({ page }) => {
+    await page.goto("/");
+    await page.locator(".product-card .product-image-button").first().click();
+    await expect(page.locator(".product-modal")).toBeVisible();
+    await page.goBack();
+    await expect(page.locator(".product-modal")).toHaveCount(0);
+    await expect(page).toHaveURL(/\/$/);
+    // Produkt → koszyk to nadal JEDEN krok „wstecz”
+    await page.locator(".product-card .product-image-button").first().click();
+    await page.locator(".product-modal").getByRole("button", { name: /Dodaj do koszyka/ }).click();
+    await expect(page.getByRole("dialog", { name: /Twój koszyk/ })).toBeVisible();
+    await page.goBack();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.locator(".product-card").first()).toBeVisible();
+    // Zamknięcie krzyżykiem nie zostawia „pustego” wpisu w historii
+    await page.getByRole("button", { name: "Otwórz menu" }).or(page.getByRole("button", { name: /^Koszyk/ })).first().click();
+    await page.getByRole("button", { name: "Zamknij okno" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+  });
+
+  test("przeciągnięcie okna w dół zamyka je (telefon)", async ({ page, browserName }, info) => {
+    test.skip(!info.project.name.startsWith("mobile") || browserName !== "chromium", "Symulacja dotyku działa w Chromium na profilach mobilnych");
+    await page.goto("/");
+    await page.locator(".product-card .product-image-button").first().click();
+    const sheet = page.locator(".product-modal");
+    await expect(sheet).toBeVisible();
+    await sheet.evaluate((el) => {
+      const touch = (y: number) => new Touch({ identifier: 1, target: el, clientX: 200, clientY: y });
+      el.dispatchEvent(new TouchEvent("touchstart", { bubbles: true, touches: [touch(150)], changedTouches: [touch(150)] }));
+      for (const y of [190, 260, 340, 420]) el.dispatchEvent(new TouchEvent("touchmove", { bubbles: true, touches: [touch(y)], changedTouches: [touch(y)] }));
+      el.dispatchEvent(new TouchEvent("touchend", { bubbles: true, touches: [], changedTouches: [touch(420)] }));
+    });
+    await expect(sheet).toHaveCount(0);
+  });
+
   test("API odrzuca zamówienie z niepoprawnymi danymi", async ({ request }) => {
     const res = await request.post("/api/orders", { data: { email: "zly", items: [] } });
     expect(res.status()).toBe(400);
