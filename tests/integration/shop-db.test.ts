@@ -47,6 +47,19 @@ describe("sklep (getStorefront)", () => {
   });
 });
 
+describe("kamienie", () => {
+  it("produkt z kilkoma kamieniami pojawia się w filtrze każdego z nich", async () => {
+    const [jasper] = await handle.db.select().from(products).where(eq(products.id, "naszyjnik-jaspis"));
+    expect(jasper.stones).toEqual(["Jaspis cesarski"]);
+    await handle.db.update(products).set({ stones: ["Jaspis cesarski", "Perła naturalna"] }).where(eq(products.id, "naszyjnik-jaspis"));
+    const { products: list } = await getStorefront(handle.db);
+    const withPearl = list.filter((p) => p.stones.includes("Perła naturalna")).map((p) => p.id);
+    expect(withPearl).toContain("naszyjnik-jaspis");
+    expect(list.filter((p) => p.stones.includes("Jaspis cesarski")).map((p) => p.id)).toContain("naszyjnik-jaspis");
+    await handle.db.update(products).set({ stones: ["Jaspis cesarski"] }).where(eq(products.id, "naszyjnik-jaspis"));
+  });
+});
+
 describe("zamówienia (createOrder)", () => {
   it("liczy kwoty z cen w bazie i zmniejsza stan magazynowy", async () => {
     const order = await createOrder(handle.db, input([{ id: "naszyjnik-jaspis", quantity: 2 }]));

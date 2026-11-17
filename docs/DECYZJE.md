@@ -40,3 +40,12 @@ Każda decyzja: **kontekst → decyzja → konsekwencje**. Nowe decyzje dopisuje
 ### D-009 · Next.js 16.4.2 → 16.4.6 (2026-11-17)
 **Kontekst:** `npm audit` zgłosił umiarkowaną podatność (GHSA-mfr8-8qww-v76h, GHSA-vc7v-qv4w-wrv8 — wyciek cache przy `use cache`).
 **Decyzja:** aktualizacja do 16.4.6 (wersja poprawkowa). Wersje zależności przypięte dokładnie.
+
+### D-010 · Kamienie jako lista przy produkcie (2026-11-18)
+**Kontekst:** naszyjniki bywają z kilku kamieni; pojedyncze pole „Kamień” nie pozwalało ich opisać ani znaleźć w filtrze.
+**Decyzja:** kolumna `products.stones text[]` (migracje 0001 — dodanie + przeniesienie danych, 0002 — usunięcie `stone`). Podpowiedzi w panelu budowane z kamieni już użytych w produktach; nazwy ujednolicane (wielka litera, bez duplikatów, max 10).
+**Konsekwencje:** prosty model bez dodatkowych tabel. Gdy kamienie dostaną własne opisy/zdjęcia (np. sekcja „Kamienie naturalne” zarządzana z panelu), przejść na tabelę `stones` + tabelę łączącą.
+
+### D-011 · Testowanie na telefonie w sieci lokalnej (2026-11-18)
+**Decyzja:** `allowedDevOrigins` w `next.config.ts` dla adresów sieci prywatnych (192.168.*, 10.*, 172.16.*). Next.js 16 domyślnie blokuje skrypty deweloperskie dla adresów innych niż localhost — strona na telefonie nie reagowała na dotyk.
+**Konsekwencje:** dotyczy tylko `npm run dev`; produkcja bez zmian.

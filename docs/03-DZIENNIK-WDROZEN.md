@@ -66,3 +66,20 @@ Chronologiczny zapis prac. Każdy wpis: **co zrobiono · konsultacje z doradcami
 
 ### Następny krok
 Etap 4 — wypchnięcie repozytorium na GitHub (wymaga konta użytkownika) i GitHub Actions.
+
+---
+
+## 2026-11-18 — Poprawki po testach na telefonie
+
+Zgłoszenia z testów użytkownika na prawdziwym telefonie i ich rozwiązanie:
+
+| # | Zgłoszenie | Przyczyna | Rozwiązanie |
+|---|---|---|---|
+| 1 | Na telefonie nie działają przyciski | Next.js 16 w trybie dev blokuje skrypty dla adresu sieciowego (192.168.1.96) — strona bez JavaScriptu | `allowedDevOrigins` (D-011) |
+| 2 | W nagłówku napis zamiast logo | wzór miał tekstowy znak „M.art” | logo z `public/brand/logo.svg` w nagłówku i stopce |
+| 3 | Kartę da się zamknąć tylko krzyżykiem u góry | okna nie były wpisane w historię przeglądarki | gest/przycisk „wstecz” zamyka okno (Android, iPhone); przeciągnięcie w dół zamyka; uchwyt arkusza |
+| 4 | Potrzebny wybór wielu kamieni | jedno pole tekstowe | lista kamieni (D-010): chipsy w panelu, filtr sklepu po każdym kamieniu, „Kamienie: A, B” w karcie produktu |
+
+**Migracja danych na bazie lokalnej użytkownika:** przed migracją wykonano kopię `data/backup-przed-kamieniami-20261118-0043`. Po migracji wszystkie produkty (także dodane przez użytkownika, np. „Perłowa Elegancja” → „Perełki ozdobne”) mają kamienie przeniesione do listy.
+
+**Wynik testów:** raport T-002.

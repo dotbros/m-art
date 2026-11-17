@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { boolean, index, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 /** Kategorie produktów (Naszyjniki, Kolczyki…). Zarządzane w panelu /admin/kategorie. */
@@ -18,7 +19,7 @@ export const products = pgTable("products", {
   name: text("name").notNull(),
   subtitle: text("subtitle").notNull().default(""),
   categoryId: integer("category_id").references(() => categories.id, { onDelete: "restrict" }),
-  stone: text("stone").notNull().default(""),
+  stones: text("stones").array() /* lista kamieni, np. {Agat mszysty,Perła naturalna} */.notNull().default(sql`'{}'::text[]`),
   material: text("material").notNull().default("Złocona stal szlachetna"),
   size: text("size").notNull().default(""),
   price: integer("price").notNull(),

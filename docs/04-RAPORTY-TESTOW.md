@@ -45,3 +45,23 @@ Po każdym etapie uruchamiamy **wszystkie** testy dotychczasowych modułów: `np
 
 ### Zrzuty ekranów (iPhone 14)
 `docs/zrzuty/01…09` — generowane skryptem `npx tsx scripts/screenshots.mts http://localhost:3100 ./docs/zrzuty` (przy działającym serwerze).
+
+---
+
+## T-002 · 2026-11-18 · po poprawkach z testów na telefonie
+
+| Zestaw | Wynik |
+|---|---|
+| `typecheck` | ✅ 0 błędów |
+| `lint` | ✅ 0 błędów (ostrzeżenia `<img>` jak w T-001) |
+| Vitest — 5 plików | ✅ **38 / 38** (+4: `parseStones`, produkt z wieloma/bez kamieni, limit 10, filtr po każdym kamieniu) |
+| Playwright — 14 scenariuszy × 3 urządzenia | ✅ **40 / 40**, 2 pominięte¹ |
+
+Nowe scenariusze E2E:
+- **gest „wstecz” zamyka okno** (produkt; produkt → koszyk = jeden krok wstecz; zamknięcie krzyżykiem nie zostawia wpisu w historii) — Android, iPhone, desktop,
+- **przeciągnięcie okna w dół zamyka je** — Android¹,
+- panel: **wybór wielu kamieni** (nowy wpisany + istniejący jednym dotknięciem) i ich wyświetlenie w karcie produktu w sklepie.
+
+Dodatkowo zweryfikowano ręcznie (automatyczny skrypt przez adres `http://192.168.1.96:3200`, profil iPhone 14): menu i karta produktu otwierają się, brak błędów w konsoli, logo wczytane.
+
+¹ Symulacja dotyku (TouchEvent) działa tylko w Chromium — na profilach iPhone (WebKit) i desktop test jest pomijany; wymaga sprawdzenia ręcznego na iPhonie.

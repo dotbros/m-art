@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parsePrice, validateCategory, validateOrder, validateProduct } from "@/lib/validation";
+import { parsePrice, parseStones, validateCategory, validateOrder, validateProduct } from "@/lib/validation";
 
 const order = { email: " Anna@Example.PL ", name: "Anna Kowalska", phone: "600 000 000", street: "Kwiatowa 1", postalCode: "00-001", city: "Warszawa", delivery: "courier", consent: true, items: [{ id: "a", quantity: 2 }] };
 
@@ -58,5 +58,25 @@ describe("validateCategory / validateProduct", () => {
   it("przyjmuje poprawny produkt (cena w groszach, etykieta wielkimi literami)", () => {
     const result = validateProduct(form({ name: "Kropla światła", categoryId: "2", price: "159,00", stock: "3", badge: "nowość", isActive: "on" }));
     expect(result.ok && result.data).toMatchObject({ id: "kropla-swiatla", price: 15900, stock: 3, badge: "NOWOŚĆ", isActive: true, compareAtPrice: null });
+  });
+});
+
+describe("kamienie (wielokrotny wybór)", () => {
+  it("parseStones usuwa puste i duplikaty, ujednolica wielką literę, zachowuje kolejność", () => {
+    expect(parseStones(["agat mszysty", " Perła  naturalna ", "", "Agat mszysty", "perła naturalna"])).toEqual(["Agat mszysty", "Perła naturalna"]);
+  });
+  it("produkt może mieć kilka kamieni lub żadnego", () => {
+    const f = form({ name: "Naszyjnik mieszany", categoryId: "1", price: "200" });
+    f.append("stones", "Agat mszysty"); f.append("stones", "Perła naturalna"); f.append("stones", "Jaspis cesarski");
+    const many = validateProduct(f);
+    expect(many.ok && many.data.stones).toEqual(["Agat mszysty", "Perła naturalna", "Jaspis cesarski"]);
+    const none = validateProduct(form({ name: "Bez kamienia", categoryId: "1", price: "50" }));
+    expect(none.ok && none.data.stones).toEqual([]);
+  });
+  it("odrzuca więcej niż 10 kamieni", () => {
+    const f = form({ name: "Za dużo", categoryId: "1", price: "10" });
+    for (let i = 0; i < 11; i++) f.append("stones", `Kamień ${i}`);
+    const result = validateProduct(f);
+    expect(!result.ok && result.errors.stones).toBeTruthy();
   });
 });

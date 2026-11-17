@@ -16,7 +16,8 @@ export type FormState = { error?: string; errors?: Record<string, string>; messa
 /** Błąd walidacji + wpisane wartości, żeby formularz ich nie zgubił (React 19 resetuje formularz po akcji). */
 function fail(form: FormData, errors: Record<string, string>): FormState {
   const values: Record<string, string> = {};
-  for (const [key, value] of form.entries()) if (typeof value === "string" && !key.startsWith("$")) values[key] = value;
+  // Pola wielokrotne (np. kilka kamieni) łączymy znakiem nowej linii.
+  for (const [key, value] of form.entries()) if (typeof value === "string" && !key.startsWith("$")) values[key] = key in values ? `${values[key]}\n${value}` : value;
   const count = Object.keys(errors).length;
   return { errors, error: count === 1 ? "Popraw zaznaczone pole." : `Popraw zaznaczone pola (${count}).`, values, ts: Date.now() };
 }

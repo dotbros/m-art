@@ -1,4 +1,4 @@
-import { MAX_PER_PRODUCT, slugify } from "./catalog";
+import { MAX_PER_PRODUCT, MAX_STONES, slugify } from "./catalog";
 
 /** Wynik walidacji: albo poprawne dane, albo słownik błędów pole → komunikat. */
 export type Result<T> = { ok: true; data: T } | { ok: false; errors: Record<string, string> };
@@ -65,7 +65,7 @@ export function validateCategory(form: FormData): Result<CategoryInput> {
 
 // ---------- Produkt (panel admina) ----------
 export type ProductInput = {
-  id: string; name: string; subtitle: string; categoryId: number; stone: string; material: string; size: string;
+  id: string; name: string; subtitle: string; categoryId: number; stones: string[]; material: string; size: string;
   price: number; compareAtPrice: number | null; badge: string | null; description: string; stock: number; position: number; isActive: boolean;
 };
 
@@ -95,10 +95,33 @@ export function validateProduct(form: FormData): Result<ProductInput> {
   if (!Number.isInteger(stock) || stock < 0 || stock > 100000) errors.stock = "Stan magazynowy to liczba całkowita ≥ 0.";
   if (!Number.isInteger(position) || position < 0 || position > 9999) errors.position = "Kolejność to liczba 0–9999.";
   if (description.length > 5000) errors.description = "Opis może mieć maksymalnie 5000 znaków.";
-  for (const field of ["subtitle", "stone", "material", "size", "badge"] as const) if (str(form.get(field)).length > 120) errors[field] = "Maksymalnie 120 znaków.";
+  const stones = parseStones(form.getAll("stones"));
+  if (stones.length > MAX_STONES) errors.stones = `Maksymalnie ${MAX_STONES} kamieni.`;
+  else if (stones.some((s) => s.length > 60)) errors.stones = "Nazwa kamienia może mieć maksymalnie 60 znaków.";
+  for (const field of ["subtitle", "material", "size", "badge"] as const) if (str(form.get(field)).length > 120) errors[field] = "Maksymalnie 120 znaków.";
   if (Object.keys(errors).length) return { ok: false, errors };
   return { ok: true, data: {
-    id, name, subtitle: str(form.get("subtitle")), categoryId, stone: str(form.get("stone")), material: str(form.get("material")), size: str(form.get("size")),
+    id, name, subtitle: str(form.get("subtitle")), categoryId, stones, material: str(form.get("material")), size: str(form.get("size")),
     price, compareAtPrice, badge: str(form.get("badge")).toUpperCase() || null, description, stock, position, isActive: form.get("isActive") === "on",
   } };
+}
+
+/**
+ * Lista kamieni z formularza: przycina spacje, usuwa puste i duplikaty (bez względu na wielkość liter),
+ * zachowuje kolejność wyboru. Pierwsza litera wielka, by „agat mszysty” i „Agat mszysty” były jednym kamieniem.
+ */
+export function parseStones(values: FormDataEntryValue[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const value of values) {
+    if (typeof value !== "string") continue;
+    const name = value.replace(/\s+/g, " ").trim();
+    if (!name) continue;
+    const normalized = name.charAt(0).toLocaleUpperCase("pl-PL") + name.slice(1);
+    const key = normalized.toLocaleLowerCase("pl-PL");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(normalized);
+  }
+  return result;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { FREE_SHIPPING_FROM, money, shippingCost, type Product } from "@/lib/catalog";
+import { FREE_SHIPPING_FROM, money, shippingCost, stoneList, type Product } from "@/lib/catalog";
 import { Icon } from "./icons";
 
 export type ResolvedCartItem = { product: Product; quantity: number };
@@ -37,6 +37,6 @@ export function Checkout({ items, onComplete, onContinue }: { items: ResolvedCar
     <details className="checkout-terms"><summary>Zasady składania zamówień</summary><p>Wysłanie formularza zapisuje zamówienie w pracowni M.art. Realizacja następuje po indywidualnym potwierdzeniu dostępności, danych sprzedawcy, ostatecznych warunków oraz płatności. Standardowo przygotowanie biżuterii trwa 2–4 dni robocze od potwierdzenia. Przysługuje Ci prawo do odstąpienia od zakupu w terminie 14 dni od otrzymania standardowego produktu. Produkty personalizowane mogą podlegać wyjątkom ustawowym. Dane podane w formularzu służą wyłącznie obsłudze zamówienia.</p></details>
     <label className="checkbox-label"><input type="checkbox" name="consent" required/><span>Akceptuję powyższe zasady zamówienia i przetwarzanie danych w celu jego realizacji.</span></label>
     {error && <p className="form-message error" role="alert">{error}</p>}<button className="button button-dark checkout-submit" type="submit" disabled={pending || !items.length}>{pending ? "Zapisujemy zamówienie…" : "Złóż zamówienie"}<Icon name="arrow" size={18}/></button></div>
-    <aside className="checkout-summary"><p className="eyebrow">TWÓJ WYBÓR</p>{items.map(({ product, quantity }) => <div className="summary-item" key={product.id}><img src={product.image} alt={product.name} width={64} height={78}/><div><strong>{product.name}</strong><span>{quantity} szt. · {product.stone}</span><b>{money(product.price * quantity)}</b></div></div>)}<div className="summary-line"><span>Wartość produktów</span><span>{money(subtotal)}</span></div><div className="summary-line"><span>Dostawa</span><span>{shipping ? money(shipping) : "Gratis"}</span></div><div className="summary-line total"><span>Razem</span><strong>{money(subtotal + shipping)}</strong></div><p className="gift-note"><Icon name="gift" size={20}/> Każde zamówienie pakujemy jak prezent.</p></aside>
+    <aside className="checkout-summary"><p className="eyebrow">TWÓJ WYBÓR</p>{items.map(({ product, quantity }) => <div className="summary-item" key={product.id}><img src={product.image} alt={product.name} width={64} height={78}/><div><strong>{product.name}</strong><span>{quantity} szt.{product.stones.length ? ` · ${stoneList(product.stones)}` : ""}</span><b>{money(product.price * quantity)}</b></div></div>)}<div className="summary-line"><span>Wartość produktów</span><span>{money(subtotal)}</span></div><div className="summary-line"><span>Dostawa</span><span>{shipping ? money(shipping) : "Gratis"}</span></div><div className="summary-line total"><span>Razem</span><strong>{money(subtotal + shipping)}</strong></div><p className="gift-note"><Icon name="gift" size={20}/> Każde zamówienie pakujemy jak prezent.</p></aside>
   </form>;
 }

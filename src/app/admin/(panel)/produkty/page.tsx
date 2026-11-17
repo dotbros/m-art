@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { and, asc, eq, ilike, lte, or, type SQL } from "drizzle-orm";
+import { and, asc, eq, ilike, lte, or, sql, type SQL } from "drizzle-orm";
 import { getDb } from "@/db";
 import { categories, products } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
@@ -12,7 +12,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const db = await getDb();
   const q = (params.q || "").trim().slice(0, 80);
   const filters: SQL[] = [];
-  if (q) filters.push(or(ilike(products.name, `%${q}%`), ilike(products.stone, `%${q}%`), ilike(products.subtitle, `%${q}%`))!);
+  if (q) filters.push(or(ilike(products.name, `%${q}%`), sql`array_to_string(${products.stones}, ' ') ILIKE ${`%${q}%`}`, ilike(products.subtitle, `%${q}%`))!);
   if (params.kategoria) filters.push(eq(products.categoryId, Number(params.kategoria)));
   if (params.stan === "niski") filters.push(lte(products.stock, 2));
   const [rows, categoryRows] = await Promise.all([
@@ -34,7 +34,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       <Link href={`/admin/produkty/${p.id}`} className="adm-product-main">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {p.image ? <img src={p.image} alt="" width={64} height={80} loading="lazy"/> : <span className="adm-noimg">brak<br/>zdjęcia</span>}
-        <span className="adm-product-info"><strong>{p.name}</strong><small>{category || "bez kategorii"}{p.stone ? ` · ${p.stone}` : ""}</small>
+        <span className="adm-product-info"><strong>{p.name}</strong><small>{category || "bez kategorii"}{p.stones.length ? ` · ${p.stones.join(", ")}` : ""}</small>
           <span className="adm-product-meta"><b>{money(p.price)}</b><span className={p.stock <= 2 ? "adm-stock-low" : ""}>{p.stock} szt.</span>{!p.isActive && <span className="adm-badge s-cancelled">Ukryty</span>}</span></span>
       </Link>
       <form action={toggleProductAction}><input type="hidden" name="id" value={p.id}/><button type="submit" className="adm-toggle-btn" aria-label={p.isActive ? `Ukryj ${p.name} w sklepie` : `Pokaż ${p.name} w sklepie`}>{p.isActive ? "Ukryj" : "Pokaż"}</button></form>

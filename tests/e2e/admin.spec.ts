@@ -65,7 +65,12 @@ test.describe("Panel administracyjny", () => {
 
     await page.getByLabel("Cena (zł)", { exact: true }).fill("249,50");
     await page.getByLabel("Stan magazynowy (szt.)").fill("3");
-    await page.getByLabel("Kamień").fill("Kwarc różowy");
+    // Wiele kamieni: nowy wpisany ręcznie + istniejący wybrany jednym dotknięciem
+    await page.getByLabel("Kamienie", { exact: true }).fill("kwarc różowy");
+    await page.getByRole("button", { name: "Dodaj", exact: true }).click();
+    await page.getByRole("button", { name: "+ Perła naturalna" }).click();
+    await expect(page.getByRole("list", { name: "Wybrane kamienie" })).toContainText("Kwarc różowy");
+    await expect(page.getByRole("list", { name: "Wybrane kamienie" })).toContainText("Perła naturalna");
     await page.getByLabel("Wybierz lub zrób zdjęcie").setInputFiles({ name: "broszka.png", mimeType: "image/png", buffer: PNG });
     await expect(page.getByAltText("Podgląd zdjęcia produktu")).toBeVisible();
     await page.getByRole("button", { name: "Dodaj produkt" }).click();
@@ -77,6 +82,9 @@ test.describe("Panel administracyjny", () => {
     await page.getByRole("tab", { name: categoryName }).click();
     await expect(card).toBeVisible();
     await expect(card).toContainText("249,50");
+    await card.getByRole("button", { name: `Odkryj ${productName}` }).click();
+    await expect(page.locator(".product-specs")).toContainText("Kwarc różowy, Perła naturalna");
+    await page.getByRole("button", { name: "Zamknij okno" }).click();
     const src = await card.locator("img").getAttribute("src");
     expect(src).toMatch(/^\/media\/[a-f0-9]{32}\.png$/);
     expect((await page.request.get(src!)).status()).toBe(200);

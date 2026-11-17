@@ -179,3 +179,16 @@
 @media(max-width:899px){.adm-chips{margin-inline:-16px;padding-inline:16px;scroll-padding-inline:16px}}.adm-image-picker>*{min-width:0}
 .adm input[type=file]{width:100%;max-width:100%}
 .adm-main{min-width:0;overflow-wrap:anywhere}
+
+/* --- wybór wielu kamieni (chipsy) --- */
+.adm-chip-list{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.adm-chip{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 14px;border-radius:999px;border:1px dashed #cbbda8;background:var(--a-card);color:var(--a-brown);font:inherit;font-size:15px;cursor:pointer}
+.adm-chip:hover{background:#f1ebe1}
+.adm-chip.is-selected{border:1px solid var(--a-brown);background:var(--a-brown);color:#fffaf1;padding:0 4px 0 14px;cursor:default}
+.adm-chip.is-selected button{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:22px;line-height:1;cursor:pointer}
+.adm-chip.is-selected button:hover{background:#ffffff26}
+.adm-stone-add{display:flex;gap:8px}
+.adm-stone-add input{flex:1;min-width:0}
+.adm-stone-add .adm-btn{flex-shrink:0}
+.adm-chip-suggest{display:flex;flex-direction:column;gap:8px}
+.adm-stones{gap:10px}

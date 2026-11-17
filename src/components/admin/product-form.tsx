@@ -4,9 +4,10 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import { saveProductAction } from "@/app/admin/actions";
 import { Field, FormMessage, SubmitButton, useFocusFirstError } from "./ui";
+import { StonePicker } from "./stone-picker";
 
 type ProductData = {
-  id: string; name: string; subtitle: string; categoryId: number | null; stone: string; material: string; size: string;
+  id: string; name: string; subtitle: string; categoryId: number | null; stones: string[]; material: string; size: string;
   price: number; compareAtPrice: number | null; image: string; badge: string | null; description: string; stock: number; position: number; isActive: boolean;
 };
 
@@ -55,13 +56,12 @@ export function ProductForm({ product, categories, stones }: { product?: Product
 
     <section className="adm-card">
       <h2>Szczegóły</h2>
+      <StonePicker initial={v ? (v.stones ? v.stones.split("\n") : []) : product?.stones ?? []} suggestions={stones} error={e.stones}/>
       <div className="adm-grid-2">
-        <Field label="Kamień" name="stone" error={e.stone} hint="Służy do filtrowania w sklepie."><input id="stone" name="stone" list="stones" maxLength={120} defaultValue={val("stone", product?.stone)}/></Field>
         <Field label="Materiał" name="material" error={e.material}><input id="material" name="material" maxLength={120} defaultValue={val("material", product?.material ?? "Złocona stal szlachetna")}/></Field>
         <Field label="Rozmiar" name="size" error={e.size}><input id="size" name="size" maxLength={120} defaultValue={val("size", product?.size)} placeholder="np. 42 cm + 5 cm regulacji"/></Field>
         <Field label="Etykieta" name="badge" error={e.badge} hint="np. NOWOŚĆ, BESTSELLER"><input id="badge" name="badge" maxLength={120} defaultValue={val("badge", product?.badge)}/></Field>
       </div>
-      <datalist id="stones">{stones.map((s) => <option key={s} value={s}/>)}</datalist>
     </section>
 
     <div className="adm-sticky-actions"><Link href="/admin/produkty" className="adm-btn">Anuluj</Link><SubmitButton>{product ? "Zapisz zmiany" : "Dodaj produkt"}</SubmitButton></div>
