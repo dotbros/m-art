@@ -6,15 +6,12 @@ import { Icon, type IconName } from "./icons";
 import { Overlay } from "./overlay";
 import { Checkout } from "./checkout";
 import { Information, infoTitles } from "./information";
+import { HeroMedia } from "./hero-media";
+import type { HeroSlide } from "@/lib/hero";
 
 type CartItem = { id: string; quantity: number };
 type Panel = "search" | "wishlist" | "cart" | "menu" | "product" | "checkout" | "info" | null;
 const normalize = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replaceAll("ł", "l");
-const slides = [
-  { title: "Z natury", italic: "wyjątkowa.", eyebrow: "BIŻUTERIA INSPIROWANA NATURĄ", description: "Prawdziwe kamienie. Ręczna praca. Twoja historia.\nOdkryj biżuterię, która jest tak niepowtarzalna jak Ty.", image: "/images/hero-jewelry.svg", stone: "Jaspis cesarski", productId: "komplet-jaspis" },
-  { title: "Małe perły,", italic: "wielkie emocje.", eyebrow: "NATURALNY BLASK, KTÓRY ZOSTAJE", description: "Subtelne, organiczne, nieidealnie idealne.\nPozwól naturalnym perłom opowiedzieć Twoją historię.", image: "/images/hero-pearl.svg", stone: "Perła naturalna", productId: "kolczyki-perly" },
-  { title: "Blisko natury.", italic: "Blisko Ciebie.", eyebrow: "ODROBINA SPOKOJU NA CO DZIEŃ", description: "Zatrzymaj piękno lasu w małym detalu.\nPoznaj biżuterię z naturalnym agatem mszystym.", image: "/images/hero-agate.svg", stone: "Agat mszysty", productId: "bransoletka-agat" },
-];
 
 function Brand({ footer = false }: { footer?: boolean }) {
   // Logo pracowni (okrągła pieczęć) z public/brand/logo.svg
@@ -22,7 +19,7 @@ function Brand({ footer = false }: { footer?: boolean }) {
   return <span className={`brand ${footer ? "brand-footer" : ""}`}><img className="brand-logo" src="/brand/logo.svg" alt="M.art — Pracownia Biżuterii" width={1290} height={1219} fetchPriority={footer ? "auto" : "high"} loading={footer ? "lazy" : "eager"}/></span>;
 }
 
-export function Shop({ products, categories: categoryNames }: { products: Product[]; categories: string[] }) {
+export function Shop({ products, categories: categoryNames, slides }: { products: Product[]; categories: string[]; slides: HeroSlide[] }) {
   const categories = useMemo(() => [ALL_CATEGORIES, ...categoryNames], [categoryNames]);
   const stones = useMemo(() => [ALL_STONES, ...Array.from(new Set(products.flatMap((p) => p.stones).filter(Boolean)))], [products]);
   const [panel, setPanel] = useState<Panel>(null);
@@ -98,7 +95,9 @@ export function Shop({ products, categories: categoryNames }: { products: Produc
   const cartItems = cart.flatMap((item) => { const product = products.find((p) => p.id === item.id); return product ? [{ product, quantity: item.quantity }] : []; });
   const subtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const currentSlide = slides[slide];
+  const currentSlide = slides[Math.min(slide, slides.length - 1)];
+  const slideProduct = currentSlide.productId ? products.find((p) => p.id === currentSlide.productId) : undefined;
+  const pad = (n: number) => String(n).padStart(2, "0");
 
   function goToCollection(nextCategory = ALL_CATEGORIES, nextStone = ALL_STONES, all = false) {
     setCategory(nextCategory); setStone(nextStone); setShowAll(all); setCollectionQuery(""); setPanel(null); setNavOpen(false);
@@ -135,12 +134,12 @@ export function Shop({ products, categories: categoryNames }: { products: Produc
     </div></header>
 
     <main>
-      <section className={`hero hero-slide-${slide}`} aria-label="Nowa kolekcja M.art">
-        <img className="hero-image" src={currentSlide.image} alt={`Ręcznie wykonana złocona biżuteria z kamieniem: ${currentSlide.stone}`} fetchPriority="high"/>
+      <section className={`hero hero-slide-${slide === 0 ? 0 : 1} ${currentSlide.mediaType === "video" ? "hero-has-video" : ""}`} aria-label="Nowa kolekcja M.art">
+        <HeroMedia key={currentSlide.id} slide={currentSlide}/>
         <div className="hero-wash"/>
-        <div className="hero-inner container"><div className="hero-copy" key={slide}><p className="eyebrow"><span className="small-line"/>{currentSlide.eyebrow}</p><h1>{currentSlide.title}<br/><em>{currentSlide.italic}</em></h1><p className="hero-description">{currentSlide.description}</p><div className="hero-cta"><button className="button button-dark" onClick={() => goToCollection(ALL_CATEGORIES, currentSlide.stone)}>Odkryj biżuterię <Icon name="arrow" size={19}/></button><button className="hero-story-link" onClick={() => showInfo("story")}>Poznaj naszą historię <span>↗</span></button></div><div className="hero-note"><Icon name="leaf" size={22}/><span>Nie ma dwóch identycznych.<br/><strong>Tak jak Ty.</strong></span></div></div>
+        <div className="hero-inner container"><div className="hero-copy" key={slide}><p className="eyebrow"><span className="small-line"/>{currentSlide.eyebrow}</p><h1>{currentSlide.title}{currentSlide.titleAccent && <><br/><em>{currentSlide.titleAccent}</em></>}</h1>{currentSlide.description && <p className="hero-description">{currentSlide.description}</p>}<div className="hero-cta"><button className="button button-dark" onClick={() => goToCollection(ALL_CATEGORIES, currentSlide.stone && stones.includes(currentSlide.stone) ? currentSlide.stone : ALL_STONES)}>Odkryj biżuterię <Icon name="arrow" size={19}/></button><button className="hero-story-link" onClick={() => showInfo("story")}>Poznaj naszą historię <span>↗</span></button></div><div className="hero-note"><Icon name="leaf" size={22}/><span>Nie ma dwóch identycznych.<br/><strong>Tak jak Ty.</strong></span></div></div>
           <div className="nature-seal"><span>MAŁA PRACOWNIA</span><Icon name="leaf" size={29}/><span>WIELKA MIŁOŚĆ</span></div>
-          <div className="hero-bottom"><div className="slide-controls" aria-label="Wybierz kolekcję"><span className="slide-number">0{slide + 1}</span>{slides.map((item, index) => <button key={item.stone} className={slide === index ? "active" : ""} aria-label={`Kolekcja ${index + 1}: ${item.stone}`} aria-pressed={slide === index} onClick={() => setSlide(index)}/>)}<span className="slide-total">03</span></div><button className="hero-product-tag" onClick={() => { const product = products.find((p) => p.id === currentSlide.productId); if (product) openProduct(product); }}><span><small>PIĘKNO ZAPISANE W KAMIENIACH</small><strong>{currentSlide.stone}</strong></span><span className="round-arrow"><Icon name="arrow" size={20}/></span></button></div>
+          <div className="hero-bottom">{slides.length > 1 ? <div className="slide-controls" aria-label="Wybierz slajd"><span className="slide-number">{pad(slide + 1)}</span>{slides.map((item, index) => <button key={item.id} className={slide === index ? "active" : ""} aria-label={`Slajd ${index + 1}: ${item.title} ${item.titleAccent}`.trim()} aria-pressed={slide === index} onClick={() => setSlide(index)}/>)}<span className="slide-total">{pad(slides.length)}</span></div> : <span/>}{(slideProduct || currentSlide.stone) && <button className="hero-product-tag" onClick={() => slideProduct ? openProduct(slideProduct) : goToCollection(ALL_CATEGORIES, stones.includes(currentSlide.stone) ? currentSlide.stone : ALL_STONES)}><span><small>{currentSlide.stone ? "PIĘKNO ZAPISANE W KAMIENIACH" : "ODKRYJ"}</small><strong>{currentSlide.stone || slideProduct?.name}</strong></span><span className="round-arrow"><Icon name="arrow" size={20}/></span></button>}</div>
         </div>
       </section>
 

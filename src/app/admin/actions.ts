@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { categories, orderItems, orders, products, ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus, type PaymentStatus } from "@/db/schema";
+import { categories, heroSlides, orderItems, orders, products, ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus, type PaymentStatus } from "@/db/schema";
+import { validateHeroSlide, MAX_HERO_SLIDES } from "@/lib/hero";
 import { requireAdmin, SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
 import { authenticate, clearAttempts, createSession, deleteSession, isRateLimited, registerFailedAttempt } from "@/lib/auth/sessions";
 import { deleteMedia, saveImage, UploadError } from "@/lib/uploads";
@@ -163,4 +164,48 @@ export async function updateOrderAction(_prev: FormState, form: FormData): Promi
   });
   refreshStorefront();
   return { message: "Zapisano zmiany zamówienia." };
+}
+
+// ---------------- Strona główna: slajdy HERO ----------------
+export async function saveHeroSlideAction(_prev: FormState, form: FormData): Promise<FormState> {
+  await requireAdmin();
+  const parsed = validateHeroSlide(form);
+  if (!parsed.ok) return fail(form, parsed.errors);
+  const db = await getDb();
+  const id = Number(form.get("id") || 0);
+  if (parsed.data.productId) {
+    const [product] = await db.select({ id: products.id }).from(products).where(eq(products.id, parsed.data.productId));
+    if (!product) return fail(form, { productId: "Wybrany produkt nie istnieje." });
+  }
+  const [existing] = id ? await db.select().from(heroSlides).where(eq(heroSlides.id, id)) : [];
+  if (id && !existing) return { error: "Slajd nie istnieje." };
+  if (!id) {
+    const [{ value }] = await db.select({ value: count() }).from(heroSlides).where(eq(heroSlides.isActive, true));
+    if (parsed.data.isActive && value >= MAX_HERO_SLIDES) return fail(form, { isActive: `Na stronie może być maksymalnie ${MAX_HERO_SLIDES} widocznych slajdów. Ukryj inny slajd lub zapisz ten jako ukryty.` });
+    await db.insert(heroSlides).values(parsed.data);
+  } else {
+    await db.update(heroSlides).set(parsed.data).where(eq(heroSlides.id, id));
+    // Podmienione pliki usuwamy z dysku (tylko wgrane przez panel — /media/…).
+    for (const old of [existing.mediaUrl, existing.posterUrl]) if (old && old !== parsed.data.mediaUrl && old !== parsed.data.posterUrl) await deleteMedia(old);
+  }
+  refreshStorefront();
+  redirect("/admin/strona?zapisano=1");
+}
+
+export async function toggleHeroSlideAction(form: FormData) {
+  await requireAdmin();
+  const id = Number(form.get("id"));
+  const db = await getDb();
+  const [slide] = await db.select({ isActive: heroSlides.isActive }).from(heroSlides).where(eq(heroSlides.id, id));
+  if (slide) await db.update(heroSlides).set({ isActive: !slide.isActive }).where(eq(heroSlides.id, id));
+  refreshStorefront();
+}
+
+export async function deleteHeroSlideAction(_prev: FormState, form: FormData): Promise<FormState> {
+  await requireAdmin();
+  const id = Number(form.get("id"));
+  const [deleted] = await (await getDb()).delete(heroSlides).where(eq(heroSlides.id, id)).returning();
+  if (deleted) for (const file of [deleted.mediaUrl, deleted.posterUrl]) if (file) await deleteMedia(file);
+  refreshStorefront();
+  redirect("/admin/strona?usunieto=1");
 }

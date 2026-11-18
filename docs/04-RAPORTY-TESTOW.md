@@ -65,3 +65,21 @@ Nowe scenariusze E2E:
 Dodatkowo zweryfikowano ręcznie (automatyczny skrypt przez adres `http://192.168.1.96:3200`, profil iPhone 14): menu i karta produktu otwierają się, brak błędów w konsoli, logo wczytane.
 
 ¹ Symulacja dotyku (TouchEvent) działa tylko w Chromium — na profilach iPhone (WebKit) i desktop test jest pomijany; wymaga sprawdzenia ręcznego na iPhonie.
+
+---
+
+## T-003 · 2026-11-18 · slajdy HERO (zdjęcie / film)
+
+| Zestaw | Wynik |
+|---|---|
+| `typecheck` | ✅ 0 błędów |
+| `lint` | ✅ 0 błędów |
+| Vitest — 7 plików | ✅ **50 / 50** (+12) |
+| Playwright — 15 scenariuszy × 3 urządzenia | ✅ **43 / 43**, 2 pominięte (przeciąganie palcem poza Chromium) |
+
+Nowe testy:
+- **jednostkowe:** rozpoznawanie zdjęć (JPG/PNG/WEBP/HEIC) i filmów (MP4/MOV/WEBM) po zawartości, odrzucanie SVG/PDF/skryptów; walidacja slajdu (wymagany tytuł i plik, obce adresy i `../` odrzucane, typ pliku zgodny z rodzajem, poster tylko dla filmu).
+- **integracyjne:** **prawdziwa konwersja ffmpeg** — MOV → MP4 (`ftyp`) + kadr JPG, zdjęcie → JPG, odrzucenie filmu tam, gdzie dozwolone tylko zdjęcia, pliku-skryptu i pustego pliku; migracja dodaje 3 slajdy ze wzoru; ukryte slajdy nie trafiają na stronę, kolejność.
+- **E2E (Android, iPhone, desktop):** panel → „Strona” → nowy slajd: brak przewijania w bok, błąd „Dodaj zdjęcie lub film” z zachowaniem tytułu, **wgranie filmu MOV → podgląd MP4**, kadrowanie, zapis → strona główna: przełączenie na slajd, **film odtwarzany z kadrem startowym**, `Range: bytes=0-99` → **206** i 100 bajtów (wymóg Safari), usunięcie slajdu kasuje plik (404).
+
+Wykryte dzięki testom: pomniejszanie formularza na telefonie przez wystające ukryte pola, niedotykalny przełącznik slajdów na telefonie (ze wzoru), wyścig w teście koszyka.

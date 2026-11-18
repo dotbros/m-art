@@ -37,6 +37,25 @@ export const products = pgTable("products", {
 import type { OrderStatus, PaymentStatus } from "../lib/statuses";
 export { ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus, type PaymentStatus } from "../lib/statuses";
 
+/** Slajdy sekcji HERO na stronie głównej — zdjęcie lub wideo, zarządzane w panelu /admin/strona. */
+export const heroSlides = pgTable("hero_slides", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  eyebrow: text("eyebrow").notNull().default(""),
+  title: text("title").notNull(),
+  titleAccent: text("title_accent").notNull().default(""), // druga linia tytułu, kursywą
+  description: text("description").notNull().default(""),
+  mediaType: text("media_type").$type<"image" | "video">().notNull().default("image"),
+  mediaUrl: text("media_url").notNull(),
+  posterUrl: text("poster_url"), // kadr startowy wideo
+  focus: text("focus").notNull().default("center"), // kadrowanie na telefonie: left | center | right
+  stone: text("stone").notNull().default(""), // przycisk „Odkryj biżuterię” filtruje po tym kamieniu
+  productId: text("product_id"), // etykieta w rogu otwiera ten produkt
+  position: integer("position").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+});
+
 export const orders = pgTable("orders", {
   id: text("id").primaryKey(),
   number: text("number").notNull().unique(),

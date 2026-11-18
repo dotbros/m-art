@@ -49,3 +49,8 @@ Każda decyzja: **kontekst → decyzja → konsekwencje**. Nowe decyzje dopisuje
 ### D-011 · Testowanie na telefonie w sieci lokalnej (2026-11-18)
 **Decyzja:** `allowedDevOrigins` w `next.config.ts` dla adresów sieci prywatnych (192.168.*, 10.*, 172.16.*). Next.js 16 domyślnie blokuje skrypty deweloperskie dla adresów innych niż localhost — strona na telefonie nie reagowała na dotyk.
 **Konsekwencje:** dotyczy tylko `npm run dev`; produkcja bez zmian.
+
+### D-012 · Slajdy HERO z panelu, zdjęcia i filmy przetwarzane przez ffmpeg (2026-11-18)
+**Kontekst:** właściciel chce sam wstawiać zdjęcie lub film z galerii telefonu. Filmy z iPhone'a to HEVC/MOV (Chrome na Androidzie często ich nie odtwarza) i ważą dziesiątki MB — za dużo dla klientów na danych komórkowych.
+**Decyzja:** tabela `hero_slides` (migracja 0003 przenosi 3 slajdy ze wzoru). Upload przez osobny endpoint `/api/admin/upload` (strumieniowo, sesja admina + kontrola Origin), konwersja `ffmpeg-static`: film → MP4 H.264, maks. 1280 px, 20 s, bez dźwięku, `faststart`, + kadr startowy JPG; zdjęcie → JPG maks. 2000 px. `/media` obsługuje Range (206) — wymagane przez Safari. Wideo: `muted autoplay loop playsinline`, pauza przy „ogranicz ruch”.
+**Konsekwencje:** +~80 MB w `node_modules` (binarka ffmpeg); konwersja trwa kilka–kilkadziesiąt sekund (synchronicznie). Przy większym ruchu przenieść konwersję do kolejki w tle. Porzucone wgrania (bez zapisu slajdu) zostawiają pliki — do sprzątania w przyszłości.

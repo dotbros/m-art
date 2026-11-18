@@ -97,6 +97,53 @@ test.describe("Panel administracyjny", () => {
     await expect(page.locator(".product-card").filter({ hasText: productName })).toHaveCount(0);
   });
 
+  test("strona główna: slajd HERO z filmem z galerii — wgranie, przetworzenie, odtwarzanie, usunięcie", async ({ page }, info) => {
+    test.setTimeout(90_000);
+    const title = `Film ${info.project.name}`;
+    await login(page);
+    await page.getByRole("navigation", { name: "Panel administracyjny" }).getByRole("link", { name: "Strona" }).click();
+    await expect(page.getByRole("heading", { name: "Slajdy HERO" })).toBeVisible();
+    await page.getByRole("link", { name: "+ Nowy" }).click();
+
+    // Formularz mieści się w ekranie (długie nazwy produktów na liście nie mogą go rozpychać)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(1);
+    // Zapis bez pliku → błąd przy polu
+    await page.getByLabel("Tytuł", { exact: true }).fill(title);
+    await page.getByRole("button", { name: "Dodaj slajd" }).click();
+    await expect(page.getByText("Dodaj zdjęcie lub film.")).toBeVisible();
+    await expect(page.getByLabel("Tytuł", { exact: true })).toHaveValue(title);
+
+    // Film MOV (jak z iPhone'a) → serwer przerabia na MP4 + kadr startowy
+    await page.locator("#media-file").setInputFiles("tests/fixtures/hero.mov");
+    await expect(page.getByLabel("Podgląd filmu")).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByLabel("Podgląd filmu")).toHaveAttribute("src", /^\/media\/[a-f0-9]{32}\.mp4$/);
+    await page.getByLabel("Druga linia tytułu (kursywą)").fill("w ruchu.");
+    await page.getByText("Lewa strona").click();
+    await page.getByLabel("Kolejność").fill("99");
+    await page.getByRole("button", { name: "Dodaj slajd" }).click();
+    await expect(page.getByText("Slajd został zapisany")).toBeVisible();
+
+    // Sklep: ostatni slajd odtwarza film; serwer obsługuje zapytania Range (wymagane przez Safari/iPhone)
+    await page.goto("/");
+    await page.locator(".slide-controls button").last().click();
+    const video = page.locator("section.hero video.hero-image");
+    await expect(video).toBeVisible();
+    await expect(page.locator(".hero h1")).toContainText(title);
+    const src = (await video.getAttribute("src"))!;
+    expect(await video.getAttribute("poster")).toMatch(/^\/media\/[a-f0-9]{32}\.jpg$/);
+    const partial = await page.request.get(src, { headers: { Range: "bytes=0-99" } });
+    expect(partial.status()).toBe(206);
+    expect((await partial.body()).length).toBe(100);
+
+    // Usunięcie slajdu kasuje też plik
+    await page.goto("/admin/strona");
+    await page.getByRole("link", { name: new RegExp(title) }).click();
+    await page.getByRole("button", { name: "Usuń slajd" }).click();
+    await page.getByRole("button", { name: "Tak, usuń" }).click();
+    await expect(page.getByText("Slajd został usunięty.")).toBeVisible();
+    expect((await page.request.get(src)).status()).toBe(404);
+  });
+
   test("kategorii z produktami nie da się usunąć", async ({ page }) => {
     await login(page);
     await page.goto("/admin/kategorie");

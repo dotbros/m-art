@@ -23,7 +23,7 @@
 .adm-link{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;font-size:15px;color:var(--a-brown);text-decoration:none;background:none;border:0;cursor:pointer}
 
 /* --- nawigacja: dół ekranu na telefonie --- */
-.adm-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(4,1fr);height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:var(--a-card);border-top:1px solid var(--a-line);box-shadow:0 -6px 20px #3b2a1a0d}
+.adm-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(5,1fr);height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:var(--a-card);border-top:1px solid var(--a-line);box-shadow:0 -6px 20px #3b2a1a0d}
 .adm-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;color:var(--a-muted);text-decoration:none;min-height:44px}
 .adm-nav a.active{color:var(--a-brown);font-weight:500}
 .adm-nav a.active svg{color:var(--a-gold)}
@@ -192,3 +192,42 @@
 .adm-stone-add .adm-btn{flex-shrink:0}
 .adm-chip-suggest{display:flex;flex-direction:column;gap:8px}
 .adm-stones{gap:10px}
+
+/* --- strona główna: slajdy HERO, wgrywanie zdjęć i filmów --- */
+.adm-intro{margin:-6px 0 14px}
+.adm-label{font-size:15px;font-weight:500}
+.adm-media-preview{position:relative;width:100%;aspect-ratio:16/10;border-radius:12px;overflow:hidden;background:#efe8dc;display:flex;align-items:center;justify-content:center;color:var(--a-muted);font-size:14px}
+.adm-media-preview img,.adm-media-preview video{width:100%;height:100%;object-fit:cover}
+.adm-media-busy{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;text-align:center;background:rgba(255,253,249,.9);color:var(--a-ink)}
+.adm-progress{display:block;width:80%;max-width:280px;height:8px;border-radius:4px;background:#e4ddd3;overflow:hidden}
+.adm-progress i{display:block;height:100%;background:var(--a-brown);transition:width .2s}
+.adm-btn.is-disabled{opacity:.5;pointer-events:none}
+.adm-focus{border:0;padding:0;margin:16px 0 0}
+.adm-focus legend{font-size:15px;font-weight:500;padding:0;margin-bottom:4px}
+.adm-segmented{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.adm-segmented label{display:flex;align-items:center;justify-content:center;min-height:44px;padding:0 6px;border:1px solid #cbbda8;border-radius:10px;font-size:14px;text-align:center;cursor:pointer;background:var(--a-card)}
+.adm-segmented label.active{background:var(--a-brown);border-color:var(--a-brown);color:#fffaf1}
+.adm-segmented input{position:absolute;opacity:0;pointer-events:none}
+.adm-segmented label:has(input:focus-visible){outline:2px solid var(--a-gold);outline-offset:2px}
+.adm-hero-preview{position:relative;width:100%;max-width:300px;aspect-ratio:9/12;margin:0 auto;border-radius:16px;overflow:hidden;background:#eee7db;box-shadow:0 6px 24px #3b2a1a1f}
+.adm-hero-preview img,.adm-hero-preview video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.adm-hero-preview-copy{position:absolute;left:0;right:0;bottom:0;padding:40px 16px 16px;background:linear-gradient(transparent,rgba(238,231,219,.95) 45%);display:flex;flex-direction:column}
+.adm-hero-preview-copy small{font-size:9px;letter-spacing:1.5px;color:#8f7755}
+.adm-hero-preview-copy strong{font-family:var(--serif);font-size:30px;font-weight:500;line-height:1.05;color:#42372c}
+.adm-hero-preview-copy em{font-family:var(--serif);font-size:30px;line-height:1.05;color:#88704d}
+@media(max-width:380px){.adm-nav a{font-size:11px}}
+/* Panel: przewijanie natychmiastowe (płynne przewijanie ze sklepu utrudnia pracę w długich formularzach) */
+html:has(.adm){scroll-behavior:auto;scroll-padding-top:72px}
+
+/* Listy wyboru z długimi nazwami (np. produktów) nie mogą rozpychać formularza poza ekran telefonu */
+.adm select{max-width:100%;text-overflow:ellipsis}
+.adm-grid-2>*,.adm-field{min-width:0}
+
+/* Ukryte pola (wybór pliku, opcje kadrowania) zakotwiczone w swoich kontenerach — wcześniej lądowały poza
+   prawą krawędzią, poszerzały stronę i telefon ją pomniejszał (przyciski przestawały trafiać w dotyk). */
+.adm-media{position:relative}
+.adm-media .sr-only{left:0;top:0}
+.adm-segmented label{position:relative}
+.adm-segmented input{inset:0;width:100%;height:100%;margin:0}
+/* Zabezpieczenie: nic w treści panelu nie może poszerzyć strony na telefonie */
+.adm-main{overflow-x:clip}

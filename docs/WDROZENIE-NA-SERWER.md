@@ -33,7 +33,7 @@ Caddy (automatyczny HTTPS):
 ```
 twoja-domena.pl {
   reverse_proxy 127.0.0.1:3000
-  request_body { max_size 8MB }
+  request_body { max_size 210MB }   # filmy do slajdów HERO (maks. 200 MB przed konwersją)
 }
 ```
 
@@ -46,6 +46,10 @@ twoja-domena.pl {
 - Zarządzany PostgreSQL z platformy → `DATABASE_URL`.
 - Polecenie startowe z migracjami: `npm run db:migrate && npm start`.
 - **Uwaga:** na Vercelu system plików jest ulotny — przed wdrożeniem trzeba przenieść zdjęcia do S3/Cloudflare R2 (zmiana w `src/lib/uploads.ts`).
+
+Nginx: `client_max_body_size 210m;` oraz `proxy_read_timeout 300s;` (konwersja filmu może trwać do kilku minut).
+
+**ffmpeg** instaluje się automatycznie z `npm ci` (pakiet `ffmpeg-static`, wersje dla Windows/Linux/macOS) — nie trzeba go instalować osobno. Folder tymczasowy systemu (`/tmp`) musi mieć ok. 500 MB wolnego miejsca.
 
 ## Lista kontrolna przed uruchomieniem sprzedaży
 - [ ] HTTPS działa, `NEXT_PUBLIC_SITE_URL` wskazuje domenę.

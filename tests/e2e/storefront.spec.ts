@@ -47,6 +47,7 @@ test.describe("Sklep — klient na telefonie i komputerze", () => {
   test("koszyk przetrwa odświeżenie strony", async ({ page }) => {
     await page.goto("/");
     await page.locator(".product-card").first().getByRole("button", { name: /Dodaj .* do koszyka/ }).click();
+    await expect(page.locator(".cart-count")).toHaveText("1"); // zapis do pamięci przeglądarki następuje po aktualizacji koszyka
     await page.reload();
     await expect(page.locator(".cart-count")).toHaveText("1");
   });

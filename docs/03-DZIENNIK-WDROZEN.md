@@ -83,3 +83,26 @@ Zgłoszenia z testów użytkownika na prawdziwym telefonie i ich rozwiązanie:
 **Migracja danych na bazie lokalnej użytkownika:** przed migracją wykonano kopię `data/backup-przed-kamieniami-20261118-0043`. Po migracji wszystkie produkty (także dodane przez użytkownika, np. „Perłowa Elegancja” → „Perełki ozdobne”) mają kamienie przeniesione do listy.
 
 **Wynik testów:** raport T-002.
+
+---
+
+## 2026-11-18 — Strona główna: slajdy HERO ze zdjęciem lub filmem z telefonu
+
+### Zrobione
+- **Panel → „Strona”** (5. pozycja w dolnej nawigacji): lista slajdów, dodawanie, edycja, ukrywanie, usuwanie (z plikiem), kolejność, maks. 6 widocznych.
+- Formularz slajdu: zdjęcie lub film z galerii / aparatu z **paskiem postępu wysyłania** i statusem „Przetwarzanie…”, kadrowanie na telefonie (lewa / środek / prawa), **podgląd na telefonie na żywo**, teksty, kamień i produkt, do których prowadzi slajd.
+- Serwer przerabia film (np. MOV z iPhone'a) na lekkie MP4 + kadr startowy; zdjęcia zmniejsza (D-012).
+- Sklep: slajdy z bazy, wideo w pętli bez dźwięku, licznik slajdów dynamiczny, slajd zapasowy gdy brak aktywnych.
+
+### Błędy wykryte przy testach i naprawione
+| Problem | Rozwiązanie |
+|---|---|
+| Ukryte pola (wybór pliku, opcje kadrowania) wystawały poza ekran → Chrome na telefonie **pomniejszał cały formularz** i dotyk nie trafiał w przyciski | zakotwiczenie pól, `overflow-x:clip` w panelu |
+| Długa nazwa produktu na liście wyboru poszerzała formularz | `select{max-width:100%}`, `min-width:0` w siatce |
+| **Na telefonie kreski przełączania slajdów leżały pod przyciskami** „Odkryj biżuterię / Poznaj historię” — nie dało się ich dotknąć (błąd ze wzoru) | przełącznik pod przyciskami, wyższa warstwa |
+| Płynne przewijanie (ze sklepu) w panelu utrudniało pracę w długich formularzach | w panelu przewijanie natychmiastowe |
+| Lint skanował wygenerowany raport Playwright | wykluczenie `playwright-report/`, `test-results/` |
+
+**Baza lokalna użytkownika:** kopia przed migracją — `data/backup-przed-hero-20261118-0142`.
+
+**Wynik testów:** raport T-003.

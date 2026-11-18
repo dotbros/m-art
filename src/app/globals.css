@@ -760,3 +760,18 @@ svg{flex-shrink:0}
   .overlay-heading{padding-top:24px}
   .product-modal>.overlay-heading{padding-top:20px}
 }
+
+/* HERO z panelu: wideo zachowuje się jak zdjęcie; kadrowanie ustawiane per slajd (telefony) */
+.hero-video{display:block}
+@media(max-width:760px){
+  .hero .hero-image{object-position:var(--hero-focus,50% 50%)}
+}
+
+/* Telefon: przełącznik slajdów pod przyciskami (we wzorze leżał pod nimi i nie dało się go dotknąć) */
+@media(max-width:760px){
+  .hero{height:auto}
+  .hero-inner{height:auto}
+  .hero-copy{padding-bottom:68px}
+  .hero-bottom{top:20px;bottom:12px;z-index:3}
+  .slide-controls{margin-top:auto}
+}

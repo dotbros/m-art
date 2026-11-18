@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readFile, stat, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 /**
@@ -8,8 +8,8 @@ import path from "node:path";
  * Później można tu podmienić zapis na S3/R2 bez zmian w reszcie aplikacji.
  */
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
-export const MEDIA_NAME = /^[a-f0-9]{32}\.(jpg|png|webp)$/;
-export const MEDIA_TYPES: Record<string, string> = { jpg: "image/jpeg", png: "image/png", webp: "image/webp" };
+export const MEDIA_NAME = /^[a-f0-9]{32}\.(jpg|png|webp|mp4)$/;
+export const MEDIA_TYPES: Record<string, string> = { jpg: "image/jpeg", png: "image/png", webp: "image/webp", mp4: "video/mp4" };
 
 export const uploadDir = () => path.resolve(/*turbopackIgnore: true*/ process.env.UPLOAD_DIR || "./storage/uploads");
 
@@ -34,6 +34,13 @@ export async function saveImage(file: File): Promise<string> {
   await mkdir(uploadDir(), { recursive: true });
   await writeFile(path.join(/*turbopackIgnore: true*/ uploadDir(), name), bytes);
   return `/media/${name}`;
+}
+
+/** Ścieżka i rozmiar pliku do strumieniowania (wideo wymaga zapytań o zakres bajtów — Range). */
+export async function locateMedia(name: string) {
+  if (!MEDIA_NAME.test(name)) return null;
+  const file = path.join(/*turbopackIgnore: true*/ uploadDir(), name);
+  try { return { file, size: (await stat(file)).size, type: MEDIA_TYPES[name.split(".").pop()!] }; } catch { return null; }
 }
 
 export async function readMedia(name: string) {
