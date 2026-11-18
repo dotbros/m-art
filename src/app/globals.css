@@ -775,3 +775,9 @@ svg{flex-shrink:0}
   .hero-bottom{top:20px;bottom:12px;z-index:3}
   .slide-controls{margin-top:auto}
 }
+
+/* HERO: poziomy gest przełącza slajdy, pionowy przewija stronę */
+.hero{touch-action:pan-y}
+.hero-image{animation:hero-fade .45s ease-out}
+@keyframes hero-fade{from{opacity:.35}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.hero-image,.hero-copy{animation:none}}

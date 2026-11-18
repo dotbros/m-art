@@ -98,6 +98,22 @@ export function Shop({ products, categories: categoryNames, slides }: { products
   const currentSlide = slides[Math.min(slide, slides.length - 1)];
   const slideProduct = currentSlide.productId ? products.find((p) => p.id === currentSlide.productId) : undefined;
   const pad = (n: number) => String(n).padStart(2, "0");
+  // Przesunięcie palcem w bok zmienia slajd HERO (w kółko). Ruch pionowy = zwykłe przewijanie strony.
+  // Gest zaczęty przy samej lewej krawędzi zostawiamy systemowi („wstecz” na iPhonie i Androidzie).
+  const heroSwipe = useRef<{ x: number; y: number } | null>(null);
+  function onHeroTouchStart(event: React.TouchEvent) {
+    const t = event.touches[0];
+    heroSwipe.current = event.touches.length === 1 && t.clientX > 24 && slides.length > 1 ? { x: t.clientX, y: t.clientY } : null;
+  }
+  function onHeroTouchEnd(event: React.TouchEvent) {
+    const start = heroSwipe.current;
+    heroSwipe.current = null;
+    if (!start) return;
+    const t = event.changedTouches[0];
+    const dx = t.clientX - start.x, dy = t.clientY - start.y;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    setSlide((current) => (current + (dx < 0 ? 1 : -1) + slides.length) % slides.length);
+  }
 
   function goToCollection(nextCategory = ALL_CATEGORIES, nextStone = ALL_STONES, all = false) {
     setCategory(nextCategory); setStone(nextStone); setShowAll(all); setCollectionQuery(""); setPanel(null); setNavOpen(false);
@@ -134,7 +150,7 @@ export function Shop({ products, categories: categoryNames, slides }: { products
     </div></header>
 
     <main>
-      <section className={`hero hero-slide-${slide === 0 ? 0 : 1} ${currentSlide.mediaType === "video" ? "hero-has-video" : ""}`} aria-label="Nowa kolekcja M.art">
+      <section className={`hero hero-slide-${slide === 0 ? 0 : 1} ${currentSlide.mediaType === "video" ? "hero-has-video" : ""}`} aria-label="Nowa kolekcja M.art" aria-roledescription="karuzela" onTouchStart={onHeroTouchStart} onTouchEnd={onHeroTouchEnd} onTouchCancel={() => { heroSwipe.current = null; }}>
         <HeroMedia key={currentSlide.id} slide={currentSlide}/>
         <div className="hero-wash"/>
         <div className="hero-inner container"><div className="hero-copy" key={slide}><p className="eyebrow"><span className="small-line"/>{currentSlide.eyebrow}</p><h1>{currentSlide.title}{currentSlide.titleAccent && <><br/><em>{currentSlide.titleAccent}</em></>}</h1>{currentSlide.description && <p className="hero-description">{currentSlide.description}</p>}<div className="hero-cta"><button className="button button-dark" onClick={() => goToCollection(ALL_CATEGORIES, currentSlide.stone && stones.includes(currentSlide.stone) ? currentSlide.stone : ALL_STONES)}>Odkryj biżuterię <Icon name="arrow" size={19}/></button><button className="hero-story-link" onClick={() => showInfo("story")}>Poznaj naszą historię <span>↗</span></button></div><div className="hero-note"><Icon name="leaf" size={22}/><span>Nie ma dwóch identycznych.<br/><strong>Tak jak Ty.</strong></span></div></div>

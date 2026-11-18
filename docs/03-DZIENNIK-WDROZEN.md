@@ -106,3 +106,10 @@ Zgłoszenia z testów użytkownika na prawdziwym telefonie i ich rozwiązanie:
 **Baza lokalna użytkownika:** kopia przed migracją — `data/backup-przed-hero-20261118-0142`.
 
 **Wynik testów:** raport T-003.
+
+### 2026-11-18 — HERO: przesuwanie palcem
+- Przesunięcie palcem w lewo/prawo zmienia slajd (w kółko); pionowy ruch przewija stronę (`touch-action: pan-y`).
+- Gest zaczęty w pasie 24 px przy lewej krawędzi jest ignorowany — to systemowy „wstecz” (iPhone, Android).
+- Łagodne przejście obrazu przy zmianie slajdu; wyłączone przy „ogranicz ruch”.
+- Test E2E: następny / poprzedni / z pierwszego na ostatni / gest od krawędzi bez zmiany (Chromium: Android, desktop; WebKit pominięty — sprawdzić ręcznie na iPhonie).
+- Wynik: Vitest 50/50, Playwright 45/45 (3 pominięte), lint 0 błędów.

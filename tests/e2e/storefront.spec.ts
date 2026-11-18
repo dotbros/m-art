@@ -87,6 +87,29 @@ test.describe("Sklep — klient na telefonie i komputerze", () => {
     await expect(sheet).toHaveCount(0);
   });
 
+  test("przesunięcie palcem w bok zmienia slajd HERO (w kółko), krawędź ekranu zostaje dla gestu „wstecz”", async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "Symulacja dotyku działa w Chromium");
+    await page.goto("/");
+    const hero = page.locator("section.hero");
+    const title = page.locator(".hero h1");
+    const swipe = (fromX: number, toX: number) => hero.evaluate((el, [a, b]) => {
+      const touch = (x: number) => new Touch({ identifier: 1, target: el, clientX: x, clientY: 300 });
+      el.dispatchEvent(new TouchEvent("touchstart", { bubbles: true, touches: [touch(a)], changedTouches: [touch(a)] }));
+      el.dispatchEvent(new TouchEvent("touchmove", { bubbles: true, touches: [touch(b)], changedTouches: [touch(b)] }));
+      el.dispatchEvent(new TouchEvent("touchend", { bubbles: true, touches: [], changedTouches: [touch(b)] }));
+    }, [fromX, toX]);
+    const first = await title.textContent();
+    await swipe(300, 120); // w lewo → następny
+    await expect(title).not.toHaveText(first!);
+    await expect(page.locator(".slide-number")).toHaveText("02");
+    await swipe(120, 300); // w prawo → poprzedni
+    await expect(page.locator(".slide-number")).toHaveText("01");
+    await swipe(120, 300); // z pierwszego w prawo → ostatni
+    await expect(page.locator(".slide-number")).toHaveText(await page.locator(".slide-total").textContent() as string);
+    await swipe(10, 250); // start przy krawędzi = gest systemowy, slajd bez zmian
+    await expect(page.locator(".slide-number")).toHaveText(await page.locator(".slide-total").textContent() as string);
+  });
+
   test("API odrzuca zamówienie z niepoprawnymi danymi", async ({ request }) => {
     const res = await request.post("/api/orders", { data: { email: "zly", items: [] } });
     expect(res.status()).toBe(400);
