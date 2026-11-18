@@ -113,3 +113,10 @@ Zgłoszenia z testów użytkownika na prawdziwym telefonie i ich rozwiązanie:
 - Łagodne przejście obrazu przy zmianie slajdu; wyłączone przy „ogranicz ruch”.
 - Test E2E: następny / poprzedni / z pierwszego na ostatni / gest od krawędzi bez zmiany (Chromium: Android, desktop; WebKit pominięty — sprawdzić ręcznie na iPhonie).
 - Wynik: Vitest 50/50, Playwright 45/45 (3 pominięte), lint 0 błędów.
+
+### 2026-11-18 — Pętla przeładowań strony w trybie deweloperskim
+- **Objaw:** strona (zwłaszcza logowanie do panelu) przeładowywała się sama kilkanaście razy na sekundę.
+- **Przyczyna:** testy E2E budowały wersję produkcyjną (`next build`) do tego samego katalogu `.next`, którego używa `next dev`. Uszkodzona pamięć podręczna Turbopacka powodowała przy każdym wczytaniu komunikat „HMR hash mismatch” → przeładowanie.
+- **Naprawa:** wyczyszczenie `.next`; testy E2E budują teraz do osobnego katalogu `.next-e2e` (`distDir` z `NEXT_DIST_DIR`). Zweryfikowano: E2E uruchomione przy działającym `next dev` — po nich 0 przeładowań.
+- Ustabilizowano test „koszyk przetrwa odświeżenie” (WebKit: kliknięcie przed hydratacją) — 2 pełne przebiegi z rzędu: 45/45.
+- **Gdyby problem wrócił:** zatrzymaj serwer, usuń katalog `.next`, uruchom ponownie `npm run dev`.

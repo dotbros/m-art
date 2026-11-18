@@ -46,8 +46,13 @@ test.describe("Sklep — klient na telefonie i komputerze", () => {
 
   test("koszyk przetrwa odświeżenie strony", async ({ page }) => {
     await page.goto("/");
-    await page.locator(".product-card").first().getByRole("button", { name: /Dodaj .* do koszyka/ }).click();
-    await expect(page.locator(".cart-count")).toHaveText("1"); // zapis do pamięci przeglądarki następuje po aktualizacji koszyka
+    // Kliknięcie tuż po wczytaniu może trafić przed podpięciem obsługi (hydratacja) — ponawiamy, dopóki koszyk jest pusty
+    await expect(async () => {
+      if ((await page.locator(".cart-count").textContent()) === "0") await page.locator(".product-card").first().getByRole("button", { name: /Dodaj .* do koszyka/ }).click();
+      await expect(page.locator(".cart-count")).toHaveText("1", { timeout: 1000 });
+    }).toPass({ timeout: 10_000 });
+    // Zapis do pamięci przeglądarki następuje chwilę po aktualizacji licznika — czekamy na sam zapis
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("mart-cart") || "")).toContain("\"quantity\":1");
     await page.reload();
     await expect(page.locator(".cart-count")).toHaveText("1");
   });

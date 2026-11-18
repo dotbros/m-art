@@ -34,6 +34,7 @@ export default defineConfig({
       ADMIN_EMAIL: "e2e@mart.local",
       ADMIN_PASSWORD: "E2eHaslo12345",
       COOKIE_SECURE: "false",
+      NEXT_DIST_DIR: ".next-e2e",
     },
   },
 });

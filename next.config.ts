@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Testy E2E budują do osobnego katalogu (.next-e2e), żeby nie nadpisać pamięci podręcznej `next dev`
+  // (wspólny katalog powodował pętlę przeładowań strony: „HMR hash mismatch”).
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   // PGlite ładuje pliki .wasm/.data z node_modules — nie może być pakowany przez bundler.
   serverExternalPackages: ["@electric-sql/pglite", "ffmpeg-static"],
   // Tryb deweloperski: pozwala testować na telefonie w tej samej sieci Wi-Fi (np. http://192.168.1.96:3200).
