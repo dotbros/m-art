@@ -814,3 +814,12 @@ svg{flex-shrink:0}
   }
   .hero-portrait .hero-wash{background:linear-gradient(90deg,var(--hero-bg) 0%,var(--hero-bg) 35%,rgba(238,231,219,0) 50%)}
 }
+/* Komputer (19.11): pionowe media — ramka na połowę szerokości ekranu (prośba właściciela);
+   poziome zdjęcia i filmy — lewa krawędź płynnie przechodzi w tło (bez twardej linii). */
+@media(min-width:761px){
+  .hero-portrait .hero-image{width:50%;aspect-ratio:auto;max-width:none;object-position:50% 38%}
+  .hero:not(.hero-portrait) .hero-image{
+    -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 28%);
+    mask-image:linear-gradient(90deg,transparent 0%,#000 28%);
+  }
+}

@@ -133,15 +133,13 @@ test.describe("Panel administracyjny", () => {
     await expect(video).toBeVisible();
     await expect(page.locator(".hero h1")).toContainText(title);
     const src = (await video.getAttribute("src"))!;
-    // Pionowy film: na komputerze węższa ramka 15:16 (widać ~3/5 wysokości), po prawej ~10% tła
+    // Pionowy film: na komputerze ramka na połowę szerokości, po prawej ~10% tła, boki płynnie zanikają
     await expect(page.locator("section.hero")).toHaveClass(/hero-portrait/);
     if (page.viewportSize()!.width >= 761) {
       const box = (await video.boundingBox())!, hero = (await page.locator("section.hero").boundingBox())!;
-      expect(box.width / box.height).toBeCloseTo(15 / 16, 1);
+      expect(box.width / hero.width).toBeCloseTo(0.5, 1);
       expect((hero.x + hero.width - (box.x + box.width)) / hero.width).toBeCloseTo(0.1, 1);
-      const visible = await video.evaluate((v: HTMLVideoElement) => (v.clientHeight / v.clientWidth) / (v.videoHeight / v.videoWidth));
-      expect(visible).toBeGreaterThan(0.55);
-      expect(visible).toBeLessThan(0.65);
+      expect(await video.evaluate((v) => getComputedStyle(v).maskImage || getComputedStyle(v).webkitMaskImage)).toContain("linear-gradient");
     }
     expect(await video.getAttribute("poster")).toMatch(/^\/media\/[a-f0-9]{32}\.jpg$/);
     const partial = await page.request.get(src, { headers: { Range: "bytes=0-99" } });
