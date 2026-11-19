@@ -83,3 +83,19 @@ Nowe testy:
 - **E2E (Android, iPhone, desktop):** panel → „Strona” → nowy slajd: brak przewijania w bok, błąd „Dodaj zdjęcie lub film” z zachowaniem tytułu, **wgranie filmu MOV → podgląd MP4**, kadrowanie, zapis → strona główna: przełączenie na slajd, **film odtwarzany z kadrem startowym**, `Range: bytes=0-99` → **206** i 100 bajtów (wymóg Safari), usunięcie slajdu kasuje plik (404).
 
 Wykryte dzięki testom: pomniejszanie formularza na telefonie przez wystające ukryte pola, niedotykalny przełącznik slajdów na telefonie (ze wzoru), wyścig w teście koszyka.
+
+---
+
+## T-004 · 2026-11-20 · kamienie naturalne
+
+| Zestaw | Wynik |
+|---|---|
+| `typecheck` | ✅ 0 błędów |
+| `lint` | ✅ 0 błędów |
+| Vitest — 8 plików | ✅ **63 / 63** (+9) |
+| Playwright — 18 scenariuszy × 3 urządzenia | ✅ **54 / 54**, 3 pominięte (gesty dotyku poza Chromium) |
+
+Nowe testy:
+- **jednostkowe:** walidacja kamienia (adres z nazwy, wielka litera, duplikaty zdjęć, obce adresy zdjęć, limit 8 zdjęć, długość podpisu).
+- **integracyjne:** dane startowe (3 opisane kamienie na stronie głównej, wszystkie kamienie z produktów w słowniku), strona kamienia (tylko widoczne produkty z kamieniem; ukryty kamień = brak strony), `ensureStones` bez duplikatów, zmiana nazwy aktualizuje produkty i slajdy HERO, wzór adresu z migracji 0006 (polskie znaki).
+- **E2E (Android, iPhone, desktop):** strona główna → karta „Jaspis cesarski” → strona kamienia (tytuł strony, podpis, opis, tylko produkty z jaspisem, brak przewijania w bok) → produkt otwiera się w sklepie; lista /kamienie, 404 dla nieistniejącego; panel: nowy kamień ze zdjęciem i opisem → przypisanie do produktu podpowiedzią → strona kamienia (zdjęcie z /media, 2 akapity, produkt) → karta na stronie głównej → blokada usunięcia kamienia w produkcie.

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { validateHeroSlide } from "@/lib/hero";
 import { detectMediaKind } from "@/lib/media";
+import { validateStone } from "@/lib/stones";
 
 const form = (data: Record<string, string>) => { const f = new FormData(); for (const [k, v] of Object.entries(data)) f.set(k, v); return f; };
 const bytes = (...parts: (number[] | string)[]) => new Uint8Array(parts.flatMap((p) => (typeof p === "string" ? [...p].map((c) => c.charCodeAt(0)) : p)));
@@ -61,5 +62,21 @@ describe("walidacja slajdu HERO", () => {
   it("nieznane kadrowanie zamienia na środek, opis normalizuje końce linii", () => {
     const r = validateHeroSlide(form({ ...base, focus: "gora", description: "a\r\nb" }));
     expect(r.ok && [r.data.focus, r.data.description]).toEqual(["center", "a\nb"]);
+  });
+});
+
+describe("walidacja kamienia (panel)", () => {
+  const f = (data: Record<string, string>, images: string[] = []) => { const x = form(data); for (const i of images) x.append("images", i); return x; };
+  it("tworzy adres z nazwy, ujednolica wielką literę, usuwa duplikaty zdjęć", () => {
+    const r = validateStone(f({ name: "kwarc  różowy", showOnHome: "on", isActive: "on" }, ["/images/necklace-jasper.svg", "/images/necklace-jasper.svg"]));
+    expect(r.ok && r.data).toMatchObject({ name: "Kwarc różowy", slug: "kwarc-rozowy", showOnHome: true, isActive: true, images: ["/images/necklace-jasper.svg"] });
+  });
+  it("wymaga nazwy; odrzuca obce adresy zdjęć i za długi podpis", () => {
+    const r = validateStone(f({ name: "", caption: "x".repeat(81) }, ["https://zly.pl/a.jpg"]));
+    expect(!r.ok && Object.keys(r.errors).sort()).toEqual(["caption", "images", "name", "slug"]);
+  });
+  it("maksymalnie 8 zdjęć", () => {
+    const imgs = Array.from({ length: 9 }, (_, i) => `/media/${String(i).padStart(32, "0")}.jpg`);
+    expect(validateStone(f({ name: "Opal" }, imgs)).ok).toBe(false);
   });
 });

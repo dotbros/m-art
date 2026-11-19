@@ -59,3 +59,8 @@ Każda decyzja: **kontekst → decyzja → konsekwencje**. Nowe decyzje dopisuje
 **Kontekst:** w D-012 dźwięk był usuwany z filmów (autoodtwarzanie w przeglądarkach działa tylko bez dźwięku). Użytkownik chce filmów z dźwiękiem.
 **Decyzja:** konwersja zachowuje dźwięk (AAC 128 kb/s, stereo). Film nadal startuje wyciszony; jeśli ma dźwięk, na filmie jest przycisk 🔊 „Włącz dźwięk / Wycisz”. W panelu przełącznik „Klient może włączyć dźwięk” (pole `hero_slides.has_audio`, migracja 0004); serwer przy zapisie sprawdza, czy plik naprawdę ma ścieżkę dźwiękową. Dźwięk wycisza się sam po przewinięciu poza HERO; wybór dźwięku obowiązuje też po przesunięciu na kolejny film.
 **Konsekwencje:** filmy wgrane przed tą zmianą są bez dźwięku — trzeba je wgrać ponownie. Pliki są nieco większe (+~0,3 MB na 20 s).
+
+### D-014 · Słownik kamieni z opisami i stronami (2026-11-20) — rozwija D-010
+**Kontekst:** kamienie mają mieć własne strony (zdjęcia, opis) i listę produktów; dodaje się je także przy tworzeniu produktu.
+**Decyzja:** tabela `stones` (nazwa, slug, podpis, opis, zdjęcia[], na stronie głównej, kolejność, widoczność; migracja 0006 przenosi kamienie z produktów i dodaje opisy 3 kamieni ze wzoru). Produkty nadal wskazują kamienie **po nazwie** (`products.stones text[]`) — bez tabeli łączącej, żeby nie przebudowywać działających filtrów i formularzy. Spójność: nowy kamień wpisany przy produkcie trafia do słownika (`ensureStones`), zmiana nazwy w panelu aktualizuje produkty i slajdy (`array_replace`), kamienia użytego w produktach nie można usunąć.
+**Konsekwencje:** prosty model; gdyby kamienie zyskały wiele powiązań (np. filtry wielokryterialne, tłumaczenia), przejść na tabelę łączącą `product_stones`.

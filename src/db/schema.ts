@@ -37,6 +37,24 @@ export const products = pgTable("products", {
 import type { OrderStatus, PaymentStatus } from "../lib/statuses";
 export { ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus, type PaymentStatus } from "../lib/statuses";
 
+/**
+ * Słownik kamieni naturalnych: opis, zdjęcia, podpis — strony /kamienie/[slug] i sekcja na stronie głównej.
+ * Produkty wskazują kamienie po NAZWIE (products.stones); zmiana nazwy w panelu aktualizuje produkty.
+ */
+export const stones = pgTable("stones", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  name: text("name").notNull().unique(),
+  slug: text("slug").notNull().unique(),
+  caption: text("caption").notNull().default(""), // krótki podpis na karcie, np. „Ciepło ziemi”
+  description: text("description").notNull().default(""), // dłuższy opis (akapity rozdzielone pustą linią)
+  images: text("images").array().notNull().default(sql`'{}'::text[]`), // pierwsze = główne
+  showOnHome: boolean("show_on_home").notNull().default(false),
+  position: integer("position").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+});
+
 /** Slajdy sekcji HERO na stronie głównej — zdjęcie lub wideo, zarządzane w panelu /admin/strona. */
 export const heroSlides = pgTable("hero_slides", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),

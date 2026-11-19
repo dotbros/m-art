@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { ALL_CATEGORIES, ALL_STONES, FREE_SHIPPING_FROM, MAX_PER_PRODUCT, money, stoneList, type Product } from "@/lib/catalog";
 import { Icon, type IconName } from "./icons";
@@ -8,6 +9,7 @@ import { Checkout } from "./checkout";
 import { Information, infoTitles } from "./information";
 import { HeroMedia } from "./hero-media";
 import type { HeroSlide } from "@/lib/hero";
+import type { Stone } from "@/lib/stones";
 import { PORTRAIT_BELOW } from "@/lib/hero-shared";
 
 type CartItem = { id: string; quantity: number };
@@ -20,7 +22,7 @@ function Brand({ footer = false }: { footer?: boolean }) {
   return <span className={`brand ${footer ? "brand-footer" : ""}`}><img className="brand-logo" src="/brand/logo.svg" alt="M.art — Pracownia Biżuterii" width={1290} height={1219} fetchPriority={footer ? "auto" : "high"} loading={footer ? "lazy" : "eager"}/></span>;
 }
 
-export function Shop({ products, categories: categoryNames, slides }: { products: Product[]; categories: string[]; slides: HeroSlide[] }) {
+export function Shop({ products, categories: categoryNames, slides, homeStones = [] }: { products: Product[]; categories: string[]; slides: HeroSlide[]; homeStones?: Pick<Stone, "name" | "slug" | "caption" | "images">[] }) {
   const categories = useMemo(() => [ALL_CATEGORIES, ...categoryNames], [categoryNames]);
   const stones = useMemo(() => [ALL_STONES, ...Array.from(new Set(products.flatMap((p) => p.stones).filter(Boolean)))], [products]);
   const [panel, setPanel] = useState<Panel>(null);
@@ -55,6 +57,15 @@ export function Shop({ products, categories: categoryNames, slides }: { products
       if (Array.isArray(savedWishlist)) setWishlist(savedWishlist.filter((id) => typeof id === "string" && products.some((product) => product.id === id)));
     } catch { /* A private browser session can block local storage. */ }
     setStorageReady(true);
+  }, [products]);
+  // Linki z innych stron sklepu (np. strona kamienia): /?produkt=<id> otwiera kartę produktu, /?koszyk=1 — koszyk.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const product = products.find((p) => p.id === params.get("produkt"));
+    if (!product && params.get("koszyk") !== "1") return;
+    window.history.replaceState(null, "", window.location.pathname);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- otwarcie okna wskazanego w adresie (jednorazowo po wczytaniu)
+    if (product) { setSelected(product); setProductQuantity(1); setPanel("product"); } else setPanel("cart");
   }, [products]);
   useEffect(() => { if (storageReady) { try { localStorage.setItem("mart-cart", JSON.stringify(cart)); localStorage.setItem("mart-wishlist", JSON.stringify(wishlist)); } catch { /* Shopping remains available without browser storage. */ } } }, [cart, wishlist, storageReady]);
   useEffect(() => {
@@ -174,9 +185,8 @@ export function Shop({ products, categories: categoryNames, slides }: { products
         {!showAll && category === ALL_CATEGORIES && stone === ALL_STONES && !collectionQuery && <div className="collection-bottom"><span>Małe serie. Niepowtarzalne kamienie.</span><button className="button button-outline" onClick={() => setShowAll(true)}>Zobacz całą kolekcję <Icon name="arrow" size={18}/></button><span>Wybierz tę, która jest Twoja.</span></div>}
       </section>
 
-      <section className="stones-section" id="kamienie"><div className="stones-inner container"><div className="stones-copy"><p className="eyebrow">NATURA NIE TWORZY KOPII</p><h2>Każdy kamień<br/>ma swoją <em>historię.</em></h2><p>Kolory, które uspokajają. Faktury, które zachwycają. Znajdź kamień, w którym zobaczysz cząstkę siebie.</p><span className="stone-small-note"><Icon name="sparkle" size={16}/> 100% naturalnego piękna</span></div><div className="stone-grid">{[
-        { name: "Jaspis cesarski", caption: "Ciepło ziemi", image: "/images/necklace-jasper.svg" }, { name: "Perła naturalna", caption: "Subtelność i blask", image: "/images/earrings-pearl.svg" }, { name: "Agat mszysty", caption: "Bliskość natury", image: "/images/bracelet-agate.svg" },
-      ].map((item) => <button className="stone-card" key={item.name} onClick={() => goToCollection(ALL_CATEGORIES, item.name)}><span className="stone-image"><img src={item.image} alt={`Biżuteria — ${item.name}`} loading="lazy"/><span><Icon name="arrow" size={22}/></span></span><h3>{item.name}</h3><p>{item.caption}</p></button>)}</div></div></section>
+      {homeStones.length > 0 && <section className="stones-section" id="kamienie"><div className="stones-inner container"><div className="stones-copy"><p className="eyebrow">NATURA NIE TWORZY KOPII</p><h2>Każdy kamień<br/>ma swoją <em>historię.</em></h2><p>Kolory, które uspokajają. Faktury, które zachwycają. Znajdź kamień, w którym zobaczysz cząstkę siebie.</p><span className="stone-small-note"><Icon name="sparkle" size={16}/> 100% naturalnego piękna</span><Link className="text-link stones-all-link" href="/kamienie">Poznaj wszystkie kamienie <Icon name="arrow" size={17}/></Link></div><div className="stone-grid">{homeStones.map((item) =>
+        <Link className="stone-card" key={item.slug} href={`/kamienie/${item.slug}`}><span className="stone-image"><img src={item.images[0] || "/images/necklace-jasper.svg"} alt={`Kamień naturalny — ${item.name}`} loading="lazy"/><span><Icon name="arrow" size={22}/></span></span><h3>{item.name}</h3>{item.caption && <p>{item.caption}</p>}</Link>)}</div></div></section>}
 
       <section className="story-section container" id="pracownia"><div className="story-photo"><img src="/images/atelier.svg" alt="Dłonie tworzące ręcznie biżuterię z naturalnych kamieni w pracowni M.art" loading="lazy"/><span className="photo-caption">MAŁE RZECZY. WIELKA UWAŻNOŚĆ.</span><span className="story-photo-mark">M.art</span></div><div className="story-copy"><p className="eyebrow">POZNAJ NASZĄ PRACOWNIĘ</p><h2>Nie z fabryki.<br/><em>Z pasji.</em></h2><p>Wierzymy, że najpiękniejsze rzeczy powstają powoli. Z uważnością, czułością i zachwytem nad tym, co daje nam natura.</p><p>W M.art każdy kamień dobieramy ręcznie, a każdy detal ma znaczenie. Tworzymy biżuterię, którą chce się nosić blisko — nie tylko od święta.</p><button className="text-link" onClick={() => showInfo("story")}>Zajrzyj do świata M.art <Icon name="arrow" size={19}/></button><span className="signature">Z miłości do piękna.</span></div></section>
 

@@ -43,6 +43,13 @@
       "when": 1795121822016,
       "tag": "0005_hero_aspect",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795129618323,
+      "tag": "0006_stones",
+      "breakpoints": true
     }
   ]
 }

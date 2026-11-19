@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
-import { categories, heroSlides, orderItems, orders, products, ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus, type PaymentStatus } from "@/db/schema";
+import { countProductsWithStone, ensureStones, renameStoneEverywhere, validateStone } from "@/lib/stones";
+import { categories, heroSlides, orderItems, orders, products, stones, ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus, type PaymentStatus } from "@/db/schema";
 import { validateHeroSlide, MAX_HERO_SLIDES } from "@/lib/hero";
 import { requireAdmin, SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
 import { authenticate, clearAttempts, createSession, deleteSession, isRateLimited, registerFailedAttempt } from "@/lib/auth/sessions";
@@ -109,6 +110,7 @@ export async function saveProductAction(_prev: FormState, form: FormData): Promi
 
   if (editingId) await db.update(products).set({ ...parsed.data, image }).where(eq(products.id, editingId));
   else await db.insert(products).values({ ...parsed.data, image });
+  await ensureStones(db, parsed.data.stones); // nowe kamienie trafiają do słownika (opis i zdjęcia — w panelu „Kamienie”)
   refreshStorefront();
   redirect("/admin/produkty?zapisano=1");
 }
@@ -217,4 +219,45 @@ export async function deleteHeroSlideAction(_prev: FormState, form: FormData): P
   if (deleted) for (const file of [deleted.mediaUrl, deleted.posterUrl]) if (file) await deleteMedia(file);
   refreshStorefront();
   redirect("/admin/strona?usunieto=1");
+}
+
+// ---------------- Kamienie naturalne ----------------
+export async function saveStoneAction(_prev: FormState, form: FormData): Promise<FormState> {
+  await requireAdmin();
+  const parsed = validateStone(form);
+  if (!parsed.ok) return fail(form, parsed.errors);
+  const db = await getDb();
+  const id = Number(form.get("id") || 0);
+  const all = await db.select({ id: stones.id, name: stones.name, slug: stones.slug, images: stones.images }).from(stones);
+  const others = all.filter((s) => s.id !== id);
+  if (others.some((s) => s.name.toLocaleLowerCase("pl-PL") === parsed.data.name.toLocaleLowerCase("pl-PL"))) return fail(form, { name: "Kamień o takiej nazwie już istnieje." });
+  if (others.some((s) => s.slug === parsed.data.slug)) return fail(form, { slug: "Ten adres jest już zajęty przez inny kamień." });
+  const existing = all.find((s) => s.id === id);
+  if (id && !existing) return { error: "Kamień nie istnieje." };
+  if (existing) {
+    await db.transaction(async (tx) => {
+      await tx.update(stones).set(parsed.data).where(eq(stones.id, id));
+      await renameStoneEverywhere(tx as unknown as typeof db, existing.name, parsed.data.name);
+    });
+    for (const old of existing.images) if (!parsed.data.images.includes(old)) await deleteMedia(old);
+  } else {
+    await db.insert(stones).values(parsed.data);
+  }
+  refreshStorefront();
+  redirect("/admin/kamienie?zapisano=1");
+}
+
+/** Kamienia użytego w produktach nie usuwamy — można go ukryć albo najpierw usunąć z produktów. */
+export async function deleteStoneAction(_prev: FormState, form: FormData): Promise<FormState> {
+  await requireAdmin();
+  const id = Number(form.get("id"));
+  const db = await getDb();
+  const [stone] = await db.select().from(stones).where(eq(stones.id, id));
+  if (!stone) return { error: "Kamień nie istnieje." };
+  const used = await countProductsWithStone(db, stone.name);
+  if (used > 0) return { error: `Nie można usunąć — kamień jest w produktach (${used}). Usuń go najpierw z produktów albo ukryj kamień.` };
+  await db.delete(stones).where(eq(stones.id, id));
+  for (const file of stone.images) await deleteMedia(file);
+  refreshStorefront();
+  redirect("/admin/kamienie?usunieto=1");
 }

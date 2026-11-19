@@ -8,6 +8,7 @@ const links: { href: string; label: string; icon: IconName }[] = [
   { href: "/admin", label: "Pulpit", icon: "sparkle" },
   { href: "/admin/produkty", label: "Produkty", icon: "gift" },
   { href: "/admin/kategorie", label: "Kategorie", icon: "filter" },
+  { href: "/admin/kamienie", label: "Kamienie", icon: "leaf" },
   { href: "/admin/zamowienia", label: "Zamówienia", icon: "bag" },
   { href: "/admin/strona", label: "Strona", icon: "star" },
 ];

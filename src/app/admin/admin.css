@@ -23,7 +23,7 @@
 .adm-link{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;font-size:15px;color:var(--a-brown);text-decoration:none;background:none;border:0;cursor:pointer}
 
 /* --- nawigacja: dół ekranu na telefonie --- */
-.adm-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(5,1fr);height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:var(--a-card);border-top:1px solid var(--a-line);box-shadow:0 -6px 20px #3b2a1a0d}
+.adm-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(6,1fr);height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:var(--a-card);border-top:1px solid var(--a-line);box-shadow:0 -6px 20px #3b2a1a0d}
 .adm-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;color:var(--a-muted);text-decoration:none;min-height:44px}
 .adm-nav a.active{color:var(--a-brown);font-weight:500}
 .adm-nav a.active svg{color:var(--a-gold)}
@@ -215,7 +215,20 @@
 .adm-hero-preview-copy small{font-size:9px;letter-spacing:1.5px;color:#8f7755}
 .adm-hero-preview-copy strong{font-family:var(--serif);font-size:30px;font-weight:500;line-height:1.05;color:#42372c}
 .adm-hero-preview-copy em{font-family:var(--serif);font-size:30px;line-height:1.05;color:#88704d}
-@media(max-width:380px){.adm-nav a{font-size:11px}}
+/* 6 pozycji w dolnym menu: na telefonach węższe podpisy */
+@media(max-width:899px){.adm-nav a{font-size:10.5px;letter-spacing:-.1px}}
+@media(max-width:360px){.adm-nav a{font-size:9.5px}}
+
+/* --- galeria zdjęć kamienia --- */
+.adm-gallery{list-style:none;margin:0 0 14px;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.adm-gallery li{position:relative;border-radius:12px;overflow:hidden;background:#efe8dc;aspect-ratio:4/5}
+.adm-gallery img{width:100%;height:100%;object-fit:cover}
+.adm-gallery-main{position:absolute;top:6px;left:6px}
+.adm-gallery-actions{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;padding:6px;background:linear-gradient(transparent,rgba(30,20,10,.45))}
+.adm-icon-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,253,249,.92);color:var(--a-brown);font-size:18px;cursor:pointer}
+.adm-icon-btn:disabled{opacity:.35;cursor:default}
+.adm-icon-danger{color:var(--a-err);font-size:22px}
+.adm-link-inline{color:var(--a-brown);text-decoration:underline}
 /* Panel: przewijanie natychmiastowe (płynne przewijanie ze sklepu utrudnia pracę w długich formularzach) */
 html:has(.adm){scroll-behavior:auto;scroll-padding-top:72px}
 

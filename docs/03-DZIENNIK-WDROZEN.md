@@ -152,3 +152,16 @@ Zgłoszenia z testów użytkownika na prawdziwym telefonie i ich rozwiązanie:
 - Kopia bazy przed migracją: `data/backup-przed-proporcjami-20261119-2309`.
 - **Testy:** Vitest 54/54 (+2: proporcje 16:9 / 9:16 / zdjęcie; walidacja proporcji), Playwright 45/45 (3 pominięte) — E2E: pionowy film z dźwiękiem → klasa `hero-portrait`, na komputerze ramka ≈15:16, ≈10% tła po prawej, widoczne 55–65% wysokości filmu; napisy pieczęci widoczne na wszystkich urządzeniach.- Boki pionowego filmu na komputerze płynnie przechodzą w przezroczystość (`mask-image`), zamiast twardych krawędzi. Testy desktop 15/15.
 - Komputer: pionowe media w ramce na połowę szerokości ekranu (prośba właściciela; przy tej samej wysokości HERO widać ok. połowy wysokości filmu 9:16). Poziome zdjęcia/filmy — lewa krawędź płynnie przechodzi w tło. Uwaga techniczna: `next dev` na Windows nie wykrywa dopisania tekstu na końcu pliku — zmiany robić zwykłym zapisem. Playwright 45/45.
+
+---
+
+## 2026-11-20 — Kamienie naturalne: panel, strony kamieni, sekcja na stronie głównej
+
+### Zrobione
+- **Panel → „Kamienie”** (6. pozycja w menu): lista z liczbą produktów, oznaczenia „Strona główna” / „Uzupełnij opis/zdjęcie” / „Ukryty”; formularz: nazwa, podpis, opis (akapity), **galeria do 8 zdjęć** (kolejność strzałkami, pierwsze = główne, zdjęcia z galerii/aparatu przez istniejący moduł wgrywania), adres strony, „pokaż na stronie głównej”, widoczność, kolejność; usuwanie zablokowane dla kamieni w produktach.
+- **Formularz produktu:** podpowiedzi kamieni ze słownika; nowy wpisany kamień trafia do słownika.
+- **Sklep:** sekcja „Każdy kamień ma swoją historię” z kamieni oznaczonych w panelu → **/kamienie/[slug]**: galeria (przesuwanie palcem, miniatury), opis, „Biżuteria z kamieniem …” (link otwiera kartę produktu w sklepie: `/?produkt=…`), „Poznaj inne kamienie”; **/kamienie** — wszystkie kamienie; metadane SEO; nieistniejący kamień → 404.
+- Decyzja D-014; migracja 0006; kopia bazy: `data/backup-przed-kamieniami-slownik-20261120-0040`.
+
+### Wynik testów
+Raport T-004.
