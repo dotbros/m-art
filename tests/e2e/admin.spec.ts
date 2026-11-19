@@ -138,6 +138,9 @@ test.describe("Panel administracyjny", () => {
     expect((await partial.body()).length).toBe(100);
     // Film startuje wyciszony; przycisk włącza i wyłącza dźwięk
     expect(await video.evaluate((v: HTMLVideoElement) => v.muted)).toBe(true);
+    // Przycisk widoczny od razu (na telefonie leżał wcześniej pod paskiem przeglądarki) — sprawdzamy na pierwszym slajdzie widoku
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(page.getByRole("button", { name: "Włącz dźwięk filmu" })).toBeInViewport();
     await page.getByRole("button", { name: "Włącz dźwięk filmu" }).click();
     await expect(page.getByRole("button", { name: "Wycisz film" })).toHaveAttribute("aria-pressed", "true");
     expect(await video.evaluate((v: HTMLVideoElement) => v.muted)).toBe(false);

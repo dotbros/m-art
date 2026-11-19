@@ -130,3 +130,10 @@ Zgłoszenia z testów użytkownika na prawdziwym telefonie i ich rozwiązanie:
 - **Zmiana (D-013):** dźwięk zostaje w pliku; film startuje wyciszony, przycisk 🔊 włącza/wyłącza dźwięk; przełącznik w panelu; automatyczne wyciszenie po przewinięciu poza HERO.
 - Kopia bazy przed migracją 0004: `data/backup-przed-dzwiekiem-20261119-2116`.
 - **Testy:** Vitest 52/52 (+2: dźwięk zachowany w AAC / brak ścieżki w niemym filmie; przycisk dźwięku tylko dla filmu), Playwright 45/45 (3 pominięte) — E2E: wgranie filmu z dźwiękiem → przełącznik domyślnie włączony → na stronie film wyciszony → „Włącz dźwięk” → `muted=false` → „Wycisz” (Android, iPhone/WebKit, desktop).
+
+### 2026-11-19 — Przycisk dźwięku niewidoczny na telefonie
+- **Zgłoszenie:** na komputerze przycisk dźwięku jest, na telefonie nie.
+- **Przyczyna:** na telefonie przycisk leżał na samym dole sekcji HERO (pod przyciskami „Odkryj biżuterię”) — poza pierwszym widokiem, pod paskiem przeglądarki.
+- **Naprawa:** na telefonie przycisk jest NA filmie (pod etykietą produktu), z napisem „Włącz dźwięk”; po włączeniu — sama ikona. Test E2E sprawdza, że przycisk jest w pierwszym widoku.
+- Przy okazji: `next dev` przestał wykrywać zmiany w `globals.css` (serwował stare style) — pomogło wyczyszczenie `.next` i restart. **Jeśli zmiana stylów „nie wchodzi”: zatrzymaj serwer, usuń `.next`, uruchom ponownie.**
+- Testy: Vitest 52/52, Playwright 45/45 (3 pominięte).

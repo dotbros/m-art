@@ -53,7 +53,7 @@ function HeroVideo({ slide, style, label, sound }: { slide: HeroSlide; style: CS
       muted autoPlay loop playsInline preload="metadata" aria-label={label} disablePictureInPicture disableRemotePlayback/>
     {slide.hasAudio && <button type="button" className={`hero-sound ${withSound ? "is-on" : ""}`} aria-pressed={withSound}
       aria-label={withSound ? "Wycisz film" : "Włącz dźwięk filmu"} onClick={() => sound.set(!withSound)}>
-      <Icon name={withSound ? "sound-on" : "sound-off"} size={22}/>
+      <Icon name={withSound ? "sound-on" : "sound-off"} size={22}/>{!withSound && <span className="hero-sound-label" aria-hidden="true">Włącz dźwięk</span>}
     </button>}
   </>;
 }

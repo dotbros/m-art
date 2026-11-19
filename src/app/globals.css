@@ -788,4 +788,7 @@ svg{flex-shrink:0}
 .hero-sound.is-on{background:var(--brown);border-color:var(--brown);color:#fffaf1}
 @media(max-width:1200px){.hero-sound{right:40px}}
 @media(max-width:1020px){.hero-sound{right:32px}}
-@media(max-width:760px){.hero-sound{right:20px;bottom:12px}}
+.hero-sound-label{font-size:13px;font-weight:500;letter-spacing:.2px;white-space:nowrap}
+.hero-sound:not(.is-on){width:auto;padding:0 16px 0 12px;gap:8px;border-radius:22px}
+/* Telefon: przycisk NA filmie (pod etykietą produktu), widoczny od razu — wcześniej był na dole sekcji, pod paskiem przeglądarki */
+@media(max-width:760px){.hero-sound{top:116px;bottom:auto;right:20px}}
