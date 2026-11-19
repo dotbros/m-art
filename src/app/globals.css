@@ -804,3 +804,13 @@ svg{flex-shrink:0}
 }
 /* Przycisk dźwięku wewnątrz ramki pionowego filmu (nie na krawędzi) */
 @media(min-width:761px){.hero-portrait .hero-sound{right:calc(10% + 16px)}}
+
+/* Pionowe media na komputerze: boki płynnie przechodzą w przezroczystość (w kolor tła HERO),
+   zamiast twardych krawędzi „wklejonego prostokąta”. */
+@media(min-width:761px){
+  .hero-portrait .hero-image{
+    -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 22%,#000 78%,transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0%,#000 22%,#000 78%,transparent 100%);
+  }
+  .hero-portrait .hero-wash{background:linear-gradient(90deg,var(--hero-bg) 0%,var(--hero-bg) 35%,rgba(238,231,219,0) 50%)}
+}
