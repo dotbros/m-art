@@ -22,7 +22,7 @@ export const MAX_VIDEO_INPUT = 200 * 1024 * 1024;
 export const MAX_VIDEO_SECONDS = 20;
 
 export type MediaKind = "image" | "video";
-export type ProcessedMedia = { mediaType: MediaKind; url: string; posterUrl: string | null; hasAudio: boolean };
+export type ProcessedMedia = { mediaType: MediaKind; url: string; posterUrl: string | null; hasAudio: boolean; aspect: number | null };
 
 /** Rozpoznaje zdjęcie lub film po pierwszych bajtach. */
 export function detectMediaKind(head: Uint8Array): MediaKind | null {
@@ -80,23 +80,38 @@ function ffmpeg(args: string[], timeoutMs = 180_000) {
   });
 }
 
-/** Czy plik ma ścieżkę dźwiękową (ffmpeg -i wypisuje opis strumieni na stderr i kończy się kodem 1 — to normalne). */
-export function hasAudioTrack(input: string) {
-  if (!ffmpegPath) return Promise.resolve(false);
-  return new Promise<boolean>((resolve) => {
+/**
+ * Opis pliku z ffmpeg: czy ma dźwięk i jakie ma proporcje obrazu (szerokość / wysokość).
+ * (ffmpeg -i wypisuje opis strumieni na stderr i kończy się kodem 1 — to normalne.)
+ */
+export function probe(input: string): Promise<{ hasAudio: boolean; aspect: number | null }> {
+  if (!ffmpegPath) return Promise.resolve({ hasAudio: false, aspect: null });
+  return new Promise((resolve) => {
     execFile(ffmpegPath as unknown as string, ["-hide_banner", "-i", input], { timeout: 30_000, windowsHide: true }, (_error, _out, stderr) => {
-      resolve(/Stream #\d+:\d+[^\n]*: Audio:/.test(String(stderr)));
+      const text = String(stderr);
+      const size = text.match(/Stream #\d+:\d+[^\n]*: Video:[^\n]*?, (\d{2,5})x(\d{2,5})/);
+      resolve({
+        hasAudio: /Stream #\d+:\d+[^\n]*: Audio:/.test(text),
+        aspect: size ? Math.round((Number(size[1]) / Number(size[2])) * 1000) / 1000 : null,
+      });
     });
   });
 }
 
+export async function hasAudioTrack(input: string) {
+  return (await probe(input)).hasAudio;
+}
+
+/** Zmniejsza tak, by DŁUŻSZY bok miał maks. `max` px (także pionowe filmy z telefonu); proporcje zachowane, wymiary parzyste. */
+const fitLongSide = (max: number) => `scale='if(gte(iw,ih),min(${max},iw),-2)':'if(gte(iw,ih),-2,min(${max},ih))'`;
+
 const newName = (ext: string) => `${randomBytes(16).toString("hex")}.${ext}`;
 
-/** Zdjęcie: maks. 2000 px szerokości, JPEG jakości ok. 85% (zwykle 200–600 KB zamiast kilku MB). */
+/** Zdjęcie: dłuższy bok maks. 2000 px, JPEG jakości ok. 85% (zwykle 200–600 KB zamiast kilku MB). */
 async function processImage(input: string): Promise<ProcessedMedia> {
   const name = newName("jpg");
-  await ffmpeg(["-i", input, "-vf", "scale='min(2000,iw)':-2", "-frames:v", "1", "-q:v", "3", path.join(uploadDir(), name)]);
-  return { mediaType: "image", url: `/media/${name}`, posterUrl: null, hasAudio: false };
+  await ffmpeg(["-i", input, "-vf", fitLongSide(2000), "-frames:v", "1", "-q:v", "3", path.join(uploadDir(), name)]);
+  return { mediaType: "image", url: `/media/${name}`, posterUrl: null, hasAudio: false, aspect: (await probe(path.join(uploadDir(), name))).aspect };
 }
 
 /**
@@ -108,9 +123,9 @@ async function processVideo(input: string): Promise<ProcessedMedia> {
   const video = newName("mp4"), poster = newName("jpg");
   const hasAudio = await hasAudioTrack(input);
   const audio = hasAudio ? ["-map", "0:a:0", "-c:a", "aac", "-b:a", "128k", "-ac", "2"] : ["-an"];
-  await ffmpeg(["-i", input, "-t", String(MAX_VIDEO_SECONDS), "-map", "0:v:0", ...audio, "-vf", "scale='min(1280,iw)':-2,fps=30", "-c:v", "libx264", "-preset", "veryfast", "-crf", "27", "-pix_fmt", "yuv420p", "-movflags", "+faststart", path.join(uploadDir(), video)], 300_000);
+  await ffmpeg(["-i", input, "-t", String(MAX_VIDEO_SECONDS), "-map", "0:v:0", ...audio, "-vf", `${fitLongSide(1280)},fps=30`, "-c:v", "libx264", "-preset", "veryfast", "-crf", "27", "-pix_fmt", "yuv420p", "-movflags", "+faststart", path.join(uploadDir(), video)], 300_000);
   await ffmpeg(["-ss", "0.3", "-i", path.join(uploadDir(), video), "-frames:v", "1", "-q:v", "4", path.join(uploadDir(), poster)]);
-  return { mediaType: "video", url: `/media/${video}`, posterUrl: `/media/${poster}`, hasAudio };
+  return { mediaType: "video", url: `/media/${video}`, posterUrl: `/media/${poster}`, hasAudio, aspect: (await probe(path.join(uploadDir(), video))).aspect };
 }
 
 /** Pełna ścieżka: strumień → plik tymczasowy → weryfikacja → konwersja → /media/… */

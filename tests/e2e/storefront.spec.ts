@@ -5,6 +5,9 @@ test.describe("Sklep — klient na telefonie i komputerze", () => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Z natury");
     await expect(page.locator(".product-card").first()).toBeVisible();
+    // Pieczęć z liściem z napisami — także na telefonie
+    await expect(page.locator(".nature-seal span").first()).toBeVisible();
+    await expect(page.locator(".nature-seal")).toContainText("MAŁA PRACOWNIA");
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
   });

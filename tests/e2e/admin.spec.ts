@@ -114,7 +114,8 @@ test.describe("Panel administracyjny", () => {
     await expect(page.getByLabel("Tytuł", { exact: true })).toHaveValue(title);
 
     // Film MOV (jak z iPhone'a) → serwer przerabia na MP4 + kadr startowy
-    await page.locator("#media-file").setInputFiles("tests/fixtures/hero-audio.mov");
+    // Pionowy film 9:16 z dźwiękiem — jak nagrany telefonem
+    await page.locator("#media-file").setInputFiles("tests/fixtures/hero-portrait.mov");
     await expect(page.getByLabel("Podgląd filmu")).toBeVisible({ timeout: 60_000 });
     await expect(page.getByLabel("Podgląd filmu")).toHaveAttribute("src", /^\/media\/[a-f0-9]{32}\.mp4$/);
     // Film ma dźwięk → opcja przycisku dźwięku, domyślnie włączona
@@ -132,6 +133,16 @@ test.describe("Panel administracyjny", () => {
     await expect(video).toBeVisible();
     await expect(page.locator(".hero h1")).toContainText(title);
     const src = (await video.getAttribute("src"))!;
+    // Pionowy film: na komputerze węższa ramka 15:16 (widać ~3/5 wysokości), po prawej ~10% tła
+    await expect(page.locator("section.hero")).toHaveClass(/hero-portrait/);
+    if (page.viewportSize()!.width >= 761) {
+      const box = (await video.boundingBox())!, hero = (await page.locator("section.hero").boundingBox())!;
+      expect(box.width / box.height).toBeCloseTo(15 / 16, 1);
+      expect((hero.x + hero.width - (box.x + box.width)) / hero.width).toBeCloseTo(0.1, 1);
+      const visible = await video.evaluate((v: HTMLVideoElement) => (v.clientHeight / v.clientWidth) / (v.videoHeight / v.videoWidth));
+      expect(visible).toBeGreaterThan(0.55);
+      expect(visible).toBeLessThan(0.65);
+    }
     expect(await video.getAttribute("poster")).toMatch(/^\/media\/[a-f0-9]{32}\.jpg$/);
     const partial = await page.request.get(src, { headers: { Range: "bytes=0-99" } });
     expect(partial.status()).toBe(206);

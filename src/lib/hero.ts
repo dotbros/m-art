@@ -4,26 +4,28 @@ import { heroSlides } from "@/db/schema";
 import type { Result } from "./validation";
 
 import { MAX_HERO_SLIDES, type HeroFocus } from "./hero-shared";
-export { HERO_FOCUS, MAX_HERO_SLIDES, type HeroFocus } from "./hero-shared";
+export { HERO_FOCUS, MAX_HERO_SLIDES, PORTRAIT_BELOW, type HeroFocus } from "./hero-shared";
 
 /** Slajd w postaci dla sklepu. */
 export type HeroSlide = {
   id: number; eyebrow: string; title: string; titleAccent: string; description: string;
   mediaType: "image" | "video"; mediaUrl: string; posterUrl: string | null; hasAudio: boolean; focus: HeroFocus; stone: string; productId: string | null;
+  /** szerokość / wysokość; null = nieznane (starsze slajdy — przeglądarka rozpozna sama) */
+  aspect: number | null;
 };
 
 /** Gdy w panelu nie ma żadnego aktywnego slajdu — strona główna nadal wygląda dobrze. */
 export const FALLBACK_SLIDE: HeroSlide = {
   id: 0, eyebrow: "BIŻUTERIA INSPIROWANA NATURĄ", title: "Z natury", titleAccent: "wyjątkowa.",
   description: "Prawdziwe kamienie. Ręczna praca. Twoja historia.\nOdkryj biżuterię, która jest tak niepowtarzalna jak Ty.",
-  mediaType: "image", mediaUrl: "/images/hero-jewelry.svg", posterUrl: null, hasAudio: false, focus: "right", stone: "", productId: null,
+  mediaType: "image", mediaUrl: "/images/hero-jewelry.svg", posterUrl: null, hasAudio: false, focus: "right", stone: "", productId: null, aspect: 1.5,
 };
 
 export async function getActiveHeroSlides(db: Db): Promise<HeroSlide[]> {
   const rows = await db.select().from(heroSlides).where(and(eq(heroSlides.isActive, true))).orderBy(asc(heroSlides.position), asc(heroSlides.id)).limit(MAX_HERO_SLIDES);
   return rows.map((r) => ({
     id: r.id, eyebrow: r.eyebrow, title: r.title, titleAccent: r.titleAccent, description: r.description, mediaType: r.mediaType,
-    mediaUrl: r.mediaUrl, posterUrl: r.posterUrl, hasAudio: r.mediaType === "video" && r.hasAudio, focus: (["left", "center", "right"].includes(r.focus) ? r.focus : "center") as HeroFocus, stone: r.stone, productId: r.productId,
+    mediaUrl: r.mediaUrl, posterUrl: r.posterUrl, hasAudio: r.mediaType === "video" && r.hasAudio, focus: (["left", "center", "right"].includes(r.focus) ? r.focus : "center") as HeroFocus, stone: r.stone, productId: r.productId, aspect: r.aspect,
   }));
 }
 
@@ -41,6 +43,8 @@ export function validateHeroSlide(form: FormData): Result<HeroSlideInput> {
   const mediaType = form.get("mediaType") === "video" ? "video" : "image";
   const focus = (["left", "center", "right"].includes(str(form.get("focus"))) ? str(form.get("focus")) : "center") as HeroFocus;
   const position = Number(str(form.get("position")) || 0);
+  const aspectRaw = Number(str(form.get("aspect")));
+  const aspect = Number.isFinite(aspectRaw) && aspectRaw >= 0.2 && aspectRaw <= 5 ? aspectRaw : null;
   if (title.length < 2 || title.length > 60) errors.title = "Tytuł musi mieć od 2 do 60 znaków.";
   if (titleAccent.length > 60) errors.titleAccent = "Maksymalnie 60 znaków.";
   if (eyebrow.length > 60) errors.eyebrow = "Maksymalnie 60 znaków.";
@@ -52,6 +56,6 @@ export function validateHeroSlide(form: FormData): Result<HeroSlideInput> {
   if (Object.keys(errors).length) return { ok: false, errors };
   return { ok: true, data: {
     title, titleAccent, eyebrow, description, mediaUrl, mediaType, posterUrl: mediaType === "video" ? posterUrl : null, hasAudio: mediaType === "video" && form.get("hasAudio") === "on", focus,
-    stone: str(form.get("stone")).slice(0, 60), productId: str(form.get("productId")) || null, position, isActive: form.get("isActive") === "on",
+    stone: str(form.get("stone")).slice(0, 60), productId: str(form.get("productId")) || null, aspect, position, isActive: form.get("isActive") === "on",
   } };
 }

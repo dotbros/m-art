@@ -8,6 +8,7 @@ import { Checkout } from "./checkout";
 import { Information, infoTitles } from "./information";
 import { HeroMedia } from "./hero-media";
 import type { HeroSlide } from "@/lib/hero";
+import { PORTRAIT_BELOW } from "@/lib/hero-shared";
 
 type CartItem = { id: string; quantity: number };
 type Panel = "search" | "wishlist" | "cart" | "menu" | "product" | "checkout" | "info" | null;
@@ -25,7 +26,8 @@ export function Shop({ products, categories: categoryNames, slides }: { products
   const [panel, setPanel] = useState<Panel>(null);
   const [navOpen, setNavOpen] = useState(false);
   const [slide, setSlide] = useState(0);
-  const [heroSound, setHeroSound] = useState(false); // dźwięk filmów HERO — włączany tylko przez klienta
+  const [heroSound, setHeroSound] = useState(false);
+  const [detectedAspect, setDetectedAspect] = useState<Record<number, number>>({}); // proporcje starszych slajdów (bez zapisanych w bazie) // dźwięk filmów HERO — włączany tylko przez klienta
   const [category, setCategory] = useState(ALL_CATEGORIES);
   const [stone, setStone] = useState(ALL_STONES);
   const [sort, setSort] = useState("featured");
@@ -151,8 +153,8 @@ export function Shop({ products, categories: categoryNames, slides }: { products
     </div></header>
 
     <main>
-      <section className={`hero hero-slide-${slide === 0 ? 0 : 1} ${currentSlide.mediaType === "video" ? "hero-has-video" : ""}`} aria-label="Nowa kolekcja M.art" aria-roledescription="karuzela" onTouchStart={onHeroTouchStart} onTouchEnd={onHeroTouchEnd} onTouchCancel={() => { heroSwipe.current = null; }}>
-        <HeroMedia key={currentSlide.id} slide={currentSlide} sound={{ on: heroSound, set: setHeroSound }} onEnded={slides.length > 1 ? () => setSlide((current) => (current + 1) % slides.length) : undefined}/>
+      <section className={`hero hero-slide-${slide === 0 ? 0 : 1} ${currentSlide.mediaType === "video" ? "hero-has-video" : ""} ${(currentSlide.aspect ?? detectedAspect[currentSlide.id] ?? 1.5) < PORTRAIT_BELOW ? "hero-portrait" : ""}`} aria-label="Nowa kolekcja M.art" aria-roledescription="karuzela" onTouchStart={onHeroTouchStart} onTouchEnd={onHeroTouchEnd} onTouchCancel={() => { heroSwipe.current = null; }}>
+        <HeroMedia key={currentSlide.id} slide={currentSlide} sound={{ on: heroSound, set: setHeroSound }} onAspect={currentSlide.aspect === null ? (a) => setDetectedAspect((d) => ({ ...d, [currentSlide.id]: a })) : undefined} onEnded={slides.length > 1 ? () => setSlide((current) => (current + 1) % slides.length) : undefined}/>
         <div className="hero-wash"/>
         <div className="hero-inner container"><div className="hero-copy" key={slide}><p className="eyebrow"><span className="small-line"/>{currentSlide.eyebrow}</p><h1>{currentSlide.title}{currentSlide.titleAccent && <><br/><em>{currentSlide.titleAccent}</em></>}</h1>{currentSlide.description && <p className="hero-description">{currentSlide.description}</p>}<div className="hero-cta"><button className="button button-dark" onClick={() => goToCollection(ALL_CATEGORIES, currentSlide.stone && stones.includes(currentSlide.stone) ? currentSlide.stone : ALL_STONES)}>Odkryj biżuterię <Icon name="arrow" size={19}/></button><button className="hero-story-link" onClick={() => showInfo("story")}>Poznaj naszą historię <span>↗</span></button></div><div className="hero-note"><Icon name="leaf" size={22}/><span>Nie ma dwóch identycznych.<br/><strong>Tak jak Ty.</strong></span></div></div>
           <div className="nature-seal"><span>MAŁA PRACOWNIA</span><Icon name="leaf" size={29}/><span>WIELKA MIŁOŚĆ</span></div>

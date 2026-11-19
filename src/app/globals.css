@@ -722,7 +722,9 @@ svg{flex-shrink:0}
   .product-badge,.product-detail-image>.product-badge,.hero-product-tag small,.photo-caption,
   .cart-count,.tiny-count,.slide-number,.slide-total{font-size:10px}
   .cart-count{width:18px;height:18px}
-  .nature-seal>span{display:none}
+  /* Pieczęć z liściem: na telefonie ten sam rozmiar i napisy co na komputerze (życzenie właściciela) */
+  .nature-seal{width:98px;height:98px;gap:6px}
+  .nature-seal>span{display:block;font-size:6.6px;letter-spacing:1.2px}
   /* kontrast tekstu drugorzędnego */
   .hero-description,.product-card-info>p,.stones-copy>p:not(.eyebrow),.footer-column>button,.footer-column>a,
   .empty-state>p,.hero-copy>.eyebrow{color:#6b5b48}
@@ -792,3 +794,13 @@ svg{flex-shrink:0}
 .hero-sound:not(.is-on){width:auto;padding:0 16px 0 12px;gap:8px;border-radius:22px}
 /* Telefon: przycisk NA filmie (pod etykietą produktu), widoczny od razu — wcześniej był na dole sekcji, pod paskiem przeglądarki */
 @media(max-width:760px){.hero-sound{top:116px;bottom:auto;right:20px}}
+
+/* Komputer i tablet: PIONOWE zdjęcie / film (np. 9:16 z telefonu) w węższej ramce po prawej.
+   Ramka 15:16 → z filmu 9:16 widać ok. 3/5 wysokości (wcześniej ~1/3). Po prawej 10% koloru tła,
+   po lewej tytuł i opis; lewa krawędź łagodnie przechodzi w tło. Telefon bez zmian. */
+@media(min-width:761px){
+  .hero-portrait .hero-image{left:auto;right:10%;width:auto;height:100%;aspect-ratio:15/16;max-width:48%;object-position:50% 40%}
+  .hero-portrait .hero-wash{background:linear-gradient(90deg,var(--hero-bg) 0%,var(--hero-bg) 38%,rgba(238,231,219,.85) 44%,rgba(238,231,219,0) 54%)}
+}
+/* Przycisk dźwięku wewnątrz ramki pionowego filmu (nie na krawędzi) */
+@media(min-width:761px){.hero-portrait .hero-sound{right:calc(10% + 16px)}}

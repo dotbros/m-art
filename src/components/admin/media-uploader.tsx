@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 
-export type UploadedMedia = { mediaType: "image" | "video"; url: string; posterUrl: string | null; hasAudio: boolean };
+export type UploadedMedia = { mediaType: "image" | "video"; url: string; posterUrl: string | null; hasAudio: boolean; aspect?: number | null };
 type Phase = { kind: "idle" } | { kind: "uploading"; percent: number } | { kind: "processing" } | { kind: "error"; message: string };
 
 /**
@@ -29,7 +29,7 @@ export function MediaUploader({ value, onChange, allowVideo = true, error }: { v
       xhr.current = null;
       let data: (UploadedMedia & { error?: string }) | null = null;
       try { data = JSON.parse(request.responseText); } catch { /* odpowiedź nie-JSON */ }
-      if (request.status === 201 && data) { onChange({ mediaType: data.mediaType, url: data.url, posterUrl: data.posterUrl, hasAudio: !!data.hasAudio }); setPhase({ kind: "idle" }); }
+      if (request.status === 201 && data) { onChange({ mediaType: data.mediaType, url: data.url, posterUrl: data.posterUrl, hasAudio: !!data.hasAudio, aspect: data.aspect ?? null }); setPhase({ kind: "idle" }); }
       else setPhase({ kind: "error", message: data?.error || "Nie udało się wysłać pliku. Spróbuj ponownie." });
     };
     request.onerror = () => { xhr.current = null; setPhase({ kind: "error", message: "Brak połączenia — sprawdź internet i spróbuj ponownie." }); };

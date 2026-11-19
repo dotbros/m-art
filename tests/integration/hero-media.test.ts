@@ -34,6 +34,15 @@ describe("przetwarzanie mediów (ffmpeg)", () => {
     expect(silent.hasAudio).toBe(false);
     expect(await hasAudioTrack(path.join(uploads, silent.url.slice(7)))).toBe(false);
   }, 60_000);
+  it("zapisuje proporcje obrazu: poziomy 16:9 i pionowy 9:16 (film z telefonu)", async () => {
+    const landscape = await processUpload(toStream(await fixture("hero.mov")), ["image", "video"]);
+    expect(landscape.aspect).toBeCloseTo(16 / 9, 1);
+    const portrait = await processUpload(toStream(await fixture("hero-portrait.mov")), ["image", "video"]);
+    expect(portrait.aspect).toBeCloseTo(9 / 16, 1);
+    expect(portrait.hasAudio).toBe(true);
+    const image = await processUpload(toStream(await fixture("hero.jpg")), ["image"]);
+    expect(image.aspect).toBeCloseTo(640 / 400, 1);
+  }, 60_000);
   it("zdjęcie → JPG", async () => {
     const result = await processUpload(toStream(await fixture("hero.jpg")), ["image", "video"]);
     expect(result).toMatchObject({ mediaType: "image", posterUrl: null });

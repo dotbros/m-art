@@ -139,3 +139,15 @@ Zgłoszenia z testów użytkownika na prawdziwym telefonie i ich rozwiązanie:
 - Testy: Vitest 52/52, Playwright 45/45 (3 pominięte).
 - Włączenie dźwięku zaczyna film od początku (wyciszenie nie przewija). Test E2E: film gra > 0,8 s → „Włącz dźwięk” → czas < 0,6 s. Playwright 45/45.
 - Po zakończeniu filmu wchodzi następny slajd (z ostatniego — pierwszy); dźwięk, jeśli włączony, zostaje dla kolejnego filmu. Przy jednym slajdzie film gra w pętli. Zweryfikowano na serwerze dev (film 3 s → slajd 02) i testem E2E. Playwright 45/45.
+
+---
+
+## 2026-11-19 — Pionowe filmy na komputerze; napisy pieczęci na telefonie
+
+- **Zgłoszenie 1:** pionowy film (9:16 z telefonu) na komputerze był mocno ucięty — widać ~1/3 kadru.
+- **Rozwiązanie:** proporcje obrazu zapisywane przy wgrywaniu (`hero_slides.aspect`, migracja 0005; odczyt z przetworzonego pliku, więc obrót z metadanych iPhone'a jest uwzględniony). Na komputerze i tablecie pionowe media (proporcja < 0,9) mają ramkę 15:16 po prawej — widać ~3/5 wysokości filmu 9:16 — z 10% tła przy prawej krawędzi; tytuł i opis po lewej. Telefon bez zmian. Starsze slajdy bez zapisanych proporcji: rozpoznanie w przeglądarce, a przy zapisie w panelu serwer uzupełnia je z pliku.
+- Przy okazji: zmniejszanie ogranicza teraz DŁUŻSZY bok (pionowy film 1080×1920 → 720×1280), wcześniej tylko szerokość.
+- Przycisk dźwięku przy pionowym filmie — wewnątrz ramki.
+- **Zgłoszenie 2:** na telefonie pieczęć z liściem bez napisów (ukryte przy przeglądzie UX — 5 px). **Rozwiązanie:** na telefonie pieczęć 98 px z napisami jak na komputerze.
+- Kopia bazy przed migracją: `data/backup-przed-proporcjami-20261119-2309`.
+- **Testy:** Vitest 54/54 (+2: proporcje 16:9 / 9:16 / zdjęcie; walidacja proporcji), Playwright 45/45 (3 pominięte) — E2E: pionowy film z dźwiękiem → klasa `hero-portrait`, na komputerze ramka ≈15:16, ≈10% tła po prawej, widoczne 55–65% wysokości filmu; napisy pieczęci widoczne na wszystkich urządzeniach.

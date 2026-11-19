@@ -41,6 +41,14 @@ describe("walidacja slajdu HERO", () => {
     expect(validateHeroSlide(form({ ...base, mediaUrl: "/media/../../.env.local" })).ok).toBe(false);
     expect(validateHeroSlide(form({ ...base, mediaType: "video" })).ok).toBe(false); // .jpg jako film
   });
+  it("proporcje obrazu: poprawna liczba zapisana, brak lub bzdura → null (serwer odczyta z pliku)", () => {
+    const ok = validateHeroSlide(form({ ...base, aspect: "0.5625" }));
+    expect(ok.ok && ok.data.aspect).toBe(0.5625);
+    for (const bad of ["", "abc", "0", "-1", "99"]) {
+      const r = validateHeroSlide(form({ ...base, aspect: bad }));
+      expect(r.ok && r.data.aspect).toBeNull();
+    }
+  });
   it("przycisk dźwięku tylko dla filmu i tylko gdy zaznaczony", () => {
     const video = { ...base, mediaType: "video", mediaUrl: "/media/0123456789abcdef0123456789abcdef.mp4" };
     const on = validateHeroSlide(form({ ...video, hasAudio: "on" }));

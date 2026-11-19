@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { boolean, index, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgTable, real, text, timestamp } from "drizzle-orm/pg-core";
 
 /** Kategorie produktów (Naszyjniki, Kolczyki…). Zarządzane w panelu /admin/kategorie. */
 export const categories = pgTable("categories", {
@@ -48,6 +48,7 @@ export const heroSlides = pgTable("hero_slides", {
   mediaUrl: text("media_url").notNull(),
   posterUrl: text("poster_url"), // kadr startowy wideo
   hasAudio: boolean("has_audio").notNull().default(false), // film ma dźwięk i klient może go włączyć przyciskiem
+  aspect: real("aspect"), // proporcje szerokość/wysokość (np. 0.5625 = pionowy 9:16) — pionowe media mają inny układ na komputerze
   focus: text("focus").notNull().default("center"), // kadrowanie na telefonie: left | center | right
   stone: text("stone").notNull().default(""), // przycisk „Odkryj biżuterię” filtruje po tym kamieniu
   productId: text("product_id"), // etykieta w rogu otwiera ten produkt
