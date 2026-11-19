@@ -45,7 +45,11 @@ function HeroVideo({ slide, style, label, sound }: { slide: HeroSlide; style: CS
     const video = ref.current;
     if (!video) return;
     video.muted = !withSound;
-    if (withSound) void video.play().catch(() => { video.muted = true; soundRef.current.set(false); });
+    // Włączenie dźwięku = klient chce obejrzeć film → od początku. Wyciszenie nie przewija.
+    if (withSound) {
+      video.currentTime = 0;
+      void video.play().catch(() => { video.muted = true; soundRef.current.set(false); });
+    }
   }, [withSound]);
 
   return <>

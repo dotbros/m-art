@@ -137,3 +137,4 @@ Zgłoszenia z testów użytkownika na prawdziwym telefonie i ich rozwiązanie:
 - **Naprawa:** na telefonie przycisk jest NA filmie (pod etykietą produktu), z napisem „Włącz dźwięk”; po włączeniu — sama ikona. Test E2E sprawdza, że przycisk jest w pierwszym widoku.
 - Przy okazji: `next dev` przestał wykrywać zmiany w `globals.css` (serwował stare style) — pomogło wyczyszczenie `.next` i restart. **Jeśli zmiana stylów „nie wchodzi”: zatrzymaj serwer, usuń `.next`, uruchom ponownie.**
 - Testy: Vitest 52/52, Playwright 45/45 (3 pominięte).
+- Włączenie dźwięku zaczyna film od początku (wyciszenie nie przewija). Test E2E: film gra > 0,8 s → „Włącz dźwięk” → czas < 0,6 s. Playwright 45/45.

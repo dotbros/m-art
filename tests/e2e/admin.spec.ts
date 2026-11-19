@@ -141,7 +141,10 @@ test.describe("Panel administracyjny", () => {
     // Przycisk widoczny od razu (na telefonie leżał wcześniej pod paskiem przeglądarki) — sprawdzamy na pierwszym slajdzie widoku
     await page.evaluate(() => window.scrollTo(0, 0));
     await expect(page.getByRole("button", { name: "Włącz dźwięk filmu" })).toBeInViewport();
+    // Film gra już chwilę; włączenie dźwięku zaczyna go od początku
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime)).toBeGreaterThan(0.8);
     await page.getByRole("button", { name: "Włącz dźwięk filmu" }).click();
+    expect(await video.evaluate((v: HTMLVideoElement) => v.currentTime)).toBeLessThan(0.6);
     await expect(page.getByRole("button", { name: "Wycisz film" })).toHaveAttribute("aria-pressed", "true");
     expect(await video.evaluate((v: HTMLVideoElement) => v.muted)).toBe(false);
     await page.getByRole("button", { name: "Wycisz film" }).click();
