@@ -9,7 +9,8 @@ import { categories, heroSlides, orderItems, orders, products, ORDER_STATUSES, P
 import { validateHeroSlide, MAX_HERO_SLIDES } from "@/lib/hero";
 import { requireAdmin, SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
 import { authenticate, clearAttempts, createSession, deleteSession, isRateLimited, registerFailedAttempt } from "@/lib/auth/sessions";
-import { deleteMedia, saveImage, UploadError } from "@/lib/uploads";
+import { deleteMedia, locateMedia, saveImage, UploadError } from "@/lib/uploads";
+import { hasAudioTrack } from "@/lib/media";
 import { validateCategory, validateProduct } from "@/lib/validation";
 
 export type FormState = { error?: string; errors?: Record<string, string>; message?: string; values?: Record<string, string>; ts?: number };
@@ -178,6 +179,11 @@ export async function saveHeroSlideAction(_prev: FormState, form: FormData): Pro
     if (!product) return fail(form, { productId: "Wybrany produkt nie istnieje." });
   }
   const [existing] = id ? await db.select().from(heroSlides).where(eq(heroSlides.id, id)) : [];
+  // Przycisk dźwięku tylko wtedy, gdy plik naprawdę ma ścieżkę dźwiękową.
+  if (parsed.data.hasAudio) {
+    const media = await locateMedia(parsed.data.mediaUrl.replace(/^\/media\//, ""));
+    parsed.data.hasAudio = !!media && (await hasAudioTrack(media.file));
+  }
   if (id && !existing) return { error: "Slajd nie istnieje." };
   if (!id) {
     const [{ value }] = await db.select({ value: count() }).from(heroSlides).where(eq(heroSlides.isActive, true));

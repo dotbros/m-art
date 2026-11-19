@@ -41,6 +41,15 @@ describe("walidacja slajdu HERO", () => {
     expect(validateHeroSlide(form({ ...base, mediaUrl: "/media/../../.env.local" })).ok).toBe(false);
     expect(validateHeroSlide(form({ ...base, mediaType: "video" })).ok).toBe(false); // .jpg jako film
   });
+  it("przycisk dźwięku tylko dla filmu i tylko gdy zaznaczony", () => {
+    const video = { ...base, mediaType: "video", mediaUrl: "/media/0123456789abcdef0123456789abcdef.mp4" };
+    const on = validateHeroSlide(form({ ...video, hasAudio: "on" }));
+    expect(on.ok && on.data.hasAudio).toBe(true);
+    const off = validateHeroSlide(form(video));
+    expect(off.ok && off.data.hasAudio).toBe(false);
+    const image = validateHeroSlide(form({ ...base, hasAudio: "on" }));
+    expect(image.ok && image.data.hasAudio).toBe(false);
+  });
   it("nieznane kadrowanie zamienia na środek, opis normalizuje końce linii", () => {
     const r = validateHeroSlide(form({ ...base, focus: "gora", description: "a\r\nb" }));
     expect(r.ok && [r.data.focus, r.data.description]).toEqual(["center", "a\nb"]);

@@ -22,7 +22,7 @@ export const MAX_VIDEO_INPUT = 200 * 1024 * 1024;
 export const MAX_VIDEO_SECONDS = 20;
 
 export type MediaKind = "image" | "video";
-export type ProcessedMedia = { mediaType: MediaKind; url: string; posterUrl: string | null };
+export type ProcessedMedia = { mediaType: MediaKind; url: string; posterUrl: string | null; hasAudio: boolean };
 
 /** Rozpoznaje zdjęcie lub film po pierwszych bajtach. */
 export function detectMediaKind(head: Uint8Array): MediaKind | null {
@@ -80,24 +80,37 @@ function ffmpeg(args: string[], timeoutMs = 180_000) {
   });
 }
 
+/** Czy plik ma ścieżkę dźwiękową (ffmpeg -i wypisuje opis strumieni na stderr i kończy się kodem 1 — to normalne). */
+export function hasAudioTrack(input: string) {
+  if (!ffmpegPath) return Promise.resolve(false);
+  return new Promise<boolean>((resolve) => {
+    execFile(ffmpegPath as unknown as string, ["-hide_banner", "-i", input], { timeout: 30_000, windowsHide: true }, (_error, _out, stderr) => {
+      resolve(/Stream #\d+:\d+[^\n]*: Audio:/.test(String(stderr)));
+    });
+  });
+}
+
 const newName = (ext: string) => `${randomBytes(16).toString("hex")}.${ext}`;
 
 /** Zdjęcie: maks. 2000 px szerokości, JPEG jakości ok. 85% (zwykle 200–600 KB zamiast kilku MB). */
 async function processImage(input: string): Promise<ProcessedMedia> {
   const name = newName("jpg");
   await ffmpeg(["-i", input, "-vf", "scale='min(2000,iw)':-2", "-frames:v", "1", "-q:v", "3", path.join(uploadDir(), name)]);
-  return { mediaType: "image", url: `/media/${name}`, posterUrl: null };
+  return { mediaType: "image", url: `/media/${name}`, posterUrl: null, hasAudio: false };
 }
 
 /**
- * Film: MP4 H.264 (działa w Safari, Chrome, Firefox), maks. 1280 px, maks. 20 s, bez dźwięku
- * (autoodtwarzanie na telefonach wymaga wyciszenia), „faststart” — odtwarzanie zaczyna się przed pobraniem całości.
+ * Film: MP4 H.264 + dźwięk AAC (działa w Safari, Chrome, Firefox), maks. 1280 px, maks. 20 s,
+ * „faststart” — odtwarzanie zaczyna się przed pobraniem całości. Dźwięk zostaje w pliku: strona startuje
+ * film wyciszony (wymóg autoodtwarzania w przeglądarkach), a klient może włączyć dźwięk przyciskiem.
  */
 async function processVideo(input: string): Promise<ProcessedMedia> {
   const video = newName("mp4"), poster = newName("jpg");
-  await ffmpeg(["-i", input, "-t", String(MAX_VIDEO_SECONDS), "-an", "-vf", "scale='min(1280,iw)':-2,fps=30", "-c:v", "libx264", "-preset", "veryfast", "-crf", "27", "-pix_fmt", "yuv420p", "-movflags", "+faststart", path.join(uploadDir(), video)], 300_000);
+  const hasAudio = await hasAudioTrack(input);
+  const audio = hasAudio ? ["-map", "0:a:0", "-c:a", "aac", "-b:a", "128k", "-ac", "2"] : ["-an"];
+  await ffmpeg(["-i", input, "-t", String(MAX_VIDEO_SECONDS), "-map", "0:v:0", ...audio, "-vf", "scale='min(1280,iw)':-2,fps=30", "-c:v", "libx264", "-preset", "veryfast", "-crf", "27", "-pix_fmt", "yuv420p", "-movflags", "+faststart", path.join(uploadDir(), video)], 300_000);
   await ffmpeg(["-ss", "0.3", "-i", path.join(uploadDir(), video), "-frames:v", "1", "-q:v", "4", path.join(uploadDir(), poster)]);
-  return { mediaType: "video", url: `/media/${video}`, posterUrl: `/media/${poster}` };
+  return { mediaType: "video", url: `/media/${video}`, posterUrl: `/media/${poster}`, hasAudio };
 }
 
 /** Pełna ścieżka: strumień → plik tymczasowy → weryfikacja → konwersja → /media/… */

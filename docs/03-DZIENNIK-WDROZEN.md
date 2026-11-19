@@ -120,3 +120,13 @@ Zgłoszenia z testów użytkownika na prawdziwym telefonie i ich rozwiązanie:
 - **Naprawa:** wyczyszczenie `.next`; testy E2E budują teraz do osobnego katalogu `.next-e2e` (`distDir` z `NEXT_DIST_DIR`). Zweryfikowano: E2E uruchomione przy działającym `next dev` — po nich 0 przeładowań.
 - Ustabilizowano test „koszyk przetrwa odświeżenie” (WebKit: kliknięcie przed hydratacją) — 2 pełne przebiegi z rzędu: 45/45.
 - **Gdyby problem wrócił:** zatrzymaj serwer, usuń katalog `.next`, uruchom ponownie `npm run dev`.
+
+---
+
+## 2026-11-19 — Dźwięk w filmach HERO
+
+- **Zgłoszenie:** wgrane filmy nie mają dźwięku.
+- **Przyczyna:** świadoma decyzja D-012 (wycinanie dźwięku, bo przeglądarki autoodtwarzają tylko wyciszone filmy) — podjęta bez konsultacji z użytkownikiem.
+- **Zmiana (D-013):** dźwięk zostaje w pliku; film startuje wyciszony, przycisk 🔊 włącza/wyłącza dźwięk; przełącznik w panelu; automatyczne wyciszenie po przewinięciu poza HERO.
+- Kopia bazy przed migracją 0004: `data/backup-przed-dzwiekiem-20261119-2116`.
+- **Testy:** Vitest 52/52 (+2: dźwięk zachowany w AAC / brak ścieżki w niemym filmie; przycisk dźwięku tylko dla filmu), Playwright 45/45 (3 pominięte) — E2E: wgranie filmu z dźwiękiem → przełącznik domyślnie włączony → na stronie film wyciszony → „Włącz dźwięk” → `muted=false` → „Wycisz” (Android, iPhone/WebKit, desktop).

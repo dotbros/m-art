@@ -114,9 +114,11 @@ test.describe("Panel administracyjny", () => {
     await expect(page.getByLabel("Tytuł", { exact: true })).toHaveValue(title);
 
     // Film MOV (jak z iPhone'a) → serwer przerabia na MP4 + kadr startowy
-    await page.locator("#media-file").setInputFiles("tests/fixtures/hero.mov");
+    await page.locator("#media-file").setInputFiles("tests/fixtures/hero-audio.mov");
     await expect(page.getByLabel("Podgląd filmu")).toBeVisible({ timeout: 60_000 });
     await expect(page.getByLabel("Podgląd filmu")).toHaveAttribute("src", /^\/media\/[a-f0-9]{32}\.mp4$/);
+    // Film ma dźwięk → opcja przycisku dźwięku, domyślnie włączona
+    await expect(page.getByLabel(/Klient może włączyć dźwięk/)).toBeChecked();
     await page.getByLabel("Druga linia tytułu (kursywą)").fill("w ruchu.");
     await page.getByText("Lewa strona").click();
     await page.getByLabel("Kolejność").fill("99");
@@ -134,6 +136,13 @@ test.describe("Panel administracyjny", () => {
     const partial = await page.request.get(src, { headers: { Range: "bytes=0-99" } });
     expect(partial.status()).toBe(206);
     expect((await partial.body()).length).toBe(100);
+    // Film startuje wyciszony; przycisk włącza i wyłącza dźwięk
+    expect(await video.evaluate((v: HTMLVideoElement) => v.muted)).toBe(true);
+    await page.getByRole("button", { name: "Włącz dźwięk filmu" }).click();
+    await expect(page.getByRole("button", { name: "Wycisz film" })).toHaveAttribute("aria-pressed", "true");
+    expect(await video.evaluate((v: HTMLVideoElement) => v.muted)).toBe(false);
+    await page.getByRole("button", { name: "Wycisz film" }).click();
+    expect(await video.evaluate((v: HTMLVideoElement) => v.muted)).toBe(true);
 
     // Usunięcie slajdu kasuje też plik
     await page.goto("/admin/strona");

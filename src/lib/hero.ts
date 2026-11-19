@@ -9,21 +9,21 @@ export { HERO_FOCUS, MAX_HERO_SLIDES, type HeroFocus } from "./hero-shared";
 /** Slajd w postaci dla sklepu. */
 export type HeroSlide = {
   id: number; eyebrow: string; title: string; titleAccent: string; description: string;
-  mediaType: "image" | "video"; mediaUrl: string; posterUrl: string | null; focus: HeroFocus; stone: string; productId: string | null;
+  mediaType: "image" | "video"; mediaUrl: string; posterUrl: string | null; hasAudio: boolean; focus: HeroFocus; stone: string; productId: string | null;
 };
 
 /** Gdy w panelu nie ma żadnego aktywnego slajdu — strona główna nadal wygląda dobrze. */
 export const FALLBACK_SLIDE: HeroSlide = {
   id: 0, eyebrow: "BIŻUTERIA INSPIROWANA NATURĄ", title: "Z natury", titleAccent: "wyjątkowa.",
   description: "Prawdziwe kamienie. Ręczna praca. Twoja historia.\nOdkryj biżuterię, która jest tak niepowtarzalna jak Ty.",
-  mediaType: "image", mediaUrl: "/images/hero-jewelry.svg", posterUrl: null, focus: "right", stone: "", productId: null,
+  mediaType: "image", mediaUrl: "/images/hero-jewelry.svg", posterUrl: null, hasAudio: false, focus: "right", stone: "", productId: null,
 };
 
 export async function getActiveHeroSlides(db: Db): Promise<HeroSlide[]> {
   const rows = await db.select().from(heroSlides).where(and(eq(heroSlides.isActive, true))).orderBy(asc(heroSlides.position), asc(heroSlides.id)).limit(MAX_HERO_SLIDES);
   return rows.map((r) => ({
     id: r.id, eyebrow: r.eyebrow, title: r.title, titleAccent: r.titleAccent, description: r.description, mediaType: r.mediaType,
-    mediaUrl: r.mediaUrl, posterUrl: r.posterUrl, focus: (["left", "center", "right"].includes(r.focus) ? r.focus : "center") as HeroFocus, stone: r.stone, productId: r.productId,
+    mediaUrl: r.mediaUrl, posterUrl: r.posterUrl, hasAudio: r.mediaType === "video" && r.hasAudio, focus: (["left", "center", "right"].includes(r.focus) ? r.focus : "center") as HeroFocus, stone: r.stone, productId: r.productId,
   }));
 }
 
@@ -51,7 +51,7 @@ export function validateHeroSlide(form: FormData): Result<HeroSlideInput> {
   if (!Number.isInteger(position) || position < 0 || position > 999) errors.position = "Kolejność to liczba 0–999.";
   if (Object.keys(errors).length) return { ok: false, errors };
   return { ok: true, data: {
-    title, titleAccent, eyebrow, description, mediaUrl, mediaType, posterUrl: mediaType === "video" ? posterUrl : null, focus,
+    title, titleAccent, eyebrow, description, mediaUrl, mediaType, posterUrl: mediaType === "video" ? posterUrl : null, hasAudio: mediaType === "video" && form.get("hasAudio") === "on", focus,
     stone: str(form.get("stone")).slice(0, 60), productId: str(form.get("productId")) || null, position, isActive: form.get("isActive") === "on",
   } };
 }

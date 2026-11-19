@@ -7,7 +7,7 @@ import { HERO_FOCUS, HERO_FOCUS_POSITION, type HeroFocus } from "@/lib/hero-shar
 import { Field, FormMessage, SubmitButton, useFocusFirstError } from "./ui";
 import { MediaUploader, type UploadedMedia } from "./media-uploader";
 
-type Slide = { id: number; eyebrow: string; title: string; titleAccent: string; description: string; mediaType: "image" | "video"; mediaUrl: string; posterUrl: string | null; focus: string; stone: string; productId: string | null; position: number; isActive: boolean };
+type Slide = { id: number; eyebrow: string; title: string; titleAccent: string; description: string; mediaType: "image" | "video"; mediaUrl: string; posterUrl: string | null; hasAudio: boolean; focus: string; stone: string; productId: string | null; position: number; isActive: boolean };
 
 export function HeroSlideForm({ slide, stones, products }: { slide?: Slide; stones: string[]; products: { id: string; name: string }[] }) {
   const [state, action] = useActionState(saveHeroSlideAction, {});
@@ -16,9 +16,13 @@ export function HeroSlideForm({ slide, stones, products }: { slide?: Slide; ston
   const v = state.values;
   const val = (key: string, fallback: string | number | null | undefined) => (v ? (v[key] ?? "") : String(fallback ?? ""));
   const [media, setMedia] = useState<UploadedMedia | null>(
-    v?.mediaUrl ? { mediaType: v.mediaType === "video" ? "video" : "image", url: v.mediaUrl, posterUrl: v.posterUrl || null }
-      : slide ? { mediaType: slide.mediaType, url: slide.mediaUrl, posterUrl: slide.posterUrl } : null,
+    v?.mediaUrl ? { mediaType: v.mediaType === "video" ? "video" : "image", url: v.mediaUrl, posterUrl: v.posterUrl || null, hasAudio: v.hasAudio === "on" }
+      : slide ? { mediaType: slide.mediaType, url: slide.mediaUrl, posterUrl: slide.posterUrl, hasAudio: slide.hasAudio } : null,
   );
+  // Dźwięk: po świeżym wgraniu wiemy, czy film go ma; dla zapisanego filmu serwer sprawdzi to przy zapisie.
+  const [justUploaded, setJustUploaded] = useState(false);
+  const [soundOn, setSoundOn] = useState(v ? v.hasAudio === "on" : slide?.hasAudio ?? false);
+  function onMediaChange(next: UploadedMedia | null) { setMedia(next); setJustUploaded(!!next); setSoundOn(!!next?.hasAudio); }
   const [focus, setFocus] = useState<HeroFocus>((val("focus", slide?.focus ?? "center") || "center") as HeroFocus);
   const [title, setTitle] = useState(val("title", slide?.title));
   const [accent, setAccent] = useState(val("titleAccent", slide?.titleAccent));
@@ -34,7 +38,10 @@ export function HeroSlideForm({ slide, stones, products }: { slide?: Slide; ston
 
     <section className="adm-card">
       <h2>Zdjęcie lub film</h2>
-      <MediaUploader value={media} onChange={setMedia} error={e.media}/>
+      <MediaUploader value={media} onChange={onMediaChange} error={e.media}/>
+      {media?.mediaType === "video" && (justUploaded && !media.hasAudio
+        ? <p className="adm-hint">Ten film nie ma dźwięku — będzie odtwarzany bez przycisku dźwięku.</p>
+        : <label className="adm-switch"><input type="checkbox" name="hasAudio" checked={soundOn} onChange={(ev) => setSoundOn(ev.target.checked)}/><span>Klient może włączyć dźwięk (przycisk 🔊 na filmie)</span></label>)}
       <fieldset className="adm-focus">
         <legend>Kadrowanie na telefonie</legend>
         <p className="adm-hint">Na telefonie widać tylko część szerokiego zdjęcia — wybierz, która część ma być widoczna.</p>

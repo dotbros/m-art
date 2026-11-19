@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 
-export type UploadedMedia = { mediaType: "image" | "video"; url: string; posterUrl: string | null };
+export type UploadedMedia = { mediaType: "image" | "video"; url: string; posterUrl: string | null; hasAudio: boolean };
 type Phase = { kind: "idle" } | { kind: "uploading"; percent: number } | { kind: "processing" } | { kind: "error"; message: string };
 
 /**
@@ -29,7 +29,7 @@ export function MediaUploader({ value, onChange, allowVideo = true, error }: { v
       xhr.current = null;
       let data: (UploadedMedia & { error?: string }) | null = null;
       try { data = JSON.parse(request.responseText); } catch { /* odpowiedź nie-JSON */ }
-      if (request.status === 201 && data) { onChange({ mediaType: data.mediaType, url: data.url, posterUrl: data.posterUrl }); setPhase({ kind: "idle" }); }
+      if (request.status === 201 && data) { onChange({ mediaType: data.mediaType, url: data.url, posterUrl: data.posterUrl, hasAudio: !!data.hasAudio }); setPhase({ kind: "idle" }); }
       else setPhase({ kind: "error", message: data?.error || "Nie udało się wysłać pliku. Spróbuj ponownie." });
     };
     request.onerror = () => { xhr.current = null; setPhase({ kind: "error", message: "Brak połączenia — sprawdź internet i spróbuj ponownie." }); };
@@ -45,7 +45,7 @@ export function MediaUploader({ value, onChange, allowVideo = true, error }: { v
     <span className="adm-label" id="media-label">{allowVideo ? "Zdjęcie lub film" : "Zdjęcie"}</span>
     <div className="adm-media-preview" aria-labelledby="media-label">
       {value ? (value.mediaType === "video"
-        ? <video src={value.url} poster={value.posterUrl ?? undefined} muted loop playsInline autoPlay controls={false} aria-label="Podgląd filmu"/>
+        ? <video src={value.url} poster={value.posterUrl ?? undefined} muted loop playsInline autoPlay controls={value.hasAudio} aria-label="Podgląd filmu"/>
         // eslint-disable-next-line @next/next/no-img-element
         : <img src={value.url} alt="Podgląd zdjęcia"/>) : <span>Brak zdjęcia ani filmu</span>}
       {busy && <div className="adm-media-busy" role="status" aria-live="polite">
@@ -61,6 +61,6 @@ export function MediaUploader({ value, onChange, allowVideo = true, error }: { v
       {value && !busy && <button type="button" className="adm-btn adm-btn-ghost-danger" onClick={() => onChange(null)}>Usuń</button>}
     </div>
     {message ? <small className="adm-error" role="alert">{message}</small>
-      : <small className="adm-hint">{allowVideo ? "Film: najlepiej 5–20 s, będzie odtwarzany bez dźwięku w pętli. Dłuższy zostanie przycięty do 20 s. Zdjęcia i filmy zmniejszamy automatycznie." : "Zdjęcie zmniejszymy automatycznie."}</small>}
+      : <small className="adm-hint">{allowVideo ? "Film: najlepiej 5–20 s, odtwarzany w pętli; dłuższy zostanie przycięty do 20 s. Startuje wyciszony (wymóg przeglądarek) — klient może włączyć dźwięk przyciskiem. Zdjęcia i filmy zmniejszamy automatycznie." : "Zdjęcie zmniejszymy automatycznie."}</small>}
   </div>;
 }

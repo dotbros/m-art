@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { getActiveHeroSlides } from "@/lib/hero";
-import { processUpload } from "@/lib/media";
+import { hasAudioTrack, processUpload } from "@/lib/media";
 import { UploadError } from "@/lib/uploads";
 import { heroSlides } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -25,6 +25,14 @@ describe("przetwarzanie mediów (ffmpeg)", () => {
     const mp4 = await readFile(path.join(uploads, result.url.slice(7)));
     expect(String.fromCharCode(...mp4.subarray(4, 8))).toBe("ftyp");
     expect((await stat(path.join(uploads, result.posterUrl!.slice(7)))).size).toBeGreaterThan(500);
+  }, 60_000);
+  it("film z dźwiękiem zachowuje dźwięk (AAC), film bez dźwięku — bez ścieżki", async () => {
+    const withAudio = await processUpload(toStream(await fixture("hero-audio.mov")), ["image", "video"]);
+    expect(withAudio.hasAudio).toBe(true);
+    expect(await hasAudioTrack(path.join(uploads, withAudio.url.slice(7)))).toBe(true);
+    const silent = await processUpload(toStream(await fixture("hero.mov")), ["image", "video"]);
+    expect(silent.hasAudio).toBe(false);
+    expect(await hasAudioTrack(path.join(uploads, silent.url.slice(7)))).toBe(false);
   }, 60_000);
   it("zdjęcie → JPG", async () => {
     const result = await processUpload(toStream(await fixture("hero.jpg")), ["image", "video"]);

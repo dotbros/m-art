@@ -47,6 +47,7 @@ export const heroSlides = pgTable("hero_slides", {
   mediaType: text("media_type").$type<"image" | "video">().notNull().default("image"),
   mediaUrl: text("media_url").notNull(),
   posterUrl: text("poster_url"), // kadr startowy wideo
+  hasAudio: boolean("has_audio").notNull().default(false), // film ma dźwięk i klient może go włączyć przyciskiem
   focus: text("focus").notNull().default("center"), // kadrowanie na telefonie: left | center | right
   stone: text("stone").notNull().default(""), // przycisk „Odkryj biżuterię” filtruje po tym kamieniu
   productId: text("product_id"), // etykieta w rogu otwiera ten produkt

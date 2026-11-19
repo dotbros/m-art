@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-export type IconName = "search" | "bag" | "heart" | "arrow" | "arrow-left" | "arrow-down" | "chevron" | "close" | "menu" | "plus" | "minus" | "leaf" | "gift" | "truck" | "hand" | "check" | "filter" | "instagram" | "star" | "shield" | "mail" | "sparkle" | "trash";
+export type IconName = "search" | "bag" | "heart" | "arrow" | "arrow-left" | "arrow-down" | "chevron" | "close" | "menu" | "plus" | "minus" | "leaf" | "gift" | "truck" | "hand" | "check" | "filter" | "instagram" | "star" | "shield" | "mail" | "sparkle" | "trash" | "sound-on" | "sound-off";
 
 export function Icon({ name, size = 22, className = "", style }: { name: IconName; size?: number; className?: string; style?: CSSProperties }) {
   const paths: Record<IconName, React.ReactNode> = {
@@ -27,6 +27,8 @@ export function Icon({ name, size = 22, className = "", style }: { name: IconNam
     mail: <><rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3 6 9 7 9-7"/></>,
     sparkle: <><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5L12 2Z"/></>,
     trash: <><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></>,
+    "sound-on": <><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></>,
+    "sound-off": <><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="m17 9.5 5 5m0-5-5 5"/></>,
   };
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round" className={className} style={style} aria-hidden="true">{paths[name]}</svg>;
 }

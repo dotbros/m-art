@@ -781,3 +781,11 @@ svg{flex-shrink:0}
 .hero-image{animation:hero-fade .45s ease-out}
 @keyframes hero-fade{from{opacity:.35}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.hero-image,.hero-copy{animation:none}}
+
+/* HERO: przycisk dźwięku filmu (tylko gdy film ma dźwięk) */
+.hero-sound{position:absolute;z-index:4;right:max(60px,calc((100% - 1320px) / 2));bottom:104px;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:#fbf6ecdd;backdrop-filter:blur(6px);border:1px solid #cdbb9c;color:#6b5941;cursor:pointer;transition:background .2s,color .2s}
+.hero-sound:hover{background:#fffaf1}
+.hero-sound.is-on{background:var(--brown);border-color:var(--brown);color:#fffaf1}
+@media(max-width:1200px){.hero-sound{right:40px}}
+@media(max-width:1020px){.hero-sound{right:32px}}
+@media(max-width:760px){.hero-sound{right:20px;bottom:12px}}

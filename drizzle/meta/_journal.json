@@ -29,6 +29,13 @@
       "when": 1794959511761,
       "tag": "0003_hero_slides",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795118132661,
+      "tag": "0004_hero_audio",
+      "breakpoints": true
     }
   ]
 }
