@@ -8,10 +8,10 @@ import { Icon } from "./icons";
 type Sound = { on: boolean; set: (on: boolean) => void };
 
 /** Zdjęcie lub film w sekcji HERO. Kadrowanie (focus) działa na telefonach, gdzie obraz jest mocno przycinany. */
-export function HeroMedia({ slide, sound }: { slide: HeroSlide; sound: Sound }) {
+export function HeroMedia({ slide, sound, onEnded }: { slide: HeroSlide; sound: Sound; onEnded?: () => void }) {
   const style = { "--hero-focus": FOCUS[slide.focus] } as CSSProperties;
   const alt = `${slide.title} ${slide.titleAccent}`.trim();
-  if (slide.mediaType === "video") return <HeroVideo slide={slide} style={style} label={alt} sound={sound}/>;
+  if (slide.mediaType === "video") return <HeroVideo slide={slide} style={style} label={alt} sound={sound} onEnded={onEnded}/>;
   // eslint-disable-next-line @next/next/no-img-element
   return <img className="hero-image" src={slide.mediaUrl} alt={alt} style={style} fetchPriority="high"/>;
 }
@@ -19,8 +19,9 @@ export function HeroMedia({ slide, sound }: { slide: HeroSlide; sound: Sound }) 
 /**
  * Film startuje WYCISZONY — przeglądarki (Safari, Chrome) pozwalają na autoodtwarzanie tylko bez dźwięku.
  * Jeśli film ma dźwięk, klient włącza go przyciskiem. Dźwięk wycisza się sam po przewinięciu strony dalej.
+ * `onEnded` podane → po zakończeniu filmu wchodzi następny slajd; brak (jeden slajd) → film gra w pętli.
  */
-function HeroVideo({ slide, style, label, sound }: { slide: HeroSlide; style: CSSProperties; label: string; sound: Sound }) {
+function HeroVideo({ slide, style, label, sound, onEnded }: { slide: HeroSlide; style: CSSProperties; label: string; sound: Sound; onEnded?: () => void }) {
   const ref = useRef<HTMLVideoElement>(null);
   const soundRef = useRef(sound);
   useEffect(() => { soundRef.current = sound; });
@@ -54,7 +55,7 @@ function HeroVideo({ slide, style, label, sound }: { slide: HeroSlide; style: CS
 
   return <>
     <video ref={ref} className="hero-image hero-video" style={style} src={slide.mediaUrl} poster={slide.posterUrl ?? undefined}
-      muted autoPlay loop playsInline preload="metadata" aria-label={label} disablePictureInPicture disableRemotePlayback/>
+      muted autoPlay loop={!onEnded} onEnded={onEnded} playsInline preload="metadata" aria-label={label} disablePictureInPicture disableRemotePlayback/>
     {slide.hasAudio && <button type="button" className={`hero-sound ${withSound ? "is-on" : ""}`} aria-pressed={withSound}
       aria-label={withSound ? "Wycisz film" : "Włącz dźwięk filmu"} onClick={() => sound.set(!withSound)}>
       <Icon name={withSound ? "sound-on" : "sound-off"} size={22}/>{!withSound && <span className="hero-sound-label" aria-hidden="true">Włącz dźwięk</span>}

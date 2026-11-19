@@ -138,3 +138,4 @@ Zgłoszenia z testów użytkownika na prawdziwym telefonie i ich rozwiązanie:
 - Przy okazji: `next dev` przestał wykrywać zmiany w `globals.css` (serwował stare style) — pomogło wyczyszczenie `.next` i restart. **Jeśli zmiana stylów „nie wchodzi”: zatrzymaj serwer, usuń `.next`, uruchom ponownie.**
 - Testy: Vitest 52/52, Playwright 45/45 (3 pominięte).
 - Włączenie dźwięku zaczyna film od początku (wyciszenie nie przewija). Test E2E: film gra > 0,8 s → „Włącz dźwięk” → czas < 0,6 s. Playwright 45/45.
+- Po zakończeniu filmu wchodzi następny slajd (z ostatniego — pierwszy); dźwięk, jeśli włączony, zostaje dla kolejnego filmu. Przy jednym slajdzie film gra w pętli. Zweryfikowano na serwerze dev (film 3 s → slajd 02) i testem E2E. Playwright 45/45.

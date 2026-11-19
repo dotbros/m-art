@@ -149,6 +149,10 @@ test.describe("Panel administracyjny", () => {
     expect(await video.evaluate((v: HTMLVideoElement) => v.muted)).toBe(false);
     await page.getByRole("button", { name: "Wycisz film" }).click();
     expect(await video.evaluate((v: HTMLVideoElement) => v.muted)).toBe(true);
+    // Po zakończeniu filmu wchodzi następny slajd (nasz jest ostatni → wraca pierwszy)
+    expect(await video.evaluate((v: HTMLVideoElement) => v.loop)).toBe(false);
+    await expect(page.locator(".slide-number")).toHaveText("01", { timeout: 8000 });
+    await expect(page.locator(".hero h1")).not.toContainText(title);
 
     // Usunięcie slajdu kasuje też plik
     await page.goto("/admin/strona");
