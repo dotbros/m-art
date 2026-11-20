@@ -24,6 +24,25 @@ test.describe("Kamienie naturalne — strony dla klienta", () => {
     await expect(page.locator(".product-modal").getByRole("heading", { name: "Słoneczny splot" })).toBeVisible();
   });
 
+  test("karty kamieni w jednym rzędzie; strzałki przesuwają karuzelę", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("#kamienie");
+    await section.scrollIntoViewIfNeeded();
+    const tops = await section.locator(".stone-card").evaluateAll((cards) => new Set(cards.map((c) => Math.round(c.getBoundingClientRect().top))).size);
+    expect(tops).toBe(1); // zawsze jeden rząd
+    await noHorizontalScroll(page);
+    const next = section.getByRole("button", { name: "Następne kamienie" });
+    if (await next.count()) { // strzałki tylko, gdy karty się nie mieszczą (na telefonie zawsze)
+      const track = section.locator(".stone-track");
+      await expect(section.getByRole("button", { name: "Poprzednie kamienie" })).toBeDisabled();
+      await next.click();
+      await expect.poll(() => track.evaluate((e) => e.scrollLeft)).toBeGreaterThan(50);
+      await expect(section.getByRole("button", { name: "Poprzednie kamienie" })).toBeEnabled();
+    } else {
+      expect(page.viewportSize()!.width).toBeGreaterThan(760);
+    }
+  });
+
   test("lista wszystkich kamieni i nieistniejący kamień", async ({ page }) => {
     await page.goto("/kamienie");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Kamienie");

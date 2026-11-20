@@ -14,7 +14,7 @@ const str = (v: FormDataEntryValue | null) => (typeof v === "string" ? v.trim() 
 const toStone = (r: typeof stones.$inferSelect): Stone => ({ id: r.id, name: r.name, slug: r.slug, caption: r.caption, description: r.description, images: r.images, showOnHome: r.showOnHome });
 
 /** Kamienie do sekcji „Każdy kamień ma swoją historię” na stronie głównej. */
-export async function getHomeStones(db: Db, limit = 6): Promise<Stone[]> {
+export async function getHomeStones(db: Db, limit = 12): Promise<Stone[]> {
   const rows = await db.select().from(stones).where(and(eq(stones.isActive, true), eq(stones.showOnHome, true))).orderBy(asc(stones.position), asc(stones.name)).limit(limit);
   return rows.map(toStone);
 }

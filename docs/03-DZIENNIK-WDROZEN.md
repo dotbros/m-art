@@ -169,3 +169,8 @@ Raport T-004.
 - Slajd ze zdjęciem przechodzi dalej po 10 s (`HERO_IMAGE_SECONDS`); film — po zakończeniu. Licznik od nowa po każdej zmianie (także ręcznej). Pauza: otwarte okno (produkt, koszyk, menu), kursor myszy nad HERO; brak automatu przy „ogranicz ruch” i przy jednym slajdzie.
 - Błąd wykryty testem na iPhonie: Safari po dotknięciu „udaje” najechanie myszą — pauza po najechaniu blokowała przełączanie na dobre. Naprawa: pauza tylko dla prawdziwej myszy (`pointerType === "mouse"`).
 - Testy E2E ze sztucznym zegarem (9 s — bez zmiany, 10 s — zmiana, ręczna zmiana zeruje licznik, okno wstrzymuje; „ogranicz ruch” — bez zmian). Playwright 60/60 (3 pominięte). Weryfikacja na serwerze dev w czasie rzeczywistym.
+### 2026-11-20 — Karuzela kamieni na stronie głównej
+- Zgłoszenie: przy 5 kamieniach karty tworzyły drugi rząd.
+- Zmiana: jeden rząd przesuwany w bok — telefon: palcem (zaczepianie na karcie, widać kawałek następnej) + strzałki; komputer: strzałki ← → (wyszarzone na początku/końcu, ukryte gdy wszystko się mieści) i gładzik. Limit kamieni w sekcji 6 → 12.
+- Błąd wykryty testem: rola `listitem` na kartach nadpisała rolę linku (czytniki ekranu nie widziały linków) — usunięta.
+- Test E2E: zawsze jeden rząd, brak przewijania strony w bok, strzałka przesuwa karuzelę i włącza „wstecz”. Playwright 63/63 (3 pominięte).

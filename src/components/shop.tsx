@@ -8,6 +8,7 @@ import { Overlay } from "./overlay";
 import { Checkout } from "./checkout";
 import { Information, infoTitles } from "./information";
 import { HeroMedia } from "./hero-media";
+import { StoneCarousel } from "./stone-carousel";
 import type { HeroSlide } from "@/lib/hero";
 import type { Stone } from "@/lib/stones";
 import { HERO_IMAGE_SECONDS, PORTRAIT_BELOW } from "@/lib/hero-shared";
@@ -196,8 +197,7 @@ export function Shop({ products, categories: categoryNames, slides, homeStones =
         {!showAll && category === ALL_CATEGORIES && stone === ALL_STONES && !collectionQuery && <div className="collection-bottom"><span>Małe serie. Niepowtarzalne kamienie.</span><button className="button button-outline" onClick={() => setShowAll(true)}>Zobacz całą kolekcję <Icon name="arrow" size={18}/></button><span>Wybierz tę, która jest Twoja.</span></div>}
       </section>
 
-      {homeStones.length > 0 && <section className="stones-section" id="kamienie"><div className="stones-inner container"><div className="stones-copy"><p className="eyebrow">NATURA NIE TWORZY KOPII</p><h2>Każdy kamień<br/>ma swoją <em>historię.</em></h2><p>Kolory, które uspokajają. Faktury, które zachwycają. Znajdź kamień, w którym zobaczysz cząstkę siebie.</p><span className="stone-small-note"><Icon name="sparkle" size={16}/> 100% naturalnego piękna</span><Link className="text-link stones-all-link" href="/kamienie">Poznaj wszystkie kamienie <Icon name="arrow" size={17}/></Link></div><div className="stone-grid">{homeStones.map((item) =>
-        <Link className="stone-card" key={item.slug} href={`/kamienie/${item.slug}`}><span className="stone-image"><img src={item.images[0] || "/images/necklace-jasper.svg"} alt={`Kamień naturalny — ${item.name}`} loading="lazy"/><span><Icon name="arrow" size={22}/></span></span><h3>{item.name}</h3>{item.caption && <p>{item.caption}</p>}</Link>)}</div></div></section>}
+      {homeStones.length > 0 && <section className="stones-section" id="kamienie"><div className="stones-inner container"><div className="stones-copy"><p className="eyebrow">NATURA NIE TWORZY KOPII</p><h2>Każdy kamień<br/>ma swoją <em>historię.</em></h2><p>Kolory, które uspokajają. Faktury, które zachwycają. Znajdź kamień, w którym zobaczysz cząstkę siebie.</p><span className="stone-small-note"><Icon name="sparkle" size={16}/> 100% naturalnego piękna</span><Link className="text-link stones-all-link" href="/kamienie">Poznaj wszystkie kamienie <Icon name="arrow" size={17}/></Link></div><StoneCarousel items={homeStones}/></div></section>}
 
       <section className="story-section container" id="pracownia"><div className="story-photo"><img src="/images/atelier.svg" alt="Dłonie tworzące ręcznie biżuterię z naturalnych kamieni w pracowni M.art" loading="lazy"/><span className="photo-caption">MAŁE RZECZY. WIELKA UWAŻNOŚĆ.</span><span className="story-photo-mark">M.art</span></div><div className="story-copy"><p className="eyebrow">POZNAJ NASZĄ PRACOWNIĘ</p><h2>Nie z fabryki.<br/><em>Z pasji.</em></h2><p>Wierzymy, że najpiękniejsze rzeczy powstają powoli. Z uważnością, czułością i zachwytem nad tym, co daje nam natura.</p><p>W M.art każdy kamień dobieramy ręcznie, a każdy detal ma znaczenie. Tworzymy biżuterię, którą chce się nosić blisko — nie tylko od święta.</p><button className="text-link" onClick={() => showInfo("story")}>Zajrzyj do świata M.art <Icon name="arrow" size={19}/></button><span className="signature">Z miłości do piękna.</span></div></section>
 
