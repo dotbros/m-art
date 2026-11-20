@@ -118,6 +118,40 @@ test.describe("Sklep — klient na telefonie i komputerze", () => {
     await expect(page.locator(".slide-number")).toHaveText(await page.locator(".slide-total").textContent() as string);
   });
 
+  test("slajd ze zdjęciem przechodzi dalej po 10 s; ręczna zmiana zeruje licznik; okno wstrzymuje", async ({ page }) => {
+    await page.clock.install();
+    await page.goto("/");
+    const number = page.locator(".slide-number");
+    await expect(page.locator("section.hero[data-ready]")).toBeAttached(); // skrypty strony gotowe (licznik działa)
+    await expect(number).toHaveText("01");
+    await page.clock.runFor(9_000);
+    await expect(number).toHaveText("01");
+    await page.clock.runFor(1_100);
+    await expect(number).toHaveText("02");
+    // Ręczna zmiana: licznik od nowa
+    await page.clock.runFor(6_000);
+    await page.locator(".slide-controls button").nth(0).click();
+    await expect(number).toHaveText("01");
+    await page.clock.runFor(6_000);
+    await expect(number).toHaveText("01");
+    // Otwarte okno (menu / koszyk) wstrzymuje przełączanie
+    await page.getByRole("button", { name: /^Koszyk/ }).click();
+    await page.clock.runFor(15_000);
+    await page.getByRole("button", { name: "Zamknij okno" }).click();
+    await expect(number).toHaveText("01");
+    await page.clock.runFor(10_100);
+    await expect(number).toHaveText("02");
+  });
+
+  test("przy ustawieniu „ogranicz ruch” slajdy nie przełączają się same", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.clock.install();
+    await page.goto("/");
+    await expect(page.locator("section.hero[data-ready]")).toBeAttached();
+    await page.clock.runFor(25_000);
+    await expect(page.locator(".slide-number")).toHaveText("01");
+  });
+
   test("API odrzuca zamówienie z niepoprawnymi danymi", async ({ request }) => {
     const res = await request.post("/api/orders", { data: { email: "zly", items: [] } });
     expect(res.status()).toBe(400);

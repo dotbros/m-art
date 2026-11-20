@@ -10,7 +10,7 @@ import { Information, infoTitles } from "./information";
 import { HeroMedia } from "./hero-media";
 import type { HeroSlide } from "@/lib/hero";
 import type { Stone } from "@/lib/stones";
-import { PORTRAIT_BELOW } from "@/lib/hero-shared";
+import { HERO_IMAGE_SECONDS, PORTRAIT_BELOW } from "@/lib/hero-shared";
 
 type CartItem = { id: string; quantity: number };
 type Panel = "search" | "wishlist" | "cart" | "menu" | "product" | "checkout" | "info" | null;
@@ -29,6 +29,7 @@ export function Shop({ products, categories: categoryNames, slides, homeStones =
   const [navOpen, setNavOpen] = useState(false);
   const [slide, setSlide] = useState(0);
   const [heroSound, setHeroSound] = useState(false);
+  const [heroHovered, setHeroHovered] = useState(false); // kursor nad HERO (komputer) = pauza automatycznego przełączania
   const [detectedAspect, setDetectedAspect] = useState<Record<number, number>>({}); // proporcje starszych slajdów (bez zapisanych w bazie) // dźwięk filmów HERO — włączany tylko przez klienta
   const [category, setCategory] = useState(ALL_CATEGORIES);
   const [stone, setStone] = useState(ALL_STONES);
@@ -112,6 +113,16 @@ export function Shop({ products, categories: categoryNames, slides, homeStones =
   const currentSlide = slides[Math.min(slide, slides.length - 1)];
   const slideProduct = currentSlide.productId ? products.find((p) => p.id === currentSlide.productId) : undefined;
   const pad = (n: number) => String(n).padStart(2, "0");
+
+  // Slajd ze ZDJĘCIEM przechodzi dalej po HERO_IMAGE_SECONDS (film — po zakończeniu). Licznik startuje od nowa
+  // przy każdej zmianie slajdu (także ręcznej). Pauza: otwarte okno, kursor nad HERO, „ogranicz ruch”.
+  const isImageSlide = currentSlide.mediaType === "image";
+  useEffect(() => {
+    if (!isImageSlide || slides.length < 2 || panel || heroHovered) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = setTimeout(() => setSlide((current) => (current + 1) % slides.length), HERO_IMAGE_SECONDS * 1000);
+    return () => clearTimeout(timer);
+  }, [slide, isImageSlide, slides.length, panel, heroHovered]);
   // Przesunięcie palcem w bok zmienia slajd HERO (w kółko). Ruch pionowy = zwykłe przewijanie strony.
   // Gest zaczęty przy samej lewej krawędzi zostawiamy systemowi („wstecz” na iPhonie i Androidzie).
   const heroSwipe = useRef<{ x: number; y: number } | null>(null);
@@ -164,7 +175,7 @@ export function Shop({ products, categories: categoryNames, slides, homeStones =
     </div></header>
 
     <main>
-      <section className={`hero hero-slide-${slide === 0 ? 0 : 1} ${currentSlide.mediaType === "video" ? "hero-has-video" : ""} ${(currentSlide.aspect ?? detectedAspect[currentSlide.id] ?? 1.5) < PORTRAIT_BELOW ? "hero-portrait" : ""}`} aria-label="Nowa kolekcja M.art" aria-roledescription="karuzela" onTouchStart={onHeroTouchStart} onTouchEnd={onHeroTouchEnd} onTouchCancel={() => { heroSwipe.current = null; }}>
+      <section className={`hero hero-slide-${slide === 0 ? 0 : 1} ${currentSlide.mediaType === "video" ? "hero-has-video" : ""} ${(currentSlide.aspect ?? detectedAspect[currentSlide.id] ?? 1.5) < PORTRAIT_BELOW ? "hero-portrait" : ""}`} aria-label="Nowa kolekcja M.art" aria-roledescription="karuzela" data-ready={storageReady ? "1" : undefined} onTouchStart={onHeroTouchStart} onTouchEnd={onHeroTouchEnd} onTouchCancel={() => { heroSwipe.current = null; }} onPointerEnter={(e) => { if (e.pointerType === "mouse") setHeroHovered(true); }} onPointerLeave={(e) => { if (e.pointerType === "mouse") setHeroHovered(false); }}>
         <HeroMedia key={currentSlide.id} slide={currentSlide} sound={{ on: heroSound, set: setHeroSound }} onAspect={currentSlide.aspect === null ? (a) => setDetectedAspect((d) => ({ ...d, [currentSlide.id]: a })) : undefined} onEnded={slides.length > 1 ? () => setSlide((current) => (current + 1) % slides.length) : undefined}/>
         <div className="hero-wash"/>
         <div className="hero-inner container"><div className="hero-copy" key={slide}><p className="eyebrow"><span className="small-line"/>{currentSlide.eyebrow}</p><h1>{currentSlide.title}{currentSlide.titleAccent && <><br/><em>{currentSlide.titleAccent}</em></>}</h1>{currentSlide.description && <p className="hero-description">{currentSlide.description}</p>}<div className="hero-cta"><button className="button button-dark" onClick={() => goToCollection(ALL_CATEGORIES, currentSlide.stone && stones.includes(currentSlide.stone) ? currentSlide.stone : ALL_STONES)}>Odkryj biżuterię <Icon name="arrow" size={19}/></button><button className="hero-story-link" onClick={() => showInfo("story")}>Poznaj naszą historię <span>↗</span></button></div><div className="hero-note"><Icon name="leaf" size={22}/><span>Nie ma dwóch identycznych.<br/><strong>Tak jak Ty.</strong></span></div></div>
