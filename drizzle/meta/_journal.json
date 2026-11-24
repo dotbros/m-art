@@ -64,6 +64,13 @@
       "when": 1795555583400,
       "tag": "0008_hero_collection",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795557152562,
+      "tag": "0009_product_gallery",
+      "breakpoints": true
     }
   ]
 }

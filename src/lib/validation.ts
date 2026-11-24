@@ -67,6 +67,8 @@ export function validateCategory(form: FormData): Result<CategoryInput> {
 export type ProductInput = {
   id: string; name: string; subtitle: string; categoryId: number; stones: string[]; material: string; size: string;
   price: number; compareAtPrice: number | null; badge: string | null; description: string; stock: number; position: number; isActive: boolean;
+  /** Galeria (pierwsze = główne) i zdjęcie główne (= images[0]). */
+  images: string[]; image: string;
 };
 
 /** „189,90” / „189.9” / „189” → 18990 groszy. Zwraca NaN, gdy format jest błędny. */
@@ -99,12 +101,20 @@ export function validateProduct(form: FormData): Result<ProductInput> {
   if (stones.length > MAX_STONES) errors.stones = `Maksymalnie ${MAX_STONES} kamieni.`;
   else if (stones.some((s) => s.length > 60)) errors.stones = "Nazwa kamienia może mieć maksymalnie 60 znaków.";
   for (const field of ["subtitle", "material", "size", "badge"] as const) if (str(form.get(field)).length > 120) errors[field] = "Maksymalnie 120 znaków.";
+  const images = [...new Set(form.getAll("images").map((v) => str(v)).filter(Boolean))];
+  if (images.length > MAX_PRODUCT_IMAGES) errors.images = `Maksymalnie ${MAX_PRODUCT_IMAGES} zdjęć.`;
+  else if (images.some((u) => !PRODUCT_IMAGE_URL.test(u))) errors.images = "Nieprawidłowe zdjęcie.";
   if (Object.keys(errors).length) return { ok: false, errors };
   return { ok: true, data: {
     id, name, subtitle: str(form.get("subtitle")), categoryId, stones, material: str(form.get("material")), size: str(form.get("size")),
     price, compareAtPrice, badge: str(form.get("badge")).toUpperCase() || null, description, stock, position, isActive: form.get("isActive") === "on",
+    images, image: images[0] ?? "",
   } };
 }
+
+export const MAX_PRODUCT_IMAGES = 10;
+/** Zdjęcia produktu: wgrane przez panel (/media/…) albo dołączone do sklepu (/images/…). */
+const PRODUCT_IMAGE_URL = /^\/(media\/[a-f0-9]{32}\.(jpg|png|webp)|images\/[a-z0-9-]+\.(svg|jpg|png|webp))$/;
 
 /**
  * Lista kamieni z formularza: przycina spacje, usuwa puste i duplikaty (bez względu na wielkość liter),

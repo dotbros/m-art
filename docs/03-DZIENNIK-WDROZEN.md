@@ -210,3 +210,9 @@ Raport T-004.
 - Sklep: „Odkryj biżuterię” na takim slajdzie pokazuje tylko produkty kolekcji (w kolejności zaznaczenia; sortowanie po cenie nadal działa) z etykietą „Kolekcja: … ✕”; plakietka na slajdzie bez produktu w rogu prowadzi do kolekcji.
 - Kopia bazy: `data/backup-przed-kolekcjami-20261124-2238`.
 - Testy: Vitest 72/72 (+3), Playwright 80/80 (4 pominięte) — E2E: błąd bez zaznaczenia, zaznaczenie 2 produktów wyszukiwarką, w sklepie tylko te 2 w kolejności, usunięcie filtra przywraca całość.
+### 2026-11-24 — Galeria zdjęć produktu
+- Produkt ma do 10 zdjęć (`products.images`, migracja 0009 przenosi dotychczasowe zdjęcie jako pierwsze); `image` = pierwsze zdjęcie (zgodność: lista, koszyk, strony kamieni).
+- Panel: edytor listy zdjęć (jak przy kamieniach/podstronach) — dodawanie z galerii/aparatu przez moduł wgrywania (zmniejszanie do JPG), kolejność, usuwanie; usunięte zdjęcia kasowane z dysku (także przy usunięciu produktu).
+- Sklep: karta produktu — galeria przesuwana palcem, kropki, strzałki na komputerze (plakietka i serce zostają na wierzchu); karta w kolekcji — drugie zdjęcie po najechaniu (komputer).
+- Weryfikacja na bazie użytkownika: 18/18 produktów ma galerię po migracji. Kopia bazy: `data/backup-przed-galeria-produktow-20261124-2307`.
+- Testy: Vitest 74/74 (+2), Playwright 80/80 (4 pominięte) — E2E: 2 zdjęcia w panelu, galeria w karcie produktu (2 zdjęcia, przejście do drugiego), zdjęcie główne z /media (JPG).

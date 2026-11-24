@@ -24,7 +24,8 @@ export const products = pgTable("products", {
   size: text("size").notNull().default(""),
   price: integer("price").notNull(),
   compareAtPrice: integer("compare_at_price"),
-  image: text("image").notNull().default(""),
+  image: text("image").notNull().default(""), // zdjęcie główne = images[0] (utrzymywane przy zapisie — dla zgodności)
+  images: text("images").array().notNull().default(sql`'{}'::text[]`), // galeria produktu (pierwsze = główne)
   badge: text("badge"),
   description: text("description").notNull().default(""),
   stock: integer("stock").notNull().default(0),

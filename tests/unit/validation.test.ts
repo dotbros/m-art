@@ -80,3 +80,16 @@ describe("kamienie (wielokrotny wybór)", () => {
     expect(!result.ok && result.errors.stones).toBeTruthy();
   });
 });
+describe("galeria zdjęć produktu", () => {
+  const f = (imgs: string[]) => { const x = new FormData(); x.set("name", "Galeria"); x.set("categoryId", "1"); x.set("price", "100"); for (const i of imgs) x.append("images", i); return x; };
+  it("zachowuje kolejność, usuwa duplikaty; zdjęcie główne = pierwsze", () => {
+    const r = validateProduct(f(["/media/0123456789abcdef0123456789abcdef.jpg", "/images/atelier.svg", "/images/atelier.svg"]));
+    expect(r.ok && [r.data.images, r.data.image]).toEqual([["/media/0123456789abcdef0123456789abcdef.jpg", "/images/atelier.svg"], "/media/0123456789abcdef0123456789abcdef.jpg"]);
+  });
+  it("bez zdjęć — pusta galeria; odrzuca obce adresy i więcej niż 10 zdjęć", () => {
+    const none = validateProduct(f([]));
+    expect(none.ok && [none.data.images, none.data.image]).toEqual([[], ""]);
+    expect(validateProduct(f(["https://zly.pl/a.jpg"])).ok).toBe(false);
+    expect(validateProduct(f(Array.from({ length: 11 }, (_, i) => `/media/${String(i).padStart(32, "0")}.jpg`))).ok).toBe(false);
+  });
+});

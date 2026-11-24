@@ -18,7 +18,7 @@ export async function getStorefront(db: Db): Promise<{ categories: Category[]; p
     categories: categoryRows,
     products: rows.map(({ product: p, categoryName, categorySlug }) => ({
       id: p.id, name: p.name, subtitle: p.subtitle, category: categoryName, categorySlug, stones: p.stones, material: p.material, size: p.size,
-      price: p.price, compareAtPrice: p.compareAtPrice, image: p.image || "/images/necklace-jasper.svg", badge: p.badge, description: p.description, stock: p.stock, position: p.position,
+      price: p.price, compareAtPrice: p.compareAtPrice, image: p.images[0] || p.image || "/images/necklace-jasper.svg", images: p.images.length ? p.images : [p.image || "/images/necklace-jasper.svg"], badge: p.badge, description: p.description, stock: p.stock, position: p.position,
     })),
   };
 }

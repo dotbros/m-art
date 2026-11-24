@@ -12,7 +12,7 @@ import { categories, heroSlides, orderItems, orders, pages, products, stones, OR
 import { validateHeroSlide, MAX_HERO_SLIDES } from "@/lib/hero";
 import { requireAdmin, SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
 import { authenticate, clearAttempts, createSession, deleteSession, isRateLimited, registerFailedAttempt } from "@/lib/auth/sessions";
-import { deleteMedia, locateMedia, saveImage, UploadError } from "@/lib/uploads";
+import { deleteMedia, locateMedia } from "@/lib/uploads";
 import { probe } from "@/lib/media";
 import { validateCategory, validateProduct } from "@/lib/validation";
 
@@ -93,25 +93,15 @@ export async function saveProductAction(_prev: FormState, form: FormData): Promi
   const [category] = await db.select({ id: categories.id }).from(categories).where(eq(categories.id, parsed.data.categoryId));
   if (!category) return fail(form, { categoryId: "Wybrana kategoria nie istnieje." });
 
-  const [existing] = await db.select({ id: products.id, image: products.image }).from(products).where(eq(products.id, parsed.data.id));
+  const [existing] = await db.select({ id: products.id, image: products.image, images: products.images }).from(products).where(eq(products.id, parsed.data.id));
   if (!editingId && existing) return fail(form, { slug: "Produkt o takim adresie już istnieje — zmień nazwę lub adres." });
   if (editingId && !existing) return { error: "Produkt nie istnieje." };
 
-  let image = existing?.image ?? "";
-  const file = form.get("imageFile");
-  if (file instanceof File && file.size > 0) {
-    try { image = await saveImage(file); } catch (error) {
-      if (error instanceof UploadError) return fail(form, { imageFile: error.message });
-      throw error;
-    }
-    if (existing?.image) await deleteMedia(existing.image);
-  } else if (form.get("removeImage") === "on") {
-    if (existing?.image) await deleteMedia(existing.image);
-    image = "";
-  }
-
-  if (editingId) await db.update(products).set({ ...parsed.data, image }).where(eq(products.id, editingId));
-  else await db.insert(products).values({ ...parsed.data, image });
+  // Galeria zdjęć wgrywana w formularzu (pierwsze = główne); `image` = images[0] dla zgodności
+  if (editingId) await db.update(products).set(parsed.data).where(eq(products.id, editingId));
+  else await db.insert(products).values(parsed.data);
+  // Zdjęcia usunięte z galerii kasujemy z dysku (tylko wgrane przez panel — /media/…)
+  if (existing) for (const old of new Set([...existing.images, existing.image])) if (old && !parsed.data.images.includes(old)) await deleteMedia(old);
   await ensureStones(db, parsed.data.stones); // nowe kamienie trafiają do słownika (opis i zdjęcia — w panelu „Kamienie”)
   refreshStorefront();
   redirect("/admin/produkty?zapisano=1");
@@ -137,8 +127,8 @@ export async function deleteProductAction(_prev: FormState, form: FormData): Pro
     refreshStorefront();
     return { message: "Produkt występuje w zamówieniach, więc został ukryty zamiast usunięty." };
   }
-  const [deleted] = await db.delete(products).where(eq(products.id, id)).returning({ image: products.image });
-  if (deleted?.image) await deleteMedia(deleted.image);
+  const [deleted] = await db.delete(products).where(eq(products.id, id)).returning({ image: products.image, images: products.images });
+  if (deleted) for (const file of new Set([...deleted.images, deleted.image])) if (file) await deleteMedia(file);
   refreshStorefront();
   redirect("/admin/produkty?usunieto=1");
 }

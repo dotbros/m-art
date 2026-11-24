@@ -5,10 +5,13 @@ import { useActionState, useState } from "react";
 import { saveProductAction } from "@/app/admin/actions";
 import { Field, FormMessage, SubmitButton, useFocusFirstError } from "./ui";
 import { StonePicker } from "./stone-picker";
+import { ImageListEditor } from "./image-list-editor";
+
+const MAX_IMAGES = 10; // = MAX_PRODUCT_IMAGES w lib/validation.ts
 
 type ProductData = {
   id: string; name: string; subtitle: string; categoryId: number | null; stones: string[]; material: string; size: string;
-  price: number; compareAtPrice: number | null; image: string; badge: string | null; description: string; stock: number; position: number; isActive: boolean;
+  price: number; compareAtPrice: number | null; image: string; images: string[]; badge: string | null; description: string; stock: number; position: number; isActive: boolean;
 };
 
 const toPln = (grosze: number | null | undefined) => (grosze == null ? "" : (grosze / 100).toFixed(2).replace(".", ","));
@@ -26,7 +29,7 @@ export function ProductForm({ product, categories, stones }: { product?: Product
   return <form key={state.ts ?? "initial"} action={action} className="adm-form" noValidate>
     <FormMessage state={state}/>
     {product && <input type="hidden" name="editingId" value={product.id}/>}
-    <ImagePicker current={product?.image || ""} error={e.imageFile} lostFile={!!v && !e.imageFile}/>
+    <ProductImages initial={v ? (v.images ? v.images.split("\n") : []) : product?.images?.length ? product.images : product?.image ? [product.image] : []} error={e.images}/>
 
     <section className="adm-card">
       <h2>Podstawowe informacje</h2>
@@ -68,27 +71,12 @@ export function ProductForm({ product, categories, stones }: { product?: Product
   </form>;
 }
 
-function ImagePicker({ current, error, lostFile }: { current: string; error?: string; lostFile: boolean }) {
-  const [preview, setPreview] = useState(current);
-  const [removeImage, setRemoveImage] = useState(false);
+/** Galeria zdjęć produktu: pierwsze = główne (karta, koszyk), kolejne — w galerii karty produktu. */
+function ProductImages({ initial, error }: { initial: string[]; error?: string }) {
+  const [images, setImages] = useState<string[]>(initial);
   return <section className="adm-card">
-    <h2>Zdjęcie</h2>
-    <div className="adm-image-picker">
-      <div className="adm-image-preview">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        {preview && !removeImage ? <img src={preview} alt="Podgląd zdjęcia produktu"/> : <span>Brak zdjęcia</span>}
-      </div>
-      <div>
-        <Field label="Wybierz lub zrób zdjęcie" name="imageFile" error={error} hint={lostFile ? "Jeśli wybrano nowe zdjęcie, wskaż je ponownie (przeglądarka nie zachowuje plików po błędzie)." : "JPG, PNG lub WEBP, maks. 5 MB. Najlepiej pionowe 4:5."}>
-          <input id="imageFile" name="imageFile" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (preview.startsWith("blob:")) URL.revokeObjectURL(preview);
-            setPreview(file ? URL.createObjectURL(file) : current);
-            setRemoveImage(false);
-          }}/>
-        </Field>
-        {current && <label className="adm-switch"><input type="checkbox" name="removeImage" checked={removeImage} onChange={(event) => setRemoveImage(event.target.checked)}/><span>Usuń obecne zdjęcie</span></label>}
-      </div>
-    </div>
+    <h2>Zdjęcia</h2>
+    <ImageListEditor images={images} onChange={setImages} max={MAX_IMAGES} inputId="product-images-file" firstLabel="Główne" error={error}
+      hint={`Pierwsze zdjęcie jest główne (lista produktów, koszyk). Kolejne klient zobaczy w galerii produktu. Najlepiej pionowe 4:5, maks. ${MAX_IMAGES} zdjęć.`}/>
   </section>;
 }

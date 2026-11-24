@@ -71,8 +71,11 @@ test.describe("Panel administracyjny", () => {
     await page.getByRole("button", { name: "+ Perła naturalna" }).click();
     await expect(page.getByRole("list", { name: "Wybrane kamienie" })).toContainText("Kwarc różowy");
     await expect(page.getByRole("list", { name: "Wybrane kamienie" })).toContainText("Perła naturalna");
-    await page.getByLabel("Wybierz lub zrób zdjęcie").setInputFiles({ name: "broszka.png", mimeType: "image/png", buffer: PNG });
-    await expect(page.getByAltText("Podgląd zdjęcia produktu")).toBeVisible();
+    // Galeria: 2 zdjęcia (pierwsze = główne); serwer przetwarza je do JPG
+    await page.locator("#product-images-file").setInputFiles("tests/fixtures/hero.jpg");
+    await expect(page.getByAltText("Zdjęcie 1")).toBeVisible({ timeout: 30_000 });
+    await page.locator("#product-images-file").setInputFiles({ name: "broszka.png", mimeType: "image/png", buffer: PNG });
+    await expect(page.getByAltText("Zdjęcie 2")).toBeVisible({ timeout: 30_000 });
     await page.getByRole("button", { name: "Dodaj produkt" }).click();
     await expect(page.getByText("Produkt został zapisany.")).toBeVisible();
 
@@ -84,9 +87,14 @@ test.describe("Panel administracyjny", () => {
     await expect(card).toContainText("249,50");
     await card.getByRole("button", { name: `Odkryj ${productName}` }).click();
     await expect(page.locator(".product-specs")).toContainText("Kwarc różowy, Perła naturalna");
+    // Galeria w karcie produktu: 2 zdjęcia, kropki, przewinięcie do drugiego
+    const gallery = page.locator(".product-detail-image .pd-gallery");
+    await expect(gallery.locator(".pd-track img")).toHaveCount(2);
+    await gallery.getByRole("button", { name: "Zdjęcie 2" }).click();
+    await expect(gallery.getByRole("button", { name: "Zdjęcie 2" })).toHaveAttribute("aria-current", "true");
     await page.getByRole("button", { name: "Zamknij okno" }).click();
-    const src = await card.locator("img").getAttribute("src");
-    expect(src).toMatch(/^\/media\/[a-f0-9]{32}\.png$/);
+    const src = await card.locator("img").first().getAttribute("src");
+    expect(src).toMatch(/^\/media\/[a-f0-9]{32}\.jpg$/);
     expect((await page.request.get(src!)).status()).toBe(200);
 
     // Ukrycie produktu w panelu usuwa go ze sklepu

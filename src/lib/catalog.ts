@@ -11,6 +11,8 @@ export type Product = {
   price: number;
   compareAtPrice: number | null;
   image: string;
+  /** Galeria produktu (pierwsze = główne). */
+  images: string[];
   badge: string | null;
   description: string;
   stock: number;
