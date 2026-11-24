@@ -50,6 +50,36 @@
 .hero-product-tag strong{color:#fbf3e4;text-shadow:0 1px 10px rgba(0,0,0,.25)}
 .hero-product-tag .round-arrow{border-color:rgba(251,243,228,.7);color:#fbf3e4;background:rgba(255,255,255,.04)}
 
+/* ---------- Komputer: czytelne napisy na stronie głównej (wzór miał 6,6–10,5 px) — telefon bez zmian ---------- */
+@media(min-width:761px){
+  /* pasek „Darmowa dostawa od 299 zł” */
+  .announcement{height:38px;font-size:13px;letter-spacing:.4px;gap:28px}
+  .announcement svg{width:16px;height:16px}
+  .announcement .announcement-divider{height:14px}
+  /* główny nagłówek: menu i koszyk */
+  .desktop-nav{gap:30px}
+  .desktop-nav>button,.desktop-nav>a,.desktop-nav .nav-dropdown-wrap>button{font-size:14px;letter-spacing:.2px}
+  .nav-dropdown>button{font-size:24px}
+  .cart-toggle{font-size:14px;gap:12px}
+  .cart-count{width:22px;height:22px;font-size:11.5px}
+  .header-actions .icon-button svg{width:24px;height:24px}
+  /* pasek korzyści: „Prawdziwe kamienie”, „Ręcznie tworzone”… */
+  .benefits-inner{padding-block:26px}
+  .benefit{gap:14px}
+  .benefit>svg{width:30px;height:30px}
+  .benefit strong{font-size:15px;letter-spacing:.1px}
+  .benefit span{font-size:13px;margin-top:4px;color:#7f715f}
+  /* „Małe serie. Niepowtarzalne kamienie.” / „Wybierz tę, która jest Twoja.” (przycisk bez zmian) */
+  .collection-bottom>span{font-size:14px;letter-spacing:.2px;color:#7a6c5a;min-width:260px}
+}
+@media(min-width:761px) and (max-width:1100px){
+  .desktop-nav{gap:18px}
+  .desktop-nav>button,.desktop-nav>a,.desktop-nav .nav-dropdown-wrap>button{font-size:13px}
+  .benefit strong{font-size:13.5px}
+  .benefit span{font-size:12px}
+  .collection-bottom>span{font-size:13px;min-width:180px}
+}
+
 /* ---------- „Poznaj naszą pracownię” na stronie głównej: jeden format zdjęcia (4:5) na komputerze i telefonie,
    zdjęcie jest linkiem do podstrony /pracownia ---------- */
 .story-section .story-photo{display:block;height:auto;aspect-ratio:4/5;width:100%;justify-self:center;border-radius:2px}

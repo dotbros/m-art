@@ -236,3 +236,12 @@ Raport T-004.
 - Zweryfikowano na produkcie właściciela (zdjęcie 1086×1448 widoczne w całości). Playwright: pełny zestaw.- Karta produktu — poprawka ramki (pierwsza wersja zbyt blada): 3 px złotego gradientu + cienka złota linia 7 px wewnątrz, obramowująca całą zawartość (także zdjęcie) — efekt oprawionego obrazu; złota poświata na zewnątrz.
 - Wolne miejsce wokół zdjęcia innego formatu wypełnia to samo zdjęcie rozmyte i przyciemnione (zamiast pustych kremowych pasów); zdjęcie nadal w całości.
 - „Dodaj do koszyka” 15 px (było 11 px), wyższy przycisk i licznik sztuk. Playwright: pełny zestaw.
+
+### 2026-11-25 — Strona główna (komputer): większe czcionki
+- Na prośbę właściciela, tylko na komputerze (≥761 px), bez zmian na telefonie:
+  - pasek „Darmowa dostawa…”: 9 → 13 px;
+  - menu w nagłówku i „Koszyk”: 10,5 → 14 px, większe ikony;
+  - pasek korzyści („Prawdziwe kamienie”…): tytuły 10,5 → 15 px, podpisy 8,5 → 13 px;
+  - linia „Małe serie. Niepowtarzalne kamienie.”: → 14 px; przycisk „Zobacz całą kolekcję” bez zmian.
+- Węższe ekrany (761–1100 px): nieco mniejsze rozmiary, żeby menu i korzyści mieściły się w jednym rzędzie.
+- Testy: Vitest 75/75, Playwright 83 zaliczone, 4 pominięte (dotyczą innego urządzenia). Pomiar 1366 i 1024 px: brak poziomego przewijania.
