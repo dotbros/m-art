@@ -11,11 +11,12 @@ export const CONTENT_PAGES = {
 
 /**
  * Zalecane formaty zdjęć — wyświetlane w formularzu panelu. Muszą odpowiadać temu, jak strona kadruje zdjęcia
- * (luxe.css: zajawka pracowni 4:5; content-pages.css: nagłówek podstrony 5:4, miniatury galerii 4:5).
+ * (luxe.css: zajawka pracowni 4:5; content-pages.css: nagłówek podstrony na pełną szerokość — telefon 4:3,
+ * komputer 21:9 — dlatego zalecamy 5:4 z ważnym elementem w środku; miniatury galerii 4:5).
  */
 export const IMAGE_FORMATS = {
   teaser: "Najlepiej pionowe 4:5, np. 1600 × 2000 px. Tak samo na komputerze i telefonie. Najważniejszy element umieść w środku kadru — w dolnych rogach zdjęcia jest napis „Małe rzeczy. Wielka uważność.” i znak M.art.",
-  header: "Pierwsze zdjęcie (nagłówek podstrony): najlepiej poziome 5:4, np. 2000 × 1600 px — wyświetla się w tym formacie na komputerze i telefonie.",
+  header: "Pierwsze zdjęcie (nagłówek podstrony): najlepiej poziome 5:4, np. 2000 × 1600 px. Wyświetla się na całą szerokość strony — na komputerze jako szeroki pas, więc górna i dolna część mogą zostać lekko przycięte; najważniejszy element umieść w środku kadru.",
   gallery: "Kolejne zdjęcia (galeria na dole strony): dowolny format — miniatury pokazują kadr 4:5, a po powiększeniu klient widzi całe zdjęcie.",
   common: "Pliki JPG, PNG, WEBP lub HEIC prosto z telefonu, do 25 MB — serwer sam je zmniejszy.",
 } as const;

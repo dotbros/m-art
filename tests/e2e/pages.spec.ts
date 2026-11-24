@@ -23,9 +23,9 @@ test.describe("Podstrony: pracownia i pielęgnacja", () => {
     await page.locator(".site-footer").getByRole("link", { name: "Pielęgnacja biżuterii" }).click();
     await expect(page).toHaveURL(/\/pielegnacja$/);
     await expect(page.getByRole("heading", { level: 2, name: "Miękko i osobno" })).toBeVisible();
-    // Nagłówek podstrony w formacie 5:4 na każdym urządzeniu (zgodnie z zaleceniem w panelu)
+    // Nagłówek podstrony na pełną szerokość strony
     const hero = (await page.locator(".content-hero").boundingBox())!;
-    expect(hero.width / hero.height).toBeCloseTo(1.25, 2);
+    expect(Math.abs(hero.width - page.viewportSize()!.width)).toBeLessThan(2);
     await noHorizontalScroll(page);
   });
 
