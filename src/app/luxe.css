@@ -126,6 +126,31 @@
 .fit-title>.fit-line{display:block;white-space:nowrap;width:max-content;max-width:none}
 .fit-title>.fit-line.is-wrapping{white-space:normal;width:auto}
 
+/* ---------- Karta produktu (okno) — poprawki właściciela 25.11 ---------- */
+/* Złota obramówka całego okna: cienka złota linia + jasny odstęp + druga, delikatniejsza linia */
+.modal-panel.product-modal{border:1px solid #c9a465;box-shadow:0 0 0 5px rgba(251,249,245,.94),0 0 0 6px rgba(201,164,101,.6),0 30px 90px rgba(38,24,14,.35)}
+/* Zdjęcie w całości (bez przycinania): ramka 4:5 jak zdjęcia produktów, inne formaty — kremowe tło po bokach */
+.product-modal .product-detail-image{min-height:0;height:auto;aspect-ratio:4/5;align-self:start;background:#f1ebe1}
+.product-modal .pd-single,.product-modal .pd-track>img{object-fit:contain}
+@media(min-width:761px){.product-modal .product-detail-image{position:sticky;top:0}} /* zdjęcie zostaje w widoku przy przewijaniu opisu */
+/* Czytelne napisy (wzór miał 7–11 px) */
+.product-modal .product-detail-copy>.eyebrow{font-size:11px;letter-spacing:2px}
+.product-modal .product-detail-subtitle{font-size:14.5px;color:#7a6c5a}
+.product-modal .product-detail-price{font-size:24px;color:#3a2f24}
+.product-modal .product-description{font-size:15px;line-height:1.75;color:#5c4f40}
+.product-modal .product-specs>div{font-size:14px;padding:8px 0}
+.product-modal .product-specs dt{color:#8f7755;font-weight:500}
+.product-modal .product-specs dd{color:#3a2f24}
+.product-modal .stock-status{font-size:13.5px;color:#5f6b4a}
+.product-modal .stock-status>span{width:7px;height:7px}
+.product-modal .product-promises{gap:10px 22px}
+.product-modal .product-promises>span{font-size:13.5px;color:#6b5941;gap:8px}
+.product-modal .product-natural-note{font-size:13px;line-height:1.65;color:#7a6c5a}
+@media(max-width:760px){
+  .modal-panel.product-modal{border-width:1px 0 0;box-shadow:0 -1px 0 4px rgba(251,249,245,.9),0 -2px 0 5px rgba(201,164,101,.5)}
+  .product-modal .product-detail-copy>h2{font-size:36px}
+}
+
 /* ---------- Galeria w karcie produktu ---------- */
 .pd-single{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pd-gallery{position:absolute;inset:0}
