@@ -50,6 +50,69 @@
 .hero-product-tag strong{color:#fbf3e4;text-shadow:0 1px 10px rgba(0,0,0,.25)}
 .hero-product-tag .round-arrow{border-color:rgba(251,243,228,.7);color:#fbf3e4;background:rgba(255,255,255,.04)}
 
+/* ---------- Kolekcja („Twoje małe zachwyty”) — na wzór zrzutu właściciela ---------- */
+.collection-section{position:relative;isolation:isolate;background:radial-gradient(110% 340px at 50% 0%,#fffcf6 0%,rgba(255,252,246,0) 75%)}
+.collection-decor{position:absolute;top:-14px;width:190px;height:190px;background:url(/images/decor-sprig.svg) no-repeat center/contain;pointer-events:none;z-index:-1}
+.collection-decor.left{left:-28px}
+.collection-decor.right{right:-28px;transform:scaleX(-1)}
+.collection-section .section-heading{flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:0;margin-bottom:18px}
+.collection-section .section-heading .eyebrow{justify-content:center}
+.collection-section .section-heading .eyebrow::after{content:"";flex:0 0 32px;height:1px;background:linear-gradient(90deg,var(--gold-line),transparent)}
+.collection-section .collection-all-link{display:none}
+
+/* zakładki kategorii: wyśrodkowane, złote podkreślenie aktywnej, przewijane w bok gdy się nie mieszczą */
+.collection-section .collection-toolbar{justify-content:center;margin-bottom:0;border-bottom:1px solid #e9dfd0}
+.collection-section .category-tabs{overflow-x:auto;scrollbar-width:none;gap:30px;padding-inline:4px}
+.collection-section .category-tabs>button{color:#8a7d6c;font-size:14px;letter-spacing:.2px}
+.collection-section .category-tabs>button.active{color:#2f261d;font-weight:500}
+.collection-section .category-tabs>button.active::after{background:linear-gradient(90deg,#a8823f,#dcc08a,#a8823f);height:2px}
+
+/* pasek: liczba produktów + „Filtruj” */
+.collection-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0 18px}
+.collection-count{font-size:14px;color:#7a6c5a}
+.collection-section .filter-toggle{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 18px;border:1px solid rgba(184,149,90,.65);border-radius:999px;background:#fffdf9;color:#3a2f24;font-size:14px;box-shadow:0 4px 12px -8px rgba(80,55,25,.4)}
+.collection-section .filter-toggle.active,.collection-section .filter-toggle:hover{border-color:var(--gold-line);background:#fbf3e4}
+
+/* karty produktów: zaokrąglone, jasne tło, cień; torebka obok ceny */
+.collection-section .product-card{display:flex;flex-direction:column;background:#fffdf9;border:1px solid #efe5d6;border-radius:16px;overflow:hidden;box-shadow:0 10px 26px -18px rgba(80,55,25,.45);transition:box-shadow .3s,transform .3s}
+.collection-section .product-card:hover{box-shadow:0 16px 32px -18px rgba(80,55,25,.55)}
+.collection-section .product-image-wrap{border-radius:15px 15px 0 0;overflow:hidden}
+.collection-section .product-badge{top:12px;left:12px;padding:6px 11px;border-radius:999px;background:rgba(251,246,236,.94);color:#5e4b34;font-size:10px;letter-spacing:1.4px;font-weight:500;box-shadow:0 2px 8px rgba(60,40,20,.08)}
+.collection-section .product-save{top:10px;right:10px;width:38px;height:38px;border-radius:50%;background:rgba(255,253,249,.94);box-shadow:0 2px 10px rgba(60,40,20,.12);color:#3a2f24}
+.collection-section .product-save::before{inset:-3px}
+.collection-section .card-info{display:flex;flex-direction:column;gap:3px;padding:12px 12px 12px 14px}
+.collection-section .card-info .product-name{font-family:var(--serif);font-size:22px;line-height:1.15;text-align:left;color:#2f261d}
+.collection-section .card-info>p{font-size:13px;line-height:1.4;color:#7a6c5a;margin:0}
+.card-buy,.collection-section .card-info>.card-buy{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:8px} /* nadpisuje display:contents ze wzoru */
+.collection-section .card-info{flex:1}
+/* stała kolejność (wzór na telefonie zmieniał ją przez `order`): nazwa → podpis → cena + torebka */
+.collection-section .card-info>.product-name{order:0}
+.collection-section .card-info>p{order:1}
+.collection-section .card-info>.card-buy{order:2;flex-direction:row}
+.collection-section .card-buy>.product-price{order:0}
+.collection-section .card-buy>.card-bag{order:1;margin-left:auto}
+.collection-section .card-buy .product-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:0 8px;font-size:17px;font-weight:600;color:#2f261d}
+.collection-section .card-buy .compare-price{margin:0;font-size:13px;font-weight:400}
+.card-bag{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;border-radius:50%;background:#efe1ca;color:#5e4b34;transition:background .25s,color .25s,transform .2s}
+.card-bag:hover:not(:disabled){background:var(--gold-grad);color:var(--gold-ink)}
+.card-bag:active:not(:disabled){transform:scale(.94)}
+.card-bag:disabled{opacity:.4;cursor:not-allowed}
+
+@media(max-width:760px){
+  .collection-decor{width:130px;height:130px;top:-6px}
+  .collection-decor.left{left:-20px}.collection-decor.right{right:-20px}
+  .collection-section .category-tabs{justify-content:flex-start;gap:24px}
+  .collection-section .product-grid{gap:12px}
+  .collection-section .card-info{padding:10px 10px 10px 12px}
+  .collection-section .card-info .product-name{font-size:18px}
+  .collection-section .card-info>p{font-size:12px}
+  .collection-section .card-buy .product-price{font-size:15px}
+  .collection-section .card-buy .compare-price{font-size:12px}
+  .card-bag{width:40px;height:40px}
+  .collection-section .product-badge{font-size:9px;padding:5px 9px;left:10px;top:10px}
+  .collection-section .product-save{width:36px;height:36px}
+}
+
 /* ---------- Tytuł HERO dopasowany do szerokości (FitTitle) ---------- */
 .hero h1.fit-title{max-width:100%}
 .fit-title>.fit-line{display:block;white-space:nowrap;width:max-content;max-width:none}

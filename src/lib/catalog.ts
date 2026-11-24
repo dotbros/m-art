@@ -62,3 +62,9 @@ export const seedProducts = [
   { id: "kolczyki-jaspis", name: "Piaskowe szepty", subtitle: "Kolczyki z jaspisem cesarskim", category: "kolczyki", stones: ["Jaspis cesarski"], size: "Długość ok. 3 cm", price: 10900, image: "/images/earrings-jasper.svg", badge: null, description: "Subtelne kolczyki inspirowane ciepłem piasku i spokojem natury. Ręcznie dobrane kamienie jaspisu cesarskiego na złoconych elementach ze stali szlachetnej. Idealne jako dopełnienie naszyjnika Słoneczny splot.", stock: 11, position: 7 },
   { id: "bransoletka-perla", name: "Odrobina czułości", subtitle: "Bransoletka z perłą naturalną", category: "bransoletki", stones: ["Perła naturalna"], size: "16 cm + 4 cm regulacji", price: 11900, image: "/images/bracelet-pearl.svg", badge: null, description: "Delikatna, kobieca i pełna naturalnego blasku. Bransoletka z perłowym akcentem i regulowanym zapięciem. Wykonana ręcznie ze złoconej stali szlachetnej oraz prawdziwych pereł słodkowodnych.", stock: 10, position: 8 },
 ];
+
+/** „1 produkt”, „2–4 produkty”, „5 produktów” (12–14 → „produktów”, 22–24 → „produkty”). */
+export function productCountLabel(n: number) {
+  const word = n === 1 ? "produkt" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "produkty" : "produktów";
+  return `${n} ${word}`;
+}

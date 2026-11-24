@@ -12,6 +12,21 @@ test.describe("Sklep — klient na telefonie i komputerze", () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
+  test("kolekcja: licznik produktów, „Filtruj”, zaokrąglone karty, torebka obok ceny", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("#kolekcja");
+    await section.scrollIntoViewIfNeeded();
+    await expect(section.locator(".collection-count")).toHaveText(/^\d+ produkt(y|ów)?$/);
+    await expect(section.getByRole("button", { name: /Filtruj/ })).toBeVisible();
+    const card = section.locator(".product-card").first();
+    expect(parseFloat(await card.evaluate((c) => getComputedStyle(c).borderTopLeftRadius))).toBeGreaterThanOrEqual(12);
+    const [price, bag] = [await card.locator(".product-price").boundingBox(), await card.getByRole("button", { name: /Dodaj .* do koszyka/ }).boundingBox()];
+    expect(bag!.x).toBeGreaterThan(price!.x + price!.width - 2); // torebka po prawej od ceny
+    expect(Math.abs(bag!.y + bag!.height / 2 - (price!.y + price!.height / 2))).toBeLessThan(14); // w tym samym wierszu
+    await page.getByRole("tab", { name: "Kolczyki" }).click();
+    await expect(section.locator(".collection-count")).toHaveText(`${await section.locator(".product-card").count()} produkt${(await section.locator(".product-card").count()) === 1 ? "" : (await section.locator(".product-card").count()) < 5 ? "y" : "ów"}`);
+  });
+
   test("filtr kategorii pokazuje tylko wybrane produkty", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("tab", { name: "Kolczyki" }).click();

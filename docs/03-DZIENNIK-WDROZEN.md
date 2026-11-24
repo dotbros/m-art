@@ -221,3 +221,10 @@ Raport T-004.
 - Tytuł HERO: każda linia osobno mieści się w jednym wierszu (`FitTitle`) — zmniejsza się tylko linia za długa; krótka zostaje w pełnym rozmiarze (pierwsza wersja zmniejszała obie — poprawione na uwagę właściciela). Poniżej 55% rozmiaru linia się zawija zamiast robić się nieczytelna (bardzo długi tekst na telefonie). Podpowiedź w formularzu slajdu.
 - Telefon: większy zapas między przyciskami a kreskami slajdów (animacja wejścia tekstu przesuwała przyciski na kreski).
 - Zmierzone: 1650 / 1366 / 1024 px i telefon — brak nachodzenia przycisków na kreski i notkę. Playwright 80/80 (4 pominięte) — E2E: brak plakietki bez produktu, linie tytułu w jednym wierszu (lub zawinięte tylko na telefonie), pierwsza linia większa od długiej drugiej, przyciski nie nachodzą na kreski.
+### 2026-11-24 — Lista produktów na stronie głównej (wzór ze zrzutu właściciela)
+- Nagłówek „Twoje małe zachwyty” wyśrodkowany, nadtytuł ze złotymi liniami po obu stronach; tło: kremowa poświata + gałązki gipsówki w górnych rogach (własna grafika wektorowa `public/images/decor-sprig.svg`, generowana skryptem).
+- Kategorie: zakładki ze złotym podkreśleniem aktywnej, przewijane w bok na telefonie.
+- Pasek: liczba produktów z poprawną odmianą (`productCountLabel`) + zaokrąglony przycisk „Filtruj”.
+- Karty: zaokrąglone rogi (16 px), jasne tło, cień; serce w białym kółku; plakietka jako kremowa „pigułka”, automatycznie „OSTATNIA SZTUKA” przy 1 szt. (gdy brak własnej); ikona torebki w beżowym kółku obok ceny zamiast „+” na zdjęciu.
+- Poprawki po drodze: reguły wzoru (`display: contents`, kolejność `order` na telefonie) rozbijały wiersz ceny — nadpisane.
+- Testy: Vitest 75/75 (+1 odmiana), Playwright 83/83 (4 pominięte) — E2E: licznik, „Filtruj”, zaokrąglenie kart, torebka po prawej od ceny w tym samym wierszu.

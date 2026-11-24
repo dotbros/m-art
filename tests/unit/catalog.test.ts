@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COURIER_PRICE, money, shippingCost, slugify } from "@/lib/catalog";
+import { COURIER_PRICE, money, productCountLabel, shippingCost, slugify } from "@/lib/catalog";
 import { resolveDatabaseConfig } from "@/db";
 
 describe("catalog", () => {
@@ -18,6 +18,15 @@ describe("catalog", () => {
     expect(slugify("Słoneczny splot")).toBe("sloneczny-splot");
     expect(slugify("  Pierścionki & Łańcuszki! ")).toBe("pierscionki-lancuszki");
     expect(slugify("Żółć")).toBe("zolc");
+  });
+});
+
+describe("liczba produktów (odmiana)", () => {
+  it("1 produkt, 2–4 produkty, 5+ produktów, 12–14 produktów, 22–24 produkty", () => {
+    expect([0, 1, 2, 4, 5, 11, 12, 14, 21, 22, 24, 25, 112, 122].map(productCountLabel)).toEqual([
+      "0 produktów", "1 produkt", "2 produkty", "4 produkty", "5 produktów", "11 produktów", "12 produktów", "14 produktów",
+      "21 produktów", "22 produkty", "24 produkty", "25 produktów", "112 produktów", "122 produkty",
+    ]);
   });
 });
 
