@@ -32,6 +32,24 @@
 .hero-story-icon{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:1px solid var(--gold-line);color:#8f6a33;flex-shrink:0;transform:rotate(-45deg)}
 .text-link{border-bottom-color:var(--gold-line)}
 
+/* Plakietka produktu na zdjęciu HERO — „szkło”: ciemne, półprzezroczyste, rozmyte tło, cienka złota ramka,
+   złota poświata u dołu, kremowe napisy (na wzór załącznika właściciela). */
+@media(min-width:761px){.hero-product-tag{position:relative}} /* na telefonie zostaje pozycjonowanie ze wzoru (prawy górny róg) */
+.hero-product-tag{overflow:hidden;border-radius:12px;border:1px solid rgba(226,196,140,.55);
+  background:linear-gradient(135deg,rgba(38,26,16,.62) 0%,rgba(62,44,26,.42) 55%,rgba(38,26,16,.55) 100%);
+  -webkit-backdrop-filter:blur(14px) saturate(1.25);backdrop-filter:blur(14px) saturate(1.25);
+  box-shadow:0 14px 34px -10px rgba(20,12,4,.45),inset 0 1px 0 rgba(255,236,200,.28),inset 0 0 0 1px rgba(255,236,200,.06);
+  transition:transform .25s ease,box-shadow .25s ease}
+.hero-product-tag::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(120% 60% at 0% 0%,rgba(255,232,190,.16),transparent 60%)}
+.hero-product-tag::after{content:"";position:absolute;left:12%;right:12%;bottom:-1px;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,214,150,.95),transparent);filter:blur(.6px);box-shadow:0 0 14px 2px rgba(255,200,120,.45)}
+.hero-product-tag:hover{transform:translateY(-2px);box-shadow:0 18px 38px -10px rgba(20,12,4,.55),inset 0 1px 0 rgba(255,236,200,.35)}
+.hero-product-tag small{display:flex;align-items:center;gap:10px;color:#e6cf9f;letter-spacing:3px}
+.hero-product-tag small::after{content:"";width:34px;height:1px;background:linear-gradient(90deg,rgba(230,207,159,.8),transparent)}
+.hero-product-tag strong{color:#fbf3e4;text-shadow:0 1px 10px rgba(0,0,0,.25)}
+.hero-product-tag .round-arrow{border-color:rgba(251,243,228,.7);color:#fbf3e4;background:rgba(255,255,255,.04)}
+
 /* ---------- Nagłówki ---------- */
 /* wyróżnienia w tytułach — złota kursywa z gradientem */
 .hero h1 em,.section-heading h2 em,.stones-copy h2 em,.story-copy h2 em,.gift-section h2 em,.newsletter-inner h2 em,
@@ -53,7 +71,18 @@
 @media(max-width:760px){
   /* Telefon: dół zdjęcia / filmu HERO płynnie zanika w tło pod tytułem (zamiast twardej krawędzi) */
   .hero .hero-image{-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%)}
-  .hero-story-link{padding:0 16px 0 8px;font-size:13px}
-  .hero-cta{flex-wrap:wrap;gap:12px}
+  /* Oba przyciski HERO w jednej linii: mniejsze odstępy i napis; kółeczko z ikonką tylko na szerszych telefonach */
+  .hero-cta{flex-wrap:nowrap;gap:10px}
+  .hero-cta>.button,.hero-cta>.hero-story-link{flex:1 1 auto;min-width:0;min-height:46px;padding:0 12px;gap:8px;font-size:12px;letter-spacing:.2px;white-space:nowrap;justify-content:center}
+  .hero-cta>.button svg{width:16px;height:16px}
+  .hero-story-icon{width:24px;height:24px}
+}
+@media(max-width:420px){
+  .hero-story-icon{display:none}
+}
+@media(max-width:350px){
+  .hero-cta{flex-wrap:wrap}
+}
+@media(max-width:760px){
 }
 @media(prefers-reduced-motion:reduce){.button-dark,.button-dark::after{transition:none}}

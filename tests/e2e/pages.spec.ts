@@ -26,6 +26,10 @@ test.describe("Podstrony: pracownia i pielęgnacja", () => {
     await page.goto("/");
     const size = await page.locator(".mobile-header-actions svg").first().evaluate((s) => s.getBoundingClientRect().width);
     expect(size).toBeGreaterThanOrEqual(25);
+    // Przyciski HERO w jednej linii, bez uciętego tekstu
+    const [a, b] = [await page.locator(".hero-cta>.button").boundingBox(), await page.locator(".hero-story-link").boundingBox()];
+    expect(Math.abs(a!.y - b!.y)).toBeLessThan(2);
+    expect(await page.locator(".hero-story-link").evaluate((e) => e.scrollWidth <= e.clientWidth + 1)).toBe(true);
     await page.getByRole("button", { name: /Filtruj/ }).click();
     await expect(page.getByLabel("Twój kamień").locator("option").first()).toHaveText("Wszystkie");
     await expect(page.getByLabel("Sortuj według").locator("option").first()).toHaveText("Polecane");
