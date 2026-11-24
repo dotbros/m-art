@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
   experimental: {
     // Upload zdjęć produktów (max 5 MB) przechodzi przez Server Actions.
     serverActions: { bodySizeLimit: "6mb" },
+    // Trwała pamięć podręczna `next dev` (domyślnie włączona w Next 16) po zmianach kodu przy wyłączonym serwerze
+    // robiła się nieaktualna → „HMR hash mismatch” → pętla przeładowań strony (zwłaszcza Safari na iPhonie).
+    // Wyłączona: start serwera trwa kilka sekund dłużej, ale zawsze z aktualnym kodem.
+    turbopackFileSystemCacheForDev: false,
   },
   poweredByHeader: false,
   async headers() {

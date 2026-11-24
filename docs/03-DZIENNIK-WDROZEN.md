@@ -174,3 +174,7 @@ Raport T-004.
 - Zmiana: jeden rząd przesuwany w bok — telefon: palcem (zaczepianie na karcie, widać kawałek następnej) + strzałki; komputer: strzałki ← → (wyszarzone na początku/końcu, ukryte gdy wszystko się mieści) i gładzik. Limit kamieni w sekcji 6 → 12.
 - Błąd wykryty testem: rola `listitem` na kartach nadpisała rolę linku (czytniki ekranu nie widziały linków) — usunięta.
 - Test E2E: zawsze jeden rząd, brak przewijania strony w bok, strzałka przesuwa karuzelę i włącza „wstecz”. Playwright 63/63 (3 pominięte).
+### 2026-11-24 — Ponowna pętla przeładowań (iPhone) — przyczyna źródłowa
+- **Objaw:** strona główna przeładowywała się w kółko (Safari/iPhone: 21 razy w 12 s; Android: sporadycznie), log: „Fast Refresh rebuilding” → „HMR hash mismatch”.
+- **Przyczyna:** Next 16 domyślnie zachowuje pamięć podręczną `next dev` na dysku między uruchomieniami (`turbopackFileSystemCacheForDev`). Po zmianach kodu przy wyłączonym serwerze była nieaktualna. (Poprzednia naprawa — osobny katalog `.next-e2e` — usuwała tylko drugą przyczynę.)
+- **Naprawa:** `experimental.turbopackFileSystemCacheForDev: false` w `next.config.ts` + jednorazowe wyczyszczenie `.next`. Weryfikacja: iPhone i Android, oba adresy sieciowe, także po zwykłym restarcie serwera — 0 przeładowań. Koszt: start serwera kilka sekund dłuższy.
