@@ -38,8 +38,8 @@ svg{flex-shrink:0}
 .site-header{position:sticky;top:0;z-index:40;background:rgba(251,249,245,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(228,221,211,.6)}
 .header-inner{height:91px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
 .desktop-nav{display:flex;align-items:center;gap:25px;justify-self:start}
-.desktop-nav>button,.desktop-nav .nav-dropdown-wrap>button{display:inline-flex;gap:6px;align-items:center;font-size:10.5px;white-space:nowrap;transition:color .2s;letter-spacing:.1px}
-.desktop-nav>button:hover,.desktop-nav .nav-dropdown-wrap>button:hover{color:var(--gold)}
+.desktop-nav>button,.desktop-nav>a,.desktop-nav .nav-dropdown-wrap>button{display:inline-flex;gap:6px;align-items:center;font-size:10.5px;white-space:nowrap;transition:color .2s;letter-spacing:.1px}
+.desktop-nav>button:hover,.desktop-nav>a:hover,.desktop-nav .nav-dropdown-wrap>button:hover{color:var(--gold)}
 .nav-dropdown-wrap{position:relative}
 .nav-dropdown{position:absolute;top:35px;left:-25px;background:var(--paper);border:1px solid var(--line);width:265px;padding:23px;box-shadow:0 15px 35px #33251512}
 .nav-dropdown>p{font-size:8px;letter-spacing:1.8px;color:var(--muted);margin-bottom:15px}
@@ -297,7 +297,7 @@ svg{flex-shrink:0}
 .mobile-menu>button{font-family:var(--serif);font-size:32px;display:flex;align-items:center;justify-content:space-between;width:100%;border-bottom:1px solid var(--line);padding:14px 0}
 .mobile-menu>button>svg{color:#b9a584}
 .mobile-menu-secondary{margin:28px 0}
-.mobile-menu-secondary>button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 0;font-size:12px;color:#968165}
+.mobile-menu-secondary>button,.mobile-menu-secondary>a{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 0;font-size:12px;color:#968165}
 .mobile-menu-note{font-family:var(--serif);font-style:italic;font-size:33px;line-height:1.2;color:#ab9573;margin-top:35px}
 
 /* Your basket */
@@ -746,6 +746,9 @@ svg{flex-shrink:0}
   /* cele dotyku ≥ 44 px */
   .mobile-header-actions,.header-actions{gap:0}
   .mobile-header-actions .icon-button,.header-actions>.icon-button,.cart-toggle{min-width:44px;height:44px}
+  /* Większe ikony nagłówka na telefonie (menu, szukaj, ulubione, koszyk) */
+  .site-header .mobile-header-actions svg,.site-header .header-actions svg{width:26px;height:26px}
+  .site-header .cart-count{width:20px;height:20px;font-size:11px}
   .product-save,.quick-add,.product-card:hover .quick-add{width:36px;height:36px}
   .product-save:before,.quick-add:before{content:"";position:absolute;inset:-4px}
   .round-arrow{width:36px;height:36px;position:relative}

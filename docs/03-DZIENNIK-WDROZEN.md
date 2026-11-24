@@ -183,3 +183,20 @@ Raport T-004.
 - Stan magazynowy: zamówienia niewysłane (do potwierdzenia / potwierdzone / opłacone) → produkty wracają na stan; wysłane/zrealizowane → bez zwrotu; anulowane → stan zwrócono już przy anulowaniu (`deleteOrders`, jedna transakcja; pozycje usuwa ON DELETE CASCADE).
 - Ostrzeżenie w potwierdzeniu dla zamówień opłaconych / wysłanych / zrealizowanych: to dokumenty sprzedaży, zwykle wymagane do księgowości.
 - Testy: integracyjny (zwrot na stan wg statusu, usunięcie pozycji, nieistniejące id), E2E (pojedyncze + 2 naraz, brak przewijania w bok). Vitest 64/64, Playwright 66/66 (3 pominięte).
+---
+
+## 2026-11-24 — Poprawki mobilne + podstrony „Pracownia” i „Pielęgnacja”
+
+| # | Zgłoszenie | Zmiana |
+|---|---|---|
+| 1 | Większe ikony w nagłówku (telefon) | ikony 26 px, licznik koszyka 20 px |
+| 2 | Krótsze etykiety filtrów | „Wszystkie kamienie” → „Wszystkie”, „Polecane przez pracownię” → „Polecane” (tylko tekst; wartości filtrów bez zmian) |
+| 3 | Karuzela kamieni bez końca | po ostatnim kamieniu — pierwszy (i odwrotnie), palcem i strzałkami (D-016) |
+| 4 | Różne rozmiary pól wyboru w panelu „Kamienie” | długi opis ściskał pole — stały rozmiar 24×24 |
+| 5 | Edycja „Poznaj naszą pracownię” | podstrona `/pracownia`: zdjęcie nagłówkowe + galeria (powiększanie, przesuwanie palcem), treść; osobna zajawka na stronie głównej z własnym zdjęciem (D-015) |
+| 6 | Edycja „Pielęgnacja biżuterii” | podstrona `/pielegnacja` (śródtytuły „## ”) |
+
+- Wszystkie linki „O pracowni”, „Poznaj naszą historię”, „Zajrzyj do świata M.art”, „Pielęgnacja biżuterii” prowadzą do nowych podstron.
+- Panel: zakładka „Strona” → sekcja „Podstrony”.
+- Kopia bazy przed migracją 0007: `data/backup-przed-podstronami-20261124-2113`.
+- **Testy:** raport T-005.

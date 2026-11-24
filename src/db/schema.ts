@@ -55,6 +55,26 @@ export const stones = pgTable("stones", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
+/**
+ * Podstrony treściowe edytowane w panelu („Poznaj naszą pracownię”, „Pielęgnacja biżuterii”).
+ * images: pierwsze = zdjęcie nagłówkowe podstrony, kolejne = galeria na dole.
+ * teaser*: zajawka na stronie głównej (dla pracowni) — z osobnym zdjęciem.
+ */
+export const pages = pgTable("pages", {
+  slug: text("slug").primaryKey(), // "pracownia" | "pielegnacja"
+  eyebrow: text("eyebrow").notNull().default(""),
+  title: text("title").notNull(),
+  titleAccent: text("title_accent").notNull().default(""),
+  intro: text("intro").notNull().default(""),
+  body: text("body").notNull().default(""), // akapity rozdzielone pustą linią; „## ” na początku linii = śródtytuł
+  images: text("images").array().notNull().default(sql`'{}'::text[]`),
+  teaserImage: text("teaser_image"),
+  teaserTitle: text("teaser_title").notNull().default(""),
+  teaserAccent: text("teaser_accent").notNull().default(""),
+  teaserText: text("teaser_text").notNull().default(""),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+});
+
 /** Slajdy sekcji HERO na stronie głównej — zdjęcie lub wideo, zarządzane w panelu /admin/strona. */
 export const heroSlides = pgTable("hero_slides", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),

@@ -50,6 +50,13 @@
       "when": 1795129618323,
       "tag": "0006_stones",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795549906103,
+      "tag": "0007_pages",
+      "breakpoints": true
     }
   ]
 }

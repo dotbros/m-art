@@ -32,12 +32,23 @@ test.describe("Kamienie naturalne — strony dla klienta", () => {
     expect(tops).toBe(1); // zawsze jeden rząd
     await noHorizontalScroll(page);
     const next = section.getByRole("button", { name: "Następne kamienie" });
-    if (await next.count()) { // strzałki tylko, gdy karty się nie mieszczą (na telefonie zawsze)
-      const track = section.locator(".stone-track");
-      await expect(section.getByRole("button", { name: "Poprzednie kamienie" })).toBeDisabled();
+    if (await next.count()) { // strzałki (i pętla) tylko, gdy karty się nie mieszczą (na telefonie zawsze)
+      // Karta najbliżej lewej krawędzi karuzeli
+      const leading = () => section.evaluate((s) => {
+        const track = s.querySelector(".stone-track")!, left = track.getBoundingClientRect().left;
+        const cards = [...track.querySelectorAll(".stone-card")] as HTMLElement[];
+        return cards.reduce((a, b) => Math.abs(b.getBoundingClientRect().left - left) < Math.abs(a.getBoundingClientRect().left - left) ? b : a).querySelector("h3")!.textContent;
+      });
+      const names = await section.locator(".stone-card:not([data-clone]) h3").allTextContents();
+      await expect.poll(leading).toBe(names[0]);
+      // Pętla bez końca: z pierwszego „wstecz” → ostatni; z ostatniego „dalej” → pierwszy
+      await section.getByRole("button", { name: "Poprzednie kamienie" }).click();
+      await expect.poll(leading).toBe(names[names.length - 1]);
+      await page.waitForTimeout(400); // przeskok do oryginału po zatrzymaniu przewijania
       await next.click();
-      await expect.poll(() => track.evaluate((e) => e.scrollLeft)).toBeGreaterThan(50);
-      await expect(section.getByRole("button", { name: "Poprzednie kamienie" })).toBeEnabled();
+      await expect.poll(leading).toBe(names[0]);
+      // Kopie ukryte przed czytnikami ekranu
+      expect(await section.locator(".stone-track").getByRole("link").count()).toBe(names.length);
     } else {
       expect(page.viewportSize()!.width).toBeGreaterThan(760);
     }

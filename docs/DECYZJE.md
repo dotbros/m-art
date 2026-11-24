@@ -64,3 +64,12 @@ Każda decyzja: **kontekst → decyzja → konsekwencje**. Nowe decyzje dopisuje
 **Kontekst:** kamienie mają mieć własne strony (zdjęcia, opis) i listę produktów; dodaje się je także przy tworzeniu produktu.
 **Decyzja:** tabela `stones` (nazwa, slug, podpis, opis, zdjęcia[], na stronie głównej, kolejność, widoczność; migracja 0006 przenosi kamienie z produktów i dodaje opisy 3 kamieni ze wzoru). Produkty nadal wskazują kamienie **po nazwie** (`products.stones text[]`) — bez tabeli łączącej, żeby nie przebudowywać działających filtrów i formularzy. Spójność: nowy kamień wpisany przy produkcie trafia do słownika (`ensureStones`), zmiana nazwy w panelu aktualizuje produkty i slajdy (`array_replace`), kamienia użytego w produktach nie można usunąć.
 **Konsekwencje:** prosty model; gdyby kamienie zyskały wiele powiązań (np. filtry wielokryterialne, tłumaczenia), przejść na tabelę łączącą `product_stones`.
+### D-015 · Podstrony treściowe edytowane w panelu (2026-11-24)
+**Decyzja:** tabela `pages` (slug = `pracownia` | `pielegnacja`; migracja 0007 przenosi teksty ze wzoru). Okna informacyjne „O pracowni” i „Pielęgnacja” zastąpione stronami `/pracownia`, `/pielegnacja` (lepsze SEO, link do udostępnienia). Zdjęcia: pierwsze = nagłówek, kolejne = galeria; dla pracowni osobna zajawka na stronie głównej (własne zdjęcie, tytuł, tekst). Treść w prostym formacie: pusta linia = akapit, „## ” = śródtytuł (bez edytora WYSIWYG — prościej na telefonie). Edycja w zakładce „Strona” (bez 7. pozycji w dolnym menu).
+**Konsekwencje:** kolejne podstrony (np. regulamin, dostawa) można dodać wpisem w `CONTENT_PAGES` + wierszem w bazie.
+
+### D-016 · Nieskończona karuzela kamieni (2026-11-24)
+**Decyzja:** lista powielona 3× z niewidocznym przeskokiem do środkowej kopii po zatrzymaniu przewijania (działa z przewijaniem palcem i scroll-snap); kopie `aria-hidden` i poza kolejnością klawiatury.
+
+### D-017 · Wyłączona trwała pamięć podręczna `next dev` (2026-11-24)
+**Kontekst / decyzja:** `experimental.turbopackFileSystemCacheForDev: false` — nieaktualna pamięć po zmianach kodu przy wyłączonym serwerze powodowała pętlę przeładowań (iPhone). Koszt: wolniejszy start serwera deweloperskiego.

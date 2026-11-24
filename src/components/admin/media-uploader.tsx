@@ -9,7 +9,7 @@ type Phase = { kind: "idle" } | { kind: "uploading"; percent: number } | { kind:
  * Wybór zdjęcia lub filmu z galerii telefonu (albo nagranie aparatem) i wysyłka z paskiem postępu.
  * Serwer zmniejsza zdjęcie / przerabia film na lekkie MP4 i zwraca adresy, które trafiają do formularza.
  */
-export function MediaUploader({ value, onChange, allowVideo = true, error }: { value: UploadedMedia | null; onChange: (media: UploadedMedia | null) => void; allowVideo?: boolean; error?: string }) {
+export function MediaUploader({ value, onChange, allowVideo = true, error, inputId = "media-file", label, buttonLabel }: { value: UploadedMedia | null; onChange: (media: UploadedMedia | null) => void; allowVideo?: boolean; error?: string; inputId?: string; label?: string; buttonLabel?: string }) {
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
   const input = useRef<HTMLInputElement>(null);
   const xhr = useRef<XMLHttpRequest | null>(null);
@@ -42,8 +42,8 @@ export function MediaUploader({ value, onChange, allowVideo = true, error }: { v
   const message = error || (phase.kind === "error" ? phase.message : "");
 
   return <div className={`adm-field adm-media ${message ? "has-error" : ""}`}>
-    <span className="adm-label" id="media-label">{allowVideo ? "Zdjęcie lub film" : "Zdjęcie"}</span>
-    <div className="adm-media-preview" aria-labelledby="media-label">
+    <span className="adm-label" id={`${inputId}-label`}>{label ?? (allowVideo ? "Zdjęcie lub film" : "Zdjęcie")}</span>
+    <div className="adm-media-preview" aria-labelledby={`${inputId}-label`}>
       {value ? (value.mediaType === "video"
         ? <video src={value.url} poster={value.posterUrl ?? undefined} muted loop playsInline autoPlay controls={value.hasAudio} aria-label="Podgląd filmu"/>
         // eslint-disable-next-line @next/next/no-img-element
@@ -53,10 +53,10 @@ export function MediaUploader({ value, onChange, allowVideo = true, error }: { v
           : <><strong>Przetwarzanie…</strong><small>Film może potrwać do minuty. Nie zamykaj strony.</small></>}
       </div>}
     </div>
-    <input ref={input} id="media-file" type="file" className="sr-only" accept={allowVideo ? "image/*,video/*" : "image/*"} disabled={busy}
+    <input ref={input} id={inputId} type="file" className="sr-only" accept={allowVideo ? "image/*,video/*" : "image/*"} disabled={busy}
       onChange={(event) => { const file = event.target.files?.[0]; event.target.value = ""; if (file) upload(file); }}/>
     <div className="adm-row">
-      <label htmlFor="media-file" className={`adm-btn ${busy ? "is-disabled" : ""}`} aria-disabled={busy}>{value ? "Zmień" : "Wybierz z galerii lub nagraj"}</label>
+      <label htmlFor={inputId} className={`adm-btn ${busy ? "is-disabled" : ""}`} aria-disabled={busy}>{buttonLabel ?? (value ? "Zmień" : "Wybierz z galerii lub nagraj")}</label>
       {busy && <button type="button" className="adm-btn" onClick={() => xhr.current?.abort()}>Przerwij</button>}
       {value && !busy && <button type="button" className="adm-btn adm-btn-ghost-danger" onClick={() => onChange(null)}>Usuń</button>}
     </div>

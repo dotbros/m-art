@@ -97,7 +97,7 @@
 .adm-hint{font-size:13.5px;color:var(--a-muted)}
 .adm-error{font-size:14px;color:var(--a-err);font-weight:500}
 .adm-switch{display:flex;align-items:center;gap:12px;min-height:44px;font-size:16px;cursor:pointer}
-.adm-switch input{width:24px;height:24px;accent-color:var(--a-brown)}
+.adm-switch input{width:24px;height:24px;flex-shrink:0;margin:0;accent-color:var(--a-brown)} /* stały rozmiar — długi opis nie ściska pola */
 .adm-grid-2{display:grid;grid-template-columns:1fr;gap:0 14px}
 .adm-alert{padding:12px 14px;border-radius:10px;margin:0 0 14px;font-size:15px}
 .adm-alert-ok{background:var(--a-ok-bg);color:var(--a-ok)}
@@ -195,6 +195,9 @@
 
 /* --- strona główna: slajdy HERO, wgrywanie zdjęć i filmów --- */
 .adm-intro{margin:-6px 0 14px}
+.adm-head-section{margin-top:36px}
+.adm .adm-h1-like{font-family:var(--serif);font-size:32px;line-height:1.1;font-weight:500;margin:2px 0 0}
+.adm-sticky-actions .adm-btn[target]{flex:0 0 auto}
 .adm-label{font-size:15px;font-weight:500}
 .adm-media-preview{position:relative;width:100%;aspect-ratio:16/10;border-radius:12px;overflow:hidden;background:#efe8dc;display:flex;align-items:center;justify-content:center;color:var(--a-muted);font-size:14px}
 .adm-media-preview img,.adm-media-preview video{width:100%;height:100%;object-fit:cover}

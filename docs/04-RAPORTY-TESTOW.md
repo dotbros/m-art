@@ -99,3 +99,15 @@ Nowe testy:
 - **jednostkowe:** walidacja kamienia (adres z nazwy, wielka litera, duplikaty zdjęć, obce adresy zdjęć, limit 8 zdjęć, długość podpisu).
 - **integracyjne:** dane startowe (3 opisane kamienie na stronie głównej, wszystkie kamienie z produktów w słowniku), strona kamienia (tylko widoczne produkty z kamieniem; ukryty kamień = brak strony), `ensureStones` bez duplikatów, zmiana nazwy aktualizuje produkty i slajdy HERO, wzór adresu z migracji 0006 (polskie znaki).
 - **E2E (Android, iPhone, desktop):** strona główna → karta „Jaspis cesarski” → strona kamienia (tytuł strony, podpis, opis, tylko produkty z jaspisem, brak przewijania w bok) → produkt otwiera się w sklepie; lista /kamienie, 404 dla nieistniejącego; panel: nowy kamień ze zdjęciem i opisem → przypisanie do produktu podpowiedzią → strona kamienia (zdjęcie z /media, 2 akapity, produkt) → karta na stronie głównej → blokada usunięcia kamienia w produkcie.
+---
+
+## T-005 · 2026-11-24 · poprawki mobilne, nieskończona karuzela, podstrony
+
+| Zestaw | Wynik |
+|---|---|
+| `typecheck` / `lint` | ✅ 0 błędów |
+| Vitest — 10 plików | ✅ **69 / 69** |
+| Playwright — 3 urządzenia | ✅ **77 / 77**, 4 pominięte (gesty dotyku poza Chromium; test ikon tylko na telefonach) |
+
+Nowe: format treści (akapity, śródtytuły), walidacja podstrony, treści z migracji 0007; E2E — strona główna → /pracownia, stopka → /pielegnacja; panel: zajawka z osobnym zdjęciem, zdjęcie nagłówkowe + 2 w galerii, powiększenie i przewijanie galerii; karuzela kamieni w pętli (wstecz z pierwszego → ostatni, dalej z ostatniego → pierwszy; kopie niewidoczne dla czytników); ikony nagłówka ≥ 25 px i krótkie etykiety filtrów na telefonach; równe pola wyboru w panelu.
+Błędy testów poprawione w trakcie: zależność od kolejności urządzeń (wspólna baza testowa), przejście do formularza przed końcem logowania, liczenie linków poza karuzelą.

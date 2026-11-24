@@ -7,7 +7,8 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { countProductsWithStone, ensureStones, renameStoneEverywhere, validateStone } from "@/lib/stones";
 import { deleteOrders } from "@/lib/orders";
-import { categories, heroSlides, orderItems, orders, products, stones, ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus, type PaymentStatus } from "@/db/schema";
+import { CONTENT_PAGES, getPage, isPageSlug, validatePage } from "@/lib/pages";
+import { categories, heroSlides, orderItems, orders, pages, products, stones, ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus, type PaymentStatus } from "@/db/schema";
 import { validateHeroSlide, MAX_HERO_SLIDES } from "@/lib/hero";
 import { requireAdmin, SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
 import { authenticate, clearAttempts, createSession, deleteSession, isRateLimited, registerFailedAttempt } from "@/lib/auth/sessions";
@@ -271,4 +272,23 @@ export async function deleteStoneAction(_prev: FormState, form: FormData): Promi
   for (const file of stone.images) await deleteMedia(file);
   refreshStorefront();
   redirect("/admin/kamienie?usunieto=1");
+}
+
+// ---------------- Podstrony („Poznaj naszą pracownię”, „Pielęgnacja biżuterii”) ----------------
+export async function savePageAction(_prev: FormState, form: FormData): Promise<FormState> {
+  await requireAdmin();
+  const slug = String(form.get("slug"));
+  if (!isPageSlug(slug)) return { error: "Nieznana podstrona." };
+  const parsed = validatePage(form);
+  if (!parsed.ok) return fail(form, parsed.errors);
+  const db = await getDb();
+  const existing = await getPage(db, slug);
+  if (!existing) return { error: "Podstrona nie istnieje." };
+  await db.update(pages).set(parsed.data).where(eq(pages.slug, slug));
+  // Zdjęcia usunięte z podstrony kasujemy z dysku (tylko wgrane przez panel — /media/…)
+  const kept = new Set([...parsed.data.images, parsed.data.teaserImage]);
+  for (const old of [...existing.images, existing.teaserImage]) if (old && !kept.has(old)) await deleteMedia(old);
+  refreshStorefront();
+  revalidatePath(CONTENT_PAGES[slug].path);
+  redirect("/admin/strona?zapisano-strone=1");
 }
