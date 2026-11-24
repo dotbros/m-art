@@ -216,3 +216,8 @@ Raport T-004.
 - Sklep: karta produktu — galeria przesuwana palcem, kropki, strzałki na komputerze (plakietka i serce zostają na wierzchu); karta w kolekcji — drugie zdjęcie po najechaniu (komputer).
 - Weryfikacja na bazie użytkownika: 18/18 produktów ma galerię po migracji. Kopia bazy: `data/backup-przed-galeria-produktow-20261124-2307`.
 - Testy: Vitest 74/74 (+2), Playwright 80/80 (4 pominięte) — E2E: 2 zdjęcia w panelu, galeria w karcie produktu (2 zdjęcia, przejście do drugiego), zdjęcie główne z /media (JPG).
+### 2026-11-24 — Plakietka na slajdzie i długie tytuły HERO
+- Plakietka na zdjęciu HERO tylko przy wybranym „Produkcie w rogu slajdu” (wcześniej — ze wzoru — także przy samym kamieniu).
+- Tytuł HERO: każda linia osobno mieści się w jednym wierszu (`FitTitle`) — zmniejsza się tylko linia za długa; krótka zostaje w pełnym rozmiarze (pierwsza wersja zmniejszała obie — poprawione na uwagę właściciela). Poniżej 55% rozmiaru linia się zawija zamiast robić się nieczytelna (bardzo długi tekst na telefonie). Podpowiedź w formularzu slajdu.
+- Telefon: większy zapas między przyciskami a kreskami slajdów (animacja wejścia tekstu przesuwała przyciski na kreski).
+- Zmierzone: 1650 / 1366 / 1024 px i telefon — brak nachodzenia przycisków na kreski i notkę. Playwright 80/80 (4 pominięte) — E2E: brak plakietki bez produktu, linie tytułu w jednym wierszu (lub zawinięte tylko na telefonie), pierwsza linia większa od długiej drugiej, przyciski nie nachodzą na kreski.

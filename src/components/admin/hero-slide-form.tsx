@@ -71,7 +71,7 @@ export function HeroSlideForm({ slide, stones, products }: { slide?: Slide; ston
       <h2>Teksty</h2>
       <Field label="Nadtytuł (małe litery nad tytułem)" name="eyebrow" error={e.eyebrow}><input id="eyebrow" name="eyebrow" maxLength={60} value={eyebrow} onChange={(ev) => setEyebrow(ev.target.value)} placeholder="np. NOWA KOLEKCJA"/></Field>
       <Field label="Tytuł" name="title" error={e.title}><input id="title" name="title" maxLength={60} required value={title} onChange={(ev) => setTitle(ev.target.value)} placeholder="np. Z natury"/></Field>
-      <Field label="Druga linia tytułu (kursywą)" name="titleAccent" error={e.titleAccent}><input id="titleAccent" name="titleAccent" maxLength={60} value={accent} onChange={(ev) => setAccent(ev.target.value)} placeholder="np. wyjątkowa."/></Field>
+      <Field label="Druga linia tytułu (kursywą)" name="titleAccent" error={e.titleAccent} hint="Każda linia tytułu mieści się w jednym wierszu — dłuższy tekst zostanie automatycznie zmniejszony. Najlepiej wyglądają krótkie hasła (do ok. 15 znaków)."><input id="titleAccent" name="titleAccent" maxLength={60} value={accent} onChange={(ev) => setAccent(ev.target.value)} placeholder="np. wyjątkowa."/></Field>
       <Field label="Opis" name="description" error={e.description} hint="Maks. 300 znaków. Enter = nowa linia."><textarea id="description" name="description" rows={3} maxLength={300} defaultValue={val("description", slide?.description)}/></Field>
     </section>
 

@@ -50,6 +50,11 @@
 .hero-product-tag strong{color:#fbf3e4;text-shadow:0 1px 10px rgba(0,0,0,.25)}
 .hero-product-tag .round-arrow{border-color:rgba(251,243,228,.7);color:#fbf3e4;background:rgba(255,255,255,.04)}
 
+/* ---------- Tytuł HERO dopasowany do szerokości (FitTitle) ---------- */
+.hero h1.fit-title{max-width:100%}
+.fit-title>.fit-line{display:block;white-space:nowrap;width:max-content;max-width:none}
+.fit-title>.fit-line.is-wrapping{white-space:normal;width:auto}
+
 /* ---------- Galeria w karcie produktu ---------- */
 .pd-single{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pd-gallery{position:absolute;inset:0}

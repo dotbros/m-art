@@ -188,7 +188,7 @@ test.describe("Panel administracyjny", () => {
     await page.locator("#media-file").setInputFiles("tests/fixtures/hero.jpg");
     await expect(page.getByAltText("Podgląd zdjęcia")).toBeVisible({ timeout: 30_000 });
     await page.getByLabel("Tytuł", { exact: true }).fill(title);
-    await page.getByLabel("Druga linia tytułu (kursywą)").fill("kolekcja.");
+    await page.getByLabel("Druga linia tytułu (kursywą)").fill("kolekcja na długie, mroźne wieczory.");
     await page.getByLabel("„Odkryj biżuterię” prowadzi do").selectOption({ label: "★ Wybrane produkty (własna kolekcja)" });
     // Bez zaznaczenia — błąd przy liście
     await page.getByRole("button", { name: "Dodaj slajd" }).click();
@@ -211,8 +211,19 @@ test.describe("Panel administracyjny", () => {
       if ((await page.locator(".hero h1").textContent())?.includes(title)) break;
     }
     await expect(page.locator(".hero h1")).toContainText(title);
+    // Bez „produktu w rogu” — brak plakietki na zdjęciu; długi tytuł — każda linia w jednym wierszu, przyciski nie nachodzą na kreski
+    await expect(page.locator(".hero-product-tag")).toHaveCount(0);
+    // Każda linia osobno: mieści się w jednym wierszu (zmniejszona tylko, jeśli trzeba) albo — gdy musiałaby być
+    // nieczytelnie mała (bardzo długi tekst na telefonie) — zawija się. Pierwsza, krótka linia zostaje w pełnym rozmiarze.
+    const lines = await page.locator(".hero h1 .fit-line").evaluateAll((els) => els.map((l) => ({ wrap: l.classList.contains("is-wrapping"), oneRow: l.getBoundingClientRect().height < parseFloat(getComputedStyle(l).fontSize) * 1.6, size: parseFloat(getComputedStyle(l).fontSize) })));
+    for (const l of lines) expect(l.wrap || l.oneRow).toBe(true);
+    if (page.viewportSize()!.width > 760) expect(lines.every((l) => !l.wrap)).toBe(true);
+    expect(lines[0].size).toBeGreaterThan(lines[1].size); // krótka pierwsza linia większa niż długa druga
+    await page.waitForTimeout(700); // koniec animacji wejścia tekstu
+    const [cta, ctl] = [await page.locator(".hero-cta").boundingBox(), await page.locator(".slide-controls").boundingBox()];
+    expect(cta!.y + cta!.height <= ctl!.y || ctl!.y + ctl!.height <= cta!.y || cta!.x + cta!.width <= ctl!.x || ctl!.x + ctl!.width <= cta!.x).toBe(true);
     await page.locator(".hero-cta").getByRole("button", { name: /Odkryj biżuterię/ }).click();
-    await expect(page.locator(".active-filters .collection-chip")).toContainText(`Kolekcja: ${title} kolekcja`);
+    await expect(page.locator(".active-filters .collection-chip")).toContainText(`Kolekcja: ${title} kolekcja na długie, mroźne wieczory`);
     await expect(page.locator(".product-grid .product-name")).toHaveText(["Piaskowe szepty", "Kropla światła"]);
     await page.locator(".active-filters .collection-chip").click();
     expect(await page.locator(".product-grid .product-card").count()).toBeGreaterThan(2);
