@@ -227,4 +227,4 @@ Raport T-004.
 - Pasek: liczba produktów z poprawną odmianą (`productCountLabel`) + zaokrąglony przycisk „Filtruj”.
 - Karty: zaokrąglone rogi (16 px), jasne tło, cień; serce w białym kółku; plakietka jako kremowa „pigułka”, automatycznie „OSTATNIA SZTUKA” przy 1 szt. (gdy brak własnej); ikona torebki w beżowym kółku obok ceny zamiast „+” na zdjęciu.
 - Poprawki po drodze: reguły wzoru (`display: contents`, kolejność `order` na telefonie) rozbijały wiersz ceny — nadpisane.
-- Testy: Vitest 75/75 (+1 odmiana), Playwright 83/83 (4 pominięte) — E2E: licznik, „Filtruj”, zaokrąglenie kart, torebka po prawej od ceny w tym samym wierszu.
+- Testy: Vitest 75/75 (+1 odmiana), Playwright 83/83 (4 pominięte) — E2E: licznik, „Filtruj”, zaokrąglenie kart, torebka po prawej od ceny w tym samym wierszu.- „Poznaj naszą pracownię” na stronie głównej: zdjęcie w jednym formacie 4:5 na komputerze i telefonie (wcześniej stała wysokość → inny kadr: ok. 5:4 na komputerze, ok. 7:8 na telefonie); zdjęcie jest linkiem do /pracownia (z delikatnym przybliżeniem po najechaniu). Podpowiedź o formacie w panelu. Test E2E: proporcja 0,8 i link na każdym urządzeniu.

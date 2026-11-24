@@ -25,7 +25,7 @@ export function PageForm({ page, path, hasTeaser, maxImages }: { page: PageData;
 
     {hasTeaser && <section className="adm-card">
       <h2>Zajawka na stronie głównej</h2>
-      <p className="adm-hint">Sekcja na stronie głównej z przyciskiem do tej podstrony. Ma własne zdjęcie — niezależne od zdjęć podstrony.</p>
+      <p className="adm-hint">Sekcja na stronie głównej z przyciskiem do tej podstrony. Ma własne zdjęcie — niezależne od zdjęć podstrony. Zdjęcie wyświetla się w formacie pionowym 4:5 (na komputerze i telefonie tak samo) i prowadzi do podstrony.</p>
       <MediaUploader value={teaser ? { mediaType: "image", url: teaser, posterUrl: null, hasAudio: false } : null} allowVideo={false} inputId="teaser-file" label="Zdjęcie na stronie głównej"
         onChange={(media) => setTeaser(media?.url ?? null)} error={e.teaserImage}/>
       <div className="adm-grid-2">

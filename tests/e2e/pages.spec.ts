@@ -7,6 +7,11 @@ test.describe("Podstrony: pracownia i pielęgnacja", () => {
     await page.goto("/");
     const story = page.locator("#pracownia");
     await expect(story.getByRole("heading", { level: 2 })).toContainText("Nie z fabryki.");
+    // Zdjęcie: ten sam format 4:5 na każdym urządzeniu i link do podstrony
+    const photo = story.locator(".story-photo");
+    const box = (await photo.boundingBox())!;
+    expect(box.width / box.height).toBeCloseTo(0.8, 2);
+    await expect(photo).toHaveAttribute("href", "/pracownia");
     await story.getByRole("link", { name: /Zajrzyj do świata M\.art/ }).click();
     await expect(page).toHaveURL(/\/pracownia$/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Nie z fabryki.");

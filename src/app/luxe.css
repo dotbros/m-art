@@ -50,6 +50,14 @@
 .hero-product-tag strong{color:#fbf3e4;text-shadow:0 1px 10px rgba(0,0,0,.25)}
 .hero-product-tag .round-arrow{border-color:rgba(251,243,228,.7);color:#fbf3e4;background:rgba(255,255,255,.04)}
 
+/* ---------- „Poznaj naszą pracownię” na stronie głównej: jeden format zdjęcia (4:5) na komputerze i telefonie,
+   zdjęcie jest linkiem do podstrony /pracownia ---------- */
+.story-section .story-photo{display:block;height:auto;aspect-ratio:4/5;width:100%;justify-self:center;border-radius:2px}
+.story-section .story-photo>img{transition:transform .8s ease}
+.story-section .story-photo:hover>img{transform:scale(1.035)}
+.story-section .story-photo:focus-visible{outline:2px solid var(--gold-line);outline-offset:4px}
+@media(min-width:761px){.story-section .story-photo{max-width:440px}}
+
 /* ---------- Kolekcja („Twoje małe zachwyty”) — na wzór zrzutu właściciela ---------- */
 .collection-section{position:relative;isolation:isolate;background:radial-gradient(110% 340px at 50% 0%,#fffcf6 0%,rgba(255,252,246,0) 75%)}
 .collection-decor{position:absolute;top:-14px;width:190px;height:190px;background:url(/images/decor-sprig.svg) no-repeat center/contain;pointer-events:none;z-index:-1}
