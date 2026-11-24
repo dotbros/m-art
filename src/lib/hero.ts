@@ -3,7 +3,7 @@ import type { Db } from "@/db";
 import { heroSlides } from "@/db/schema";
 import type { Result } from "./validation";
 
-import { MAX_HERO_SLIDES, type HeroFocus } from "./hero-shared";
+import { MAX_COLLECTION_PRODUCTS, MAX_HERO_SLIDES, TARGET_PRODUCTS, type HeroFocus } from "./hero-shared";
 export { HERO_FOCUS, MAX_HERO_SLIDES, PORTRAIT_BELOW, type HeroFocus } from "./hero-shared";
 
 /** Slajd w postaci dla sklepu. */
@@ -12,20 +12,24 @@ export type HeroSlide = {
   mediaType: "image" | "video"; mediaUrl: string; posterUrl: string | null; hasAudio: boolean; focus: HeroFocus; stone: string; productId: string | null;
   /** szerokość / wysokość; null = nieznane (starsze slajdy — przeglądarka rozpozna sama) */
   aspect: number | null;
+  /** Własna kolekcja slajdu: „Odkryj biżuterię” pokazuje tylko te produkty (pusta = kamień / cała kolekcja). */
+  productIds: string[];
 };
+
+export { TARGET_PRODUCTS, MAX_COLLECTION_PRODUCTS } from "./hero-shared";
 
 /** Gdy w panelu nie ma żadnego aktywnego slajdu — strona główna nadal wygląda dobrze. */
 export const FALLBACK_SLIDE: HeroSlide = {
   id: 0, eyebrow: "BIŻUTERIA INSPIROWANA NATURĄ", title: "Z natury", titleAccent: "wyjątkowa.",
   description: "Prawdziwe kamienie. Ręczna praca. Twoja historia.\nOdkryj biżuterię, która jest tak niepowtarzalna jak Ty.",
-  mediaType: "image", mediaUrl: "/images/hero-jewelry.svg", posterUrl: null, hasAudio: false, focus: "right", stone: "", productId: null, aspect: 1.5,
+  mediaType: "image", mediaUrl: "/images/hero-jewelry.svg", posterUrl: null, hasAudio: false, focus: "right", stone: "", productId: null, aspect: 1.5, productIds: [],
 };
 
 export async function getActiveHeroSlides(db: Db): Promise<HeroSlide[]> {
   const rows = await db.select().from(heroSlides).where(and(eq(heroSlides.isActive, true))).orderBy(asc(heroSlides.position), asc(heroSlides.id)).limit(MAX_HERO_SLIDES);
   return rows.map((r) => ({
     id: r.id, eyebrow: r.eyebrow, title: r.title, titleAccent: r.titleAccent, description: r.description, mediaType: r.mediaType,
-    mediaUrl: r.mediaUrl, posterUrl: r.posterUrl, hasAudio: r.mediaType === "video" && r.hasAudio, focus: (["left", "center", "right"].includes(r.focus) ? r.focus : "center") as HeroFocus, stone: r.stone, productId: r.productId, aspect: r.aspect,
+    mediaUrl: r.mediaUrl, posterUrl: r.posterUrl, hasAudio: r.mediaType === "video" && r.hasAudio, focus: (["left", "center", "right"].includes(r.focus) ? r.focus : "center") as HeroFocus, stone: r.stone, productId: r.productId, aspect: r.aspect, productIds: r.productIds,
   }));
 }
 
@@ -53,9 +57,15 @@ export function validateHeroSlide(form: FormData): Result<HeroSlideInput> {
   else if ((mediaType === "video") !== mediaUrl.endsWith(".mp4")) errors.media = "Nieprawidłowy typ pliku.";
   if (posterUrl && !MEDIA_URL.test(posterUrl)) errors.media = "Nieprawidłowy kadr startowy filmu.";
   if (!Number.isInteger(position) || position < 0 || position > 999) errors.position = "Kolejność to liczba 0–999.";
+  // Dokąd prowadzi slajd: cała kolekcja ("") / kamień / własna kolekcja wybranych produktów
+  const target = str(form.get("stone"));
+  const isCollection = target === TARGET_PRODUCTS;
+  const productIds = isCollection ? [...new Set(form.getAll("productIds").map((v) => str(v)).filter((v) => v && v.length <= 100))] : [];
+  if (isCollection && productIds.length === 0) errors.productIds = "Zaznacz co najmniej jeden produkt kolekcji.";
+  if (productIds.length > MAX_COLLECTION_PRODUCTS) errors.productIds = `Maksymalnie ${MAX_COLLECTION_PRODUCTS} produktów.`;
   if (Object.keys(errors).length) return { ok: false, errors };
   return { ok: true, data: {
     title, titleAccent, eyebrow, description, mediaUrl, mediaType, posterUrl: mediaType === "video" ? posterUrl : null, hasAudio: mediaType === "video" && form.get("hasAudio") === "on", focus,
-    stone: str(form.get("stone")).slice(0, 60), productId: str(form.get("productId")) || null, aspect, position, isActive: form.get("isActive") === "on",
+    stone: isCollection ? "" : target.slice(0, 60), productIds, productId: str(form.get("productId")) || null, aspect, position, isActive: form.get("isActive") === "on",
   } };
 }

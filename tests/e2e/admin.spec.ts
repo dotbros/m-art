@@ -172,6 +172,51 @@ test.describe("Panel administracyjny", () => {
     expect((await page.request.get(src)).status()).toBe(404);
   });
 
+  test("slajd „Zimowa kolekcja” z wybranymi produktami → „Odkryj biżuterię” pokazuje tylko je", async ({ page }, info) => {
+    test.setTimeout(90_000);
+    const title = `Zimowa ${info.project.name}`;
+    await login(page);
+    await page.goto("/admin/strona/nowy");
+    await page.locator("#media-file").setInputFiles("tests/fixtures/hero.jpg");
+    await expect(page.getByAltText("Podgląd zdjęcia")).toBeVisible({ timeout: 30_000 });
+    await page.getByLabel("Tytuł", { exact: true }).fill(title);
+    await page.getByLabel("Druga linia tytułu (kursywą)").fill("kolekcja.");
+    await page.getByLabel("„Odkryj biżuterię” prowadzi do").selectOption({ label: "★ Wybrane produkty (własna kolekcja)" });
+    // Bez zaznaczenia — błąd przy liście
+    await page.getByRole("button", { name: "Dodaj slajd" }).click();
+    await expect(page.getByText("Zaznacz co najmniej jeden produkt kolekcji.")).toBeVisible();
+    await page.getByLabel("Szukaj produktu…").or(page.locator("#picker-search")).first().fill("szepty");
+    await page.getByLabel("Dodaj do kolekcji: Piaskowe szepty").check();
+    await page.locator("#picker-search").fill("");
+    await page.getByLabel("Dodaj do kolekcji: Kropla światła").check();
+    await expect(page.locator(".adm-picker-head")).toContainText("Wybrano: 2");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(1);
+    await page.getByLabel("Kolejność").fill("98");
+    await page.getByRole("button", { name: "Dodaj slajd" }).click();
+    await expect(page.getByText("Slajd został zapisany")).toBeVisible();
+
+    // Sklep: slajd → „Odkryj biżuterię” → tylko 2 produkty + etykieta kolekcji
+    await page.goto("/");
+    const controls = page.locator(".slide-controls button");
+    for (let i = 0; i < await controls.count(); i++) {
+      await controls.nth(i).click();
+      if ((await page.locator(".hero h1").textContent())?.includes(title)) break;
+    }
+    await expect(page.locator(".hero h1")).toContainText(title);
+    await page.locator(".hero-cta").getByRole("button", { name: /Odkryj biżuterię/ }).click();
+    await expect(page.locator(".active-filters .collection-chip")).toContainText(`Kolekcja: ${title} kolekcja`);
+    await expect(page.locator(".product-grid .product-name")).toHaveText(["Piaskowe szepty", "Kropla światła"]);
+    await page.locator(".active-filters .collection-chip").click();
+    expect(await page.locator(".product-grid .product-card").count()).toBeGreaterThan(2);
+
+    // Sprzątanie: usuń slajd testowy
+    await page.goto("/admin/strona");
+    await page.getByRole("link", { name: new RegExp(title) }).click();
+    await page.getByRole("button", { name: "Usuń slajd" }).click();
+    await page.getByRole("button", { name: "Tak, usuń" }).click();
+    await expect(page.getByText("Slajd został usunięty.")).toBeVisible();
+  });
+
   test("kategorii z produktami nie da się usunąć", async ({ page }) => {
     await login(page);
     await page.goto("/admin/kategorie");

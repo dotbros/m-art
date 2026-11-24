@@ -247,6 +247,22 @@
 .adm-bulk-confirm p{margin:0 0 12px;color:var(--a-err);font-size:15px}
 .adm-bulk-confirm strong{display:block;margin-top:6px}
 @media(min-width:900px){.adm-bulk-bar{bottom:12px}}
+
+/* --- wybór produktów do kolekcji slajdu --- */
+.adm-picker-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.adm-picker-head label{font-size:15px;font-weight:500}
+.adm-picker-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.adm-picker-tools input[type=search]{flex:1 1 200px}
+.adm-picker-list{list-style:none;margin:0;padding:4px;max-height:420px;overflow-y:auto;overscroll-behavior:contain;border:1px solid var(--a-line);border-radius:12px;background:#fff}
+.adm-picker-item{display:flex;align-items:center;gap:12px;min-height:64px;padding:6px 8px;border-radius:10px;cursor:pointer}
+.adm-picker-item:hover{background:#faf6ef}
+.adm-picker-item.is-selected{background:#f6ecdb}
+.adm-picker-item input{width:22px;height:22px;flex-shrink:0;accent-color:var(--a-brown)}
+.adm-picker-item img,.adm-picker-item .adm-noimg{width:48px;height:60px;object-fit:cover;border-radius:6px;flex-shrink:0}
+.adm-picker-info{display:flex;flex-direction:column;min-width:0}
+.adm-picker-info strong{font-weight:500;font-size:15px;overflow-wrap:anywhere}
+.adm-picker-info small{font-size:13px;color:var(--a-muted)}
+.adm-picker-empty{padding:14px}
 /* Panel: przewijanie natychmiastowe (płynne przewijanie ze sklepu utrudnia pracę w długich formularzach) */
 html:has(.adm){scroll-behavior:auto;scroll-padding-top:72px}
 

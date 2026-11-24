@@ -57,6 +57,13 @@
       "when": 1795549906103,
       "tag": "0007_pages",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795555583400,
+      "tag": "0008_hero_collection",
+      "breakpoints": true
     }
   ]
 }

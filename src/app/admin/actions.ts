@@ -1,6 +1,6 @@
 "use server";
 
-import { and, count, eq, ne } from "drizzle-orm";
+import { and, count, eq, inArray, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -191,6 +191,12 @@ export async function saveHeroSlideAction(_prev: FormState, form: FormData): Pro
   if (parsed.data.productId) {
     const [product] = await db.select({ id: products.id }).from(products).where(eq(products.id, parsed.data.productId));
     if (!product) return fail(form, { productId: "Wybrany produkt nie istnieje." });
+  }
+  if (parsed.data.productIds.length) {
+    // Własna kolekcja: zostawiamy tylko istniejące produkty, w kolejności zaznaczenia
+    const existingIds = new Set((await db.select({ id: products.id }).from(products).where(inArray(products.id, parsed.data.productIds))).map((r) => r.id));
+    parsed.data.productIds = parsed.data.productIds.filter((pid) => existingIds.has(pid));
+    if (!parsed.data.productIds.length) return fail(form, { productIds: "Wybrane produkty nie istnieją." });
   }
   const [existing] = id ? await db.select().from(heroSlides).where(eq(heroSlides.id, id)) : [];
   // Przycisk dźwięku tylko wtedy, gdy plik naprawdę ma ścieżkę dźwiękową.

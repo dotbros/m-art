@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { saveHeroSlideAction } from "@/app/admin/actions";
-import { HERO_FOCUS, HERO_FOCUS_POSITION, type HeroFocus } from "@/lib/hero-shared";
+import { HERO_FOCUS, HERO_FOCUS_POSITION, TARGET_PRODUCTS, type HeroFocus } from "@/lib/hero-shared";
+import { ProductPicker, type PickerProduct } from "./product-picker";
 import { Field, FormMessage, SubmitButton, useFocusFirstError } from "./ui";
 import { MediaUploader, type UploadedMedia } from "./media-uploader";
 
-type Slide = { id: number; eyebrow: string; title: string; titleAccent: string; description: string; mediaType: "image" | "video"; mediaUrl: string; posterUrl: string | null; hasAudio: boolean; aspect: number | null; focus: string; stone: string; productId: string | null; position: number; isActive: boolean };
+type Slide = { id: number; eyebrow: string; title: string; titleAccent: string; description: string; mediaType: "image" | "video"; mediaUrl: string; posterUrl: string | null; hasAudio: boolean; aspect: number | null; focus: string; stone: string; productId: string | null; productIds: string[]; position: number; isActive: boolean };
 
-export function HeroSlideForm({ slide, stones, products }: { slide?: Slide; stones: string[]; products: { id: string; name: string }[] }) {
+export function HeroSlideForm({ slide, stones, products }: { slide?: Slide; stones: string[]; products: PickerProduct[] }) {
   const [state, action] = useActionState(saveHeroSlideAction, {});
   useFocusFirstError(state);
   const e = state.errors || {};
@@ -24,6 +25,8 @@ export function HeroSlideForm({ slide, stones, products }: { slide?: Slide; ston
   const [soundOn, setSoundOn] = useState(v ? v.hasAudio === "on" : slide?.hasAudio ?? false);
   function onMediaChange(next: UploadedMedia | null) { setMedia(next); setJustUploaded(!!next); setSoundOn(!!next?.hasAudio); }
   const [focus, setFocus] = useState<HeroFocus>((val("focus", slide?.focus ?? "center") || "center") as HeroFocus);
+  // Dokąd prowadzi „Odkryj biżuterię”: "" = cała kolekcja, nazwa kamienia, albo TARGET_PRODUCTS = własna kolekcja
+  const [target, setTarget] = useState<string>(v ? v.stone ?? "" : slide?.productIds.length ? TARGET_PRODUCTS : slide?.stone ?? "");
   const [title, setTitle] = useState(val("title", slide?.title));
   const [accent, setAccent] = useState(val("titleAccent", slide?.titleAccent));
   const [eyebrow, setEyebrow] = useState(val("eyebrow", slide?.eyebrow));
@@ -74,8 +77,15 @@ export function HeroSlideForm({ slide, stones, products }: { slide?: Slide; ston
 
     <section className="adm-card">
       <h2>Dokąd prowadzi slajd</h2>
+      <Field label="„Odkryj biżuterię” prowadzi do" name="stone" hint={target === TARGET_PRODUCTS ? "Zaznacz poniżej produkty, które należą do tej kolekcji." : "Cała kolekcja, produkty z wybranym kamieniem albo Twoja własna kolekcja (np. „Zimowa kolekcja”)."}>
+        <select id="stone" name="stone" value={target} onChange={(ev) => setTarget(ev.target.value)}>
+          <option value="">— cała kolekcja —</option>
+          <option value={TARGET_PRODUCTS}>★ Wybrane produkty (własna kolekcja)</option>
+          <optgroup label="Produkty z kamieniem">{stones.map((s) => <option key={s} value={s}>{s}</option>)}</optgroup>
+        </select>
+      </Field>
+      {target === TARGET_PRODUCTS && <ProductPicker products={products} initial={v ? (v.productIds ? v.productIds.split("\n") : []) : slide?.productIds ?? []} error={e.productIds}/>}
       <div className="adm-grid-2">
-        <Field label="Kamień" name="stone" hint="„Odkryj biżuterię” pokaże produkty z tym kamieniem."><select id="stone" name="stone" defaultValue={val("stone", slide?.stone)}><option value="">— cała kolekcja —</option>{stones.map((s) => <option key={s} value={s}>{s}</option>)}</select></Field>
         <Field label="Produkt w rogu slajdu" name="productId" error={e.productId} hint="Opcjonalnie — etykieta otworzy kartę produktu."><select id="productId" name="productId" defaultValue={val("productId", slide?.productId)}><option value="">— brak —</option>{products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></Field>
         <Field label="Kolejność" name="position" error={e.position} hint="Mniejsza liczba = wcześniej."><input id="position" name="position" type="number" inputMode="numeric" min={0} max={999} defaultValue={val("position", slide?.position ?? 0)}/></Field>
       </div>

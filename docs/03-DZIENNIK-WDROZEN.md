@@ -205,3 +205,8 @@ Raport T-004.
 - Telefon: dół zdjęcia/filmu HERO płynnie zanika w tło pod tytułem (wcześniej twarda krawędź).
 - Testy: Playwright 77/77 (pełny zestaw po zmianie stylów), ponownie telefony po zmianie zanikania.- Telefon: przyciski HERO w jednej linii (12 px, mniejsze odstępy; kółeczko z ikonką ukryte do 420 px szerokości; zawijanie dopiero poniżej 350 px). Zmierzone dla 360/375/390/412/430 px; test E2E.
 - Plakietka produktu na zdjęciu HERO w stylu „szkła” (wzór z załącznika): ciemne półprzezroczyste rozmyte tło, cienka złota ramka, zaokrąglone rogi, złota poświata u dołu, kremowe napisy, linia przy „ODKRYJ”. Poprawka po drodze: nowa reguła nadpisała pozycjonowanie plakietki na telefonie (nachodziła na pieczęć) — pozycjonowanie tylko dla komputera. Playwright: pełny zestaw.
+### 2026-11-24 — Slajd z własną kolekcją produktów („Zimowa kolekcja”)
+- Panel → slajd → „Dokąd prowadzi slajd”: lista „Odkryj biżuterię prowadzi do” z opcją „★ Wybrane produkty (własna kolekcja)”; po wybraniu — lista produktów ze zdjęciem i ceną, wyszukiwarka, „Tylko zaznaczone”, licznik. Pole `hero_slides.product_ids` (migracja 0008); serwer zostawia tylko istniejące produkty.
+- Sklep: „Odkryj biżuterię” na takim slajdzie pokazuje tylko produkty kolekcji (w kolejności zaznaczenia; sortowanie po cenie nadal działa) z etykietą „Kolekcja: … ✕”; plakietka na slajdzie bez produktu w rogu prowadzi do kolekcji.
+- Kopia bazy: `data/backup-przed-kolekcjami-20261124-2238`.
+- Testy: Vitest 72/72 (+3), Playwright 80/80 (4 pominięte) — E2E: błąd bez zaznaczenia, zaznaczenie 2 produktów wyszukiwarką, w sklepie tylko te 2 w kolejności, usunięcie filtra przywraca całość.

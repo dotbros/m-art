@@ -80,3 +80,19 @@ describe("walidacja kamienia (panel)", () => {
     expect(validateStone(f({ name: "Opal" }, imgs)).ok).toBe(false);
   });
 });
+describe("slajd z własną kolekcją produktów", () => {
+  const base = { title: "Zimowa", titleAccent: "kolekcja.", mediaUrl: "/media/0123456789abcdef0123456789abcdef.jpg", mediaType: "image", isActive: "on" };
+  const f = (data: Record<string, string>, ids: string[] = []) => { const x = form(data); for (const id of ids) x.append("productIds", id); return x; };
+  it("„Wybrane produkty” zapisuje listę (bez duplikatów, w kolejności) i czyści kamień", () => {
+    const r = validateHeroSlide(f({ ...base, stone: "__produkty__" }, ["b", "a", "b"]));
+    expect(r.ok && [r.data.productIds, r.data.stone]).toEqual([["b", "a"], ""]);
+  });
+  it("wymaga co najmniej jednego produktu", () => {
+    const r = validateHeroSlide(f({ ...base, stone: "__produkty__" }));
+    expect(!r.ok && r.errors.productIds).toBeTruthy();
+  });
+  it("przy kamieniu lub całej kolekcji lista produktów jest ignorowana", () => {
+    const r = validateHeroSlide(f({ ...base, stone: "Agat mszysty" }, ["a"]));
+    expect(r.ok && [r.data.stone, r.data.productIds]).toEqual(["Agat mszysty", []]);
+  });
+});

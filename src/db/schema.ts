@@ -90,6 +90,7 @@ export const heroSlides = pgTable("hero_slides", {
   focus: text("focus").notNull().default("center"), // kadrowanie na telefonie: left | center | right
   stone: text("stone").notNull().default(""), // przycisk „Odkryj biżuterię” filtruje po tym kamieniu
   productId: text("product_id"), // etykieta w rogu otwiera ten produkt
+  productIds: text("product_ids").array().notNull().default(sql`'{}'::text[]`), // własna kolekcja slajdu („Odkryj biżuterię” pokazuje tylko te produkty)
   position: integer("position").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
