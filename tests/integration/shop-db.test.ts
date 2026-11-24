@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { count, eq } from "drizzle-orm";
+import { count, eq, inArray, sql } from "drizzle-orm";
 import { categories, orderItems, orders, products } from "@/db/schema";
-import { createOrder, OrderError } from "@/lib/orders";
+import { createOrder, deleteOrders, OrderError } from "@/lib/orders";
 import { seedDemoData } from "@/lib/seed";
 import { getStorefront } from "@/lib/store";
 import { validateOrder, type OrderInput } from "@/lib/validation";
@@ -57,6 +57,27 @@ describe("kamienie", () => {
     expect(withPearl).toContain("naszyjnik-jaspis");
     expect(list.filter((p) => p.stones.includes("Jaspis cesarski")).map((p) => p.id)).toContain("naszyjnik-jaspis");
     await handle.db.update(products).set({ stones: ["Jaspis cesarski"] }).where(eq(products.id, "naszyjnik-jaspis"));
+  });
+});
+
+describe("usuwanie zamówień (deleteOrders)", () => {
+  const stockOf = async (id: string) => (await handle.db.select({ s: products.stock }).from(products).where(eq(products.id, id)))[0].s;
+  it("niewysłane: produkty wracają na stan; wysłane i anulowane: bez zmian; pozycje znikają", async () => {
+    const id = "kolczyki-jaspis";
+    const start = await stockOf(id);
+    const a = await createOrder(handle.db, input([{ id, quantity: 2 }])); // do potwierdzenia
+    const b = await createOrder(handle.db, input([{ id, quantity: 1 }]));
+    await handle.db.update(orders).set({ status: "shipped" }).where(eq(orders.id, b.id));
+    const c = await createOrder(handle.db, input([{ id, quantity: 1 }]));
+    await handle.db.update(orders).set({ status: "cancelled" }).where(eq(orders.id, c.id)); // stan zwrócony już przy anulowaniu (tu symulujemy)
+    await handle.db.update(products).set({ stock: sql`${products.stock} + 1` }).where(eq(products.id, id));
+    expect(await stockOf(id)).toBe(start - 3);
+
+    expect(await deleteOrders(handle.db, [a.id, b.id, c.id, "00000000-0000-0000-0000-000000000000"])).toBe(3);
+    expect(await stockOf(id)).toBe(start - 1); // +2 z niewysłanego; wysłany (1 szt.) zostaje zdjęty ze stanu
+    expect(await handle.db.select().from(orders).where(inArray(orders.id, [a.id, b.id, c.id]))).toHaveLength(0);
+    expect(await handle.db.select().from(orderItems).where(inArray(orderItems.orderId, [a.id, b.id, c.id]))).toHaveLength(0);
+    expect(await deleteOrders(handle.db, [])).toBe(0);
   });
 });
 

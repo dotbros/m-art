@@ -5,6 +5,28 @@ import { orderItems, orders, products } from "@/db/schema";
 import { shippingCost } from "./catalog";
 import type { OrderInput } from "./validation";
 
+/** Statusy, w których towar jest jeszcze w pracowni — usunięcie zamówienia zwraca go na stan. */
+const STOCK_RESERVED = ["awaiting_confirmation", "confirmed", "paid"];
+
+/**
+ * Usuwa zamówienia (z pozycjami) w jednej transakcji. Dla zamówień, których towar nie wyszedł z pracowni,
+ * zwraca produkty na stan; wysłane/zrealizowane — bez zwrotu, anulowane — stan zwrócono już przy anulowaniu.
+ * Zwraca liczbę usuniętych zamówień.
+ */
+export async function deleteOrders(db: Db, ids: string[]) {
+  if (!ids.length) return 0;
+  return db.transaction(async (tx) => {
+    const found = await tx.select({ id: orders.id, status: orders.status }).from(orders).where(inArray(orders.id, ids));
+    const restore = found.filter((o) => STOCK_RESERVED.includes(o.status)).map((o) => o.id);
+    if (restore.length) {
+      const items = await tx.select().from(orderItems).where(inArray(orderItems.orderId, restore));
+      for (const item of items) await tx.update(products).set({ stock: sql`${products.stock} + ${item.quantity}` }).where(eq(products.id, item.productId));
+    }
+    if (found.length) await tx.delete(orders).where(inArray(orders.id, found.map((o) => o.id))); // pozycje usuwa ON DELETE CASCADE
+    return found.length;
+  });
+}
+
 /** Błąd, którego treść można bezpiecznie pokazać klientowi. */
 export class OrderError extends Error {}
 

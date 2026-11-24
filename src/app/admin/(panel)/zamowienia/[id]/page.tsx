@@ -6,6 +6,9 @@ import { orderItems, orders } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
 import { money } from "@/lib/catalog";
 import { OrderForm } from "@/components/admin/order-form";
+import { DangerForm } from "@/components/admin/ui";
+import { deleteOrdersAction } from "../../../actions";
+import { deleteOrderWarning } from "../../../labels";
 import { dateTime, deliveryLabels, orderStatusLabels, paymentStatusLabels } from "../../../labels";
 
 export default async function OrderPage({ params }: { params: Promise<{ id: string }> }) {
@@ -35,5 +38,6 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
       </section>
     </div>
     <OrderForm order={{ id: order.id, status: order.status, paymentStatus: order.paymentStatus, trackingNumber: order.trackingNumber ?? "", adminNote: order.adminNote }}/>
+    <DangerForm action={deleteOrdersAction} id={order.id} label="Usuń zamówienie" confirmText={deleteOrderWarning(order.number, order.status, order.paymentStatus)}/>
   </>;
 }

@@ -6,6 +6,7 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { countProductsWithStone, ensureStones, renameStoneEverywhere, validateStone } from "@/lib/stones";
+import { deleteOrders } from "@/lib/orders";
 import { categories, heroSlides, orderItems, orders, products, stones, ORDER_STATUSES, PAYMENT_STATUSES, type OrderStatus, type PaymentStatus } from "@/db/schema";
 import { validateHeroSlide, MAX_HERO_SLIDES } from "@/lib/hero";
 import { requireAdmin, SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
@@ -142,6 +143,16 @@ export async function deleteProductAction(_prev: FormState, form: FormData): Pro
 }
 
 // ---------------- Zamówienia ----------------
+/** Usuwa jedno lub kilka zamówień (pola `id`); niewysłany towar wraca na stan (deleteOrders). */
+export async function deleteOrdersAction(_prev: FormState, form: FormData): Promise<FormState> {
+  await requireAdmin();
+  const ids = [...new Set(form.getAll("id").map(String).filter((id) => /^[0-9a-f-]{36}$/.test(id)))].slice(0, 200);
+  if (!ids.length) return { error: "Zaznacz zamówienia do usunięcia." };
+  const removed = await deleteOrders(await getDb(), ids);
+  refreshStorefront();
+  redirect(`/admin/zamowienia?usunieto=${removed}`);
+}
+
 export async function updateOrderAction(_prev: FormState, form: FormData): Promise<FormState> {
   await requireAdmin();
   const id = String(form.get("id"));

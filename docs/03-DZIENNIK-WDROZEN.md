@@ -178,3 +178,8 @@ Raport T-004.
 - **Objaw:** strona główna przeładowywała się w kółko (Safari/iPhone: 21 razy w 12 s; Android: sporadycznie), log: „Fast Refresh rebuilding” → „HMR hash mismatch”.
 - **Przyczyna:** Next 16 domyślnie zachowuje pamięć podręczną `next dev` na dysku między uruchomieniami (`turbopackFileSystemCacheForDev`). Po zmianach kodu przy wyłączonym serwerze była nieaktualna. (Poprzednia naprawa — osobny katalog `.next-e2e` — usuwała tylko drugą przyczynę.)
 - **Naprawa:** `experimental.turbopackFileSystemCacheForDev: false` w `next.config.ts` + jednorazowe wyczyszczenie `.next`. Weryfikacja: iPhone i Android, oba adresy sieciowe, także po zwykłym restarcie serwera — 0 przeładowań. Koszt: start serwera kilka sekund dłuższy.
+### 2026-11-24 — Usuwanie zamówień w panelu
+- Strona zamówienia: „Usuń zamówienie” z potwierdzeniem; lista zamówień: zaznaczanie (także „Zaznacz wszystkie”) i „Usuń zaznaczone” w pasku nad dolnym menu.
+- Stan magazynowy: zamówienia niewysłane (do potwierdzenia / potwierdzone / opłacone) → produkty wracają na stan; wysłane/zrealizowane → bez zwrotu; anulowane → stan zwrócono już przy anulowaniu (`deleteOrders`, jedna transakcja; pozycje usuwa ON DELETE CASCADE).
+- Ostrzeżenie w potwierdzeniu dla zamówień opłaconych / wysłanych / zrealizowanych: to dokumenty sprzedaży, zwykle wymagane do księgowości.
+- Testy: integracyjny (zwrot na stan wg statusu, usunięcie pozycji, nieistniejące id), E2E (pojedyncze + 2 naraz, brak przewijania w bok). Vitest 64/64, Playwright 66/66 (3 pominięte).

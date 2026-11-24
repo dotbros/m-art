@@ -196,6 +196,35 @@ test.describe("Panel administracyjny", () => {
     await expect(page.getByText("Zapisano zmiany zamówienia.")).toBeVisible();
   });
 
+  test("usuwanie zamówień: pojedyncze ze strony zamówienia i kilka naraz z listy", async ({ page, request }) => {
+    const order = async () => {
+      const res = await request.post("/api/orders", { data: { email: "test@example.pl", name: "Do usunięcia", phone: "600300400", street: "Testowa 1", postalCode: "00-001", city: "Warszawa", delivery: "pickup", consent: true, items: [{ id: "pierscionek-perla", quantity: 1 }] } });
+      expect(res.status()).toBe(201);
+      return (await res.json()).number as string;
+    };
+    const [first, second, third] = [await order(), await order(), await order()];
+    await login(page);
+
+    // Pojedyncze — ze strony zamówienia, z potwierdzeniem i informacją o zwrocie na stan
+    await page.goto("/admin/zamowienia");
+    await page.getByRole("link", { name: new RegExp(first) }).click();
+    await page.getByRole("button", { name: "Usuń zamówienie" }).click();
+    await expect(page.locator(".adm-danger-confirm")).toContainText("wrócą na stan");
+    await page.getByRole("button", { name: "Tak, usuń" }).click();
+    await expect(page.getByText("Usunięto zamówienia: 1.")).toBeVisible();
+    await expect(page.getByRole("link", { name: new RegExp(first) })).toHaveCount(0);
+
+    // Kilka naraz — zaznaczenie na liście
+    await page.getByLabel(`Zaznacz zamówienie ${second}`).check();
+    await page.getByLabel(`Zaznacz zamówienie ${third}`).check();
+    await expect(page.getByRole("region", { name: /zaznaczonych zamówieniach/ })).toContainText("Zaznaczono: 2");
+    await page.getByRole("button", { name: "Usuń zaznaczone" }).click();
+    await page.getByRole("button", { name: "Tak, usuń" }).click();
+    await expect(page.getByText("Usunięto zamówienia: 2.")).toBeVisible();
+    await expect(page.getByRole("link", { name: new RegExp(`${second}|${third}`) })).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(1);
+  });
+
   test("wylogowanie kończy sesję", async ({ page }) => {
     await login(page);
     await page.getByRole("button", { name: "Wyloguj" }).click();
