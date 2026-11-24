@@ -200,3 +200,7 @@ Raport T-004.
 - Panel: zakładka „Strona” → sekcja „Podstrony”.
 - Kopia bazy przed migracją 0007: `data/backup-przed-podstronami-20261124-2113`.
 - **Testy:** raport T-005.
+### 2026-11-24 — „Luksusowe” przyciski i nagłówki; zanikanie zdjęcia HERO na telefonie
+- Na wzór załącznika właściciela (`src/app/luxe.css`, ładowany po `globals.css`): główne przyciski — złoty gradient z ciemnym napisem i połyskiem przy najechaniu; drugorzędne — cienka złota ramka; „Poznaj naszą historię” w HERO — ramka + strzałka w kółeczku; wyróżnienia w tytułach — złota kursywa (gradient); nadtytuły — złoty kolor i cienka złota linia przed tekstem. Kontrast napisu na złotym przycisku > 4,5:1.
+- Telefon: dół zdjęcia/filmu HERO płynnie zanika w tło pod tytułem (wcześniej twarda krawędź).
+- Testy: Playwright 77/77 (pełny zestaw po zmianie stylów), ponownie telefony po zmianie zanikania.

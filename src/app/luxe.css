@@ -1,0 +1,59 @@
+/* ============================================================
+   „Luksusowy” styl przycisków i nagłówków (2026-11-24, na wzór załącznika właściciela):
+   złoty gradient na głównych przyciskach, cienka złota ramka na drugorzędnych, nadtytuły z cienką złotą linią,
+   wyróżnienia w tytułach złotą kursywą (gradient). Ładowany PO globals.css — nadpisuje styl wzoru.
+   Dotyczy sklepu; panel admina (.adm) ma własne style.
+   ============================================================ */
+:root{
+  --gold-grad:linear-gradient(135deg,#a07a3c 0%,#c9a465 30%,#ecd6a2 52%,#c39d5e 72%,#a8823f 100%);
+  --gold-text:linear-gradient(100deg,#8f6a33 0%,#c39b5c 40%,#dcc08a 55%,#a9803f 100%);
+  --gold-line:#b8955a;
+  --gold-ink:#2b2015;
+}
+
+/* ---------- Przyciski ---------- */
+.button{border-radius:2px;letter-spacing:.6px;font-weight:500;position:relative;overflow:hidden;isolation:isolate}
+.button-dark{background:var(--gold-grad);background-size:160% 100%;background-position:0% 0;color:var(--gold-ink);border:1px solid #b08b4f;
+  box-shadow:0 10px 24px -14px rgba(110,75,25,.75),inset 0 1px 0 rgba(255,244,214,.55);transition:background-position .6s ease,box-shadow .3s,transform .2s}
+.button-dark:hover:not(:disabled){background:var(--gold-grad);background-size:160% 100%;background-position:100% 0;border-color:#a8823f;
+  box-shadow:0 14px 28px -14px rgba(110,75,25,.85),inset 0 1px 0 rgba(255,244,214,.6)}
+/* subtelny „błysk” przesuwający się po najechaniu */
+.button-dark::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,transparent 30%,rgba(255,250,232,.55) 48%,transparent 66%);transform:translateX(-120%);transition:transform .8s ease}
+.button-dark:hover:not(:disabled)::after{transform:translateX(120%)}
+.button-dark:active:not(:disabled){transform:translateY(1px)}
+.button-dark:disabled{filter:grayscale(.35)}
+
+.button-outline{background:transparent;color:var(--ink);border:1px solid rgba(184,149,90,.75);box-shadow:inset 0 0 0 1px rgba(255,250,240,.35)}
+.button-outline:hover{background:rgba(184,149,90,.08);border-color:var(--gold-line);color:#5e4b34}
+
+/* Drugi przycisk w HERO: ramka + ikonka w kółeczku (jak w załączniku) */
+.hero-story-link{gap:12px;min-height:48px;padding:0 20px 0 10px;border:1px solid rgba(184,149,90,.75);border-radius:2px;color:var(--ink);background:rgba(251,249,245,.35);backdrop-filter:blur(4px);transition:background .2s,border-color .2s}
+.hero-story-link:hover{background:rgba(184,149,90,.1);border-color:var(--gold-line);color:#5e4b34}
+.hero-story-icon{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:1px solid var(--gold-line);color:#8f6a33;flex-shrink:0;transform:rotate(-45deg)}
+.text-link{border-bottom-color:var(--gold-line)}
+
+/* ---------- Nagłówki ---------- */
+/* wyróżnienia w tytułach — złota kursywa z gradientem */
+.hero h1 em,.section-heading h2 em,.stones-copy h2 em,.story-copy h2 em,.gift-section h2 em,.newsletter-inner h2 em,
+.stones-page h1 em,.stone-products h2 em,.stone-others h2 em,.content-body h1 em,.stone-caption{
+  background:var(--gold-text);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;padding-right:.08em}
+
+/* nadtytuły: złoty kolor, szerszy rozstaw, cienka złota linia przed */
+.eyebrow{color:#9a7642;letter-spacing:2.6px}
+.hero-copy>.eyebrow .small-line{width:36px;background:linear-gradient(90deg,transparent,var(--gold-line))}
+.section-heading .eyebrow,.stones-copy>.eyebrow,.story-copy .eyebrow,.gift-section .eyebrow,.newsletter-inner .eyebrow,
+.stones-page>.eyebrow,.stone-copy>.eyebrow,.stone-products>.eyebrow,.content-body>.eyebrow{display:flex;align-items:center;gap:12px}
+.section-heading .eyebrow::before,.stones-copy>.eyebrow::before,.story-copy .eyebrow::before,.gift-section .eyebrow::before,.newsletter-inner .eyebrow::before,
+.stones-page>.eyebrow::before,.stone-copy>.eyebrow::before,.stone-products>.eyebrow::before,.content-body>.eyebrow::before{
+  content:"";flex:0 0 32px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-line))}
+
+/* tytuły: nieco ciemniejszy, „atramentowy” odcień i ciaśniejszy rozstaw — elegantszy wygląd */
+.hero h1,.section-heading h2,.stones-copy h2,.story-copy h2,.content-body h1,.stone-copy h1,.stones-page h1{color:#3a2f24;letter-spacing:-.8px}
+
+@media(max-width:760px){
+  /* Telefon: dół zdjęcia / filmu HERO płynnie zanika w tło pod tytułem (zamiast twardej krawędzi) */
+  .hero .hero-image{-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%)}
+  .hero-story-link{padding:0 16px 0 8px;font-size:13px}
+  .hero-cta{flex-wrap:wrap;gap:12px}
+}
+@media(prefers-reduced-motion:reduce){.button-dark,.button-dark::after{transition:none}}
