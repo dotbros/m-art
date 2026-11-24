@@ -248,6 +248,12 @@
 .adm-bulk-confirm strong{display:block;margin-top:6px}
 @media(min-width:900px){.adm-bulk-bar{bottom:12px}}
 
+/* --- ramka „Format zdjęcia” --- */
+.adm-format-tip{margin:12px 0 4px;padding:12px 14px;border-radius:12px;background:#f8f1e4;border:1px solid #ead9b9;font-size:14px;line-height:1.5;color:#5e4b34}
+.adm-format-tip strong{display:block;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:#8f6a33;margin-bottom:4px}
+.adm-format-tip ul{margin:0;padding-left:18px}
+.adm-format-tip li+li{margin-top:4px}
+
 /* --- wybór produktów do kolekcji slajdu --- */
 .adm-picker-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .adm-picker-head label{font-size:15px;font-weight:500}

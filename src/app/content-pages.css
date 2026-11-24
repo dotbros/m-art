@@ -2,7 +2,8 @@
 .chrome-back{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:13px;color:var(--ink);justify-self:start}
 .chrome-back:hover{color:var(--gold)}
 
-.content-hero{width:100%;aspect-ratio:4/3;max-height:72vh;overflow:hidden;background:#eee7db}
+/* Nagłówek podstrony: jeden format 5:4 na komputerze i telefonie (zgodny z zaleceniem w panelu) */
+.content-hero{width:100%;aspect-ratio:5/4;overflow:hidden;background:#eee7db}
 .content-hero img{width:100%;height:100%;object-fit:cover;animation:hero-fade .5s ease-out}
 .content-body{max-width:720px;padding:32px 0 40px}
 .content-body .eyebrow{font-size:11px;letter-spacing:1.6px}
@@ -30,7 +31,7 @@
 .lightbox-count{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);color:#f4ead8;font-size:14px}
 
 @media(min-width:761px){
-  .content-hero{aspect-ratio:21/9}
+  .content-hero{width:min(100% - 120px,960px);margin:32px auto 0;border-radius:2px}
   .content-body{padding:56px 0 56px}
   .content-body h1{font-size:64px}
   .content-body .content-intro{font-size:27px}

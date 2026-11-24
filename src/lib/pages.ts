@@ -8,6 +8,17 @@ export const CONTENT_PAGES = {
   pracownia: { path: "/pracownia", label: "Poznaj naszą pracownię", hasTeaser: true },
   pielegnacja: { path: "/pielegnacja", label: "Pielęgnacja biżuterii", hasTeaser: false },
 } as const;
+
+/**
+ * Zalecane formaty zdjęć — wyświetlane w formularzu panelu. Muszą odpowiadać temu, jak strona kadruje zdjęcia
+ * (luxe.css: zajawka pracowni 4:5; content-pages.css: nagłówek podstrony 5:4, miniatury galerii 4:5).
+ */
+export const IMAGE_FORMATS = {
+  teaser: "Najlepiej pionowe 4:5, np. 1600 × 2000 px. Tak samo na komputerze i telefonie. Najważniejszy element umieść w środku kadru — w dolnych rogach zdjęcia jest napis „Małe rzeczy. Wielka uważność.” i znak M.art.",
+  header: "Pierwsze zdjęcie (nagłówek podstrony): najlepiej poziome 5:4, np. 2000 × 1600 px — wyświetla się w tym formacie na komputerze i telefonie.",
+  gallery: "Kolejne zdjęcia (galeria na dole strony): dowolny format — miniatury pokazują kadr 4:5, a po powiększeniu klient widzi całe zdjęcie.",
+  common: "Pliki JPG, PNG, WEBP lub HEIC prosto z telefonu, do 25 MB — serwer sam je zmniejszy.",
+} as const;
 export type PageSlug = keyof typeof CONTENT_PAGES;
 export const isPageSlug = (s: string): s is PageSlug => s in CONTENT_PAGES;
 

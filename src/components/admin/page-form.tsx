@@ -9,7 +9,14 @@ import { MediaUploader } from "./media-uploader";
 
 type PageData = { slug: string; eyebrow: string; title: string; titleAccent: string; intro: string; body: string; images: string[]; teaserImage: string | null; teaserTitle: string; teaserAccent: string; teaserText: string };
 
-export function PageForm({ page, path, hasTeaser, maxImages }: { page: PageData; path: string; hasTeaser: boolean; maxImages: number }) {
+export type ImageFormats = { teaser: string; header: string; gallery: string; common: string };
+
+/** Ramka „Format zdjęcia” z zaleceniami (zgodnymi z tym, jak strona kadruje zdjęcia). */
+function FormatTip({ lines }: { lines: string[] }) {
+  return <div className="adm-format-tip" role="note"><strong>Format zdjęcia</strong><ul>{lines.map((l) => <li key={l}>{l}</li>)}</ul></div>;
+}
+
+export function PageForm({ page, path, hasTeaser, maxImages, formats }: { page: PageData; path: string; hasTeaser: boolean; maxImages: number; formats: ImageFormats }) {
   const [state, action] = useActionState(savePageAction, {});
   useFocusFirstError(state);
   const e = state.errors || {};
@@ -25,7 +32,8 @@ export function PageForm({ page, path, hasTeaser, maxImages }: { page: PageData;
 
     {hasTeaser && <section className="adm-card">
       <h2>Zajawka na stronie głównej</h2>
-      <p className="adm-hint">Sekcja na stronie głównej z przyciskiem do tej podstrony. Ma własne zdjęcie — niezależne od zdjęć podstrony. Zdjęcie wyświetla się w formacie pionowym 4:5 (na komputerze i telefonie tak samo) i prowadzi do podstrony.</p>
+      <p className="adm-hint">Sekcja na stronie głównej z przyciskiem do tej podstrony. Ma własne zdjęcie — niezależne od zdjęć podstrony — i kliknięcie w nie prowadzi do podstrony.</p>
+      <FormatTip lines={[formats.teaser, formats.common]}/>
       <MediaUploader value={teaser ? { mediaType: "image", url: teaser, posterUrl: null, hasAudio: false } : null} allowVideo={false} inputId="teaser-file" label="Zdjęcie na stronie głównej"
         onChange={(media) => setTeaser(media?.url ?? null)} error={e.teaserImage}/>
       <div className="adm-grid-2">
@@ -39,6 +47,7 @@ export function PageForm({ page, path, hasTeaser, maxImages }: { page: PageData;
       <h2>Zdjęcia podstrony</h2>
       <ImageListEditor images={images} onChange={setImages} max={maxImages} inputId="page-images-file" firstLabel="Nagłówek" error={e.images}
         hint="Pierwsze zdjęcie to zdjęcie nagłówkowe podstrony. Kolejne tworzą galerię na dole strony. Kolejność zmienisz strzałkami."/>
+      <FormatTip lines={[formats.header, formats.gallery, formats.common]}/>
     </section>
 
     <section className="adm-card">
