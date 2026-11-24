@@ -233,4 +233,6 @@ Raport T-004.
 - Zdjęcia bez przycinania: ramka 4:5, `object-fit: contain` (inne formaty — kremowe tło po bokach); na komputerze zdjęcie „przyklejone” przy przewijaniu opisu; także telefon (wcześniej stała wysokość 370 px z przycinaniem).
 - Złota podwójna obramówka całego okna produktu.
 - Czytelne napisy (wzór: 7–11 px): Kamienie/Materiał 14 px, „Ozdobne opakowanie gratis / Wysyłka” 13,5 px, uwaga „Każdy kamień jest inny…” 13 px, opis 15 px, nadtytuł 11 px, podtytuł 14,5 px, cena 24 px, dostępność 13,5 px.
-- Zweryfikowano na produkcie właściciela (zdjęcie 1086×1448 widoczne w całości). Playwright: pełny zestaw.
+- Zweryfikowano na produkcie właściciela (zdjęcie 1086×1448 widoczne w całości). Playwright: pełny zestaw.- Karta produktu — poprawka ramki (pierwsza wersja zbyt blada): 3 px złotego gradientu + cienka złota linia 7 px wewnątrz, obramowująca całą zawartość (także zdjęcie) — efekt oprawionego obrazu; złota poświata na zewnątrz.
+- Wolne miejsce wokół zdjęcia innego formatu wypełnia to samo zdjęcie rozmyte i przyciemnione (zamiast pustych kremowych pasów); zdjęcie nadal w całości.
+- „Dodaj do koszyka” 15 px (było 11 px), wyższy przycisk i licznik sztuk. Playwright: pełny zestaw.

@@ -127,11 +127,26 @@
 .fit-title>.fit-line.is-wrapping{white-space:normal;width:auto}
 
 /* ---------- Karta produktu (okno) — poprawki właściciela 25.11 ---------- */
-/* Złota obramówka całego okna: cienka złota linia + jasny odstęp + druga, delikatniejsza linia */
-.modal-panel.product-modal{border:1px solid #c9a465;box-shadow:0 0 0 5px rgba(251,249,245,.94),0 0 0 6px rgba(201,164,101,.6),0 30px 90px rgba(38,24,14,.35)}
-/* Zdjęcie w całości (bez przycinania): ramka 4:5 jak zdjęcia produktów, inne formaty — kremowe tło po bokach */
-.product-modal .product-detail-image{min-height:0;height:auto;aspect-ratio:4/5;align-self:start;background:#f1ebe1}
-.product-modal .pd-single,.product-modal .pd-track>img{object-fit:contain}
+/* Złota ramka całego okna: 3 px złotego gradientu + wewnętrzna cienka złota linia (jak passe-partout) + poświata.
+   `outline` z ujemnym odsunięciem rysuje się NAD treścią i nie przewija się razem z nią. */
+.modal-panel.product-modal{border:3px solid transparent;
+  background:linear-gradient(var(--paper),var(--paper)) padding-box,linear-gradient(135deg,#9c763a 0%,#d9bb7f 25%,#f3e2b4 50%,#c9a465 75%,#9c763a 100%) border-box;
+  padding:7px;
+  box-shadow:0 0 0 1px rgba(120,85,35,.25),0 0 28px rgba(214,178,112,.35),0 30px 90px rgba(38,24,14,.4)}
+/* wewnętrzna cienka złota linia: obramowanie samej zawartości, 7 px od złotej krawędzi — biegnie dookoła, także wokół zdjęcia */
+.modal-panel.product-modal>.overlay-heading{background:var(--paper);border:1px solid rgba(190,150,85,.8);border-bottom-color:rgba(190,150,85,.45)}
+.modal-panel.product-modal>.product-detail{border:1px solid rgba(190,150,85,.8);border-top:0}
+/* „Dodaj do koszyka” — większy, czytelny napis */
+.product-modal .product-buy-row .button{font-size:15px;letter-spacing:.5px;min-height:54px}
+.product-modal .product-buy-row .quantity-control{height:54px}
+.product-modal .product-buy-row .quantity-control span{font-size:16px}
+/* Zdjęcie w całości (bez przycinania) w ramce 4:5; wolne miejsce — to samo zdjęcie rozmyte i przyciemnione */
+.product-modal .product-detail-image{min-height:0;height:auto;aspect-ratio:4/5;align-self:start;background:#2b2118;overflow:hidden}
+.pd-single-wrap{position:absolute;inset:0}
+.pd-slide{position:relative;flex:0 0 100%;width:100%;height:100%;overflow:hidden;scroll-snap-align:start}
+.pd-single-wrap>.pd-slide{position:absolute;inset:0}
+.pd-blur{position:absolute;inset:-8%;width:116%;height:116%;object-fit:cover;filter:blur(26px) saturate(1.15) brightness(.82);transform:translateZ(0)}
+.pd-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 24px rgba(20,12,4,.28))}
 @media(min-width:761px){.product-modal .product-detail-image{position:sticky;top:0}} /* zdjęcie zostaje w widoku przy przewijaniu opisu */
 /* Czytelne napisy (wzór miał 7–11 px) */
 .product-modal .product-detail-copy>.eyebrow{font-size:11px;letter-spacing:2px}
@@ -152,11 +167,10 @@
 }
 
 /* ---------- Galeria w karcie produktu ---------- */
-.pd-single{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pd-gallery{position:absolute;inset:0}
 .pd-track{display:flex;width:100%;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .pd-track::-webkit-scrollbar{display:none}
-.pd-track>img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:start;user-select:none}
+.pd-track>.pd-slide{user-select:none}
 .pd-dots{position:absolute;left:0;right:0;bottom:14px;display:flex;justify-content:center;gap:4px;z-index:2}
 .pd-dots button{width:22px;height:22px;display:flex;align-items:center;justify-content:center}
 .pd-dots button::before{content:"";width:7px;height:7px;border-radius:50%;background:rgba(255,250,240,.7);box-shadow:0 0 0 1px rgba(80,60,35,.25);transition:width .25s,background .25s}

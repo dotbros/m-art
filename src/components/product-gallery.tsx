@@ -5,8 +5,17 @@ import { Icon } from "./icons";
 
 /**
  * Galeria w karcie produktu: zdjęcia przesuwane palcem (przewijanie z „zaczepianiem”), kropki, strzałki (komputer).
- * Wypełnia ramkę `.product-detail-image` (plakietka i serce „ulubione” zostają na wierzchu).
+ * Każde zdjęcie jest pokazane W CAŁOŚCI; wolne miejsce w ramce wypełnia to samo zdjęcie — rozmyte (zamiast pustych pasów).
  */
+function Slide({ src, alt, eager }: { src: string; alt: string; eager?: boolean }) {
+  return <div className="pd-slide">
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    <img className="pd-blur" src={src} alt="" aria-hidden="true" loading={eager ? "eager" : "lazy"} draggable={false}/>
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    <img className="pd-img" src={src} alt={alt} loading={eager ? "eager" : "lazy"} draggable={false}/>
+  </div>;
+}
+
 export function ProductGallery({ images, alt }: { images: string[]; alt: string }) {
   const track = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
@@ -26,14 +35,10 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
     el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
   };
 
-  if (images.length < 2) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img className="pd-single" src={images[0]} alt={alt}/>;
-  }
+  if (images.length < 2) return <div className="pd-gallery pd-single-wrap"><Slide src={images[0]} alt={alt} eager/></div>;
   return <div className="pd-gallery" role="group" aria-roledescription="galeria" aria-label={`Zdjęcia: ${alt}`}>
     <div className="pd-track" ref={track}>
-      {images.map((src, i) => /* eslint-disable-next-line @next/next/no-img-element */
-        <img key={src} src={src} alt={`${alt} — zdjęcie ${i + 1} z ${images.length}`} loading={i === 0 ? "eager" : "lazy"} draggable={false}/>)}
+      {images.map((src, i) => <Slide key={src} src={src} alt={`${alt} — zdjęcie ${i + 1} z ${images.length}`} eager={i === 0}/>)}
     </div>
     <button type="button" className="pd-nav prev" onClick={() => go(index - 1)} aria-label="Poprzednie zdjęcie"><Icon name="arrow-left" size={18}/></button>
     <button type="button" className="pd-nav next" onClick={() => go(index + 1)} aria-label="Następne zdjęcie"><Icon name="arrow" size={18}/></button>

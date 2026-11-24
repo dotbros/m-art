@@ -89,7 +89,7 @@ test.describe("Panel administracyjny", () => {
     await expect(page.locator(".product-specs")).toContainText("Kwarc różowy, Perła naturalna");
     // Galeria w karcie produktu: 2 zdjęcia, kropki, przewinięcie do drugiego
     const gallery = page.locator(".product-detail-image .pd-gallery");
-    await expect(gallery.locator(".pd-track img")).toHaveCount(2);
+    await expect(gallery.locator(".pd-track .pd-img")).toHaveCount(2);
     await gallery.getByRole("button", { name: "Zdjęcie 2" }).click();
     await expect(gallery.getByRole("button", { name: "Zdjęcie 2" })).toHaveAttribute("aria-current", "true");
     await page.getByRole("button", { name: "Zamknij okno" }).click();
