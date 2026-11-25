@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   // Testy E2E budują do osobnego katalogu (.next-e2e), żeby nie nadpisać pamięci podręcznej `next dev`
   // (wspólny katalog powodował pętlę przeładowań strony: „HMR hash mismatch”).
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  // Paczka na hosting (CloudLinux „Setup Node.js App”): samodzielny server.js + tylko potrzebne moduły.
+  // Budujemy na komputerze (limit pamięci hostingu) — scripts/build-deploy.mts.
+  output: process.env.NEXT_OUTPUT_STANDALONE === "true" ? "standalone" : undefined,
   // Sterownik bazy i ffmpeg (plik binarny) ładowane wprost z node_modules — bez pakowania przez bundler.
   serverExternalPackages: ["mysql2", "ffmpeg-static"],
   // Tryb deweloperski: pozwala testować na telefonie w tej samej sieci Wi-Fi (np. http://192.168.1.96:3200).

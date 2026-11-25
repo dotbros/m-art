@@ -23,7 +23,8 @@
     "test:e2e": "playwright test",
     "test:all": "npm run typecheck && npm run lint && npm run test && npm run test:e2e",
     "db:start": "tsx scripts/db-start.mts",
-    "db:import-pglite": "tsx scripts/import-pglite.mts"
+    "db:import-pglite": "tsx scripts/import-pglite.mts",
+    "deploy:build": "tsx scripts/build-deploy.mts"
   },
   "dependencies": {
     "@fontsource/cormorant": "5.3.0",

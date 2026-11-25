@@ -4,6 +4,8 @@ node_modules/
 # build Next.js
 .next/
 .next-e2e/
+.next-deploy/
+deploy/
 out/
 build/
 next-env.d.ts
