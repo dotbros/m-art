@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { and, asc, eq, ilike, lte, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, eq, like, lte, or, sql, type SQL } from "drizzle-orm";
 import { getDb } from "@/db";
 import { categories, products } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
@@ -12,7 +12,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const db = await getDb();
   const q = (params.q || "").trim().slice(0, 80);
   const filters: SQL[] = [];
-  if (q) filters.push(or(ilike(products.name, `%${q}%`), sql`array_to_string(${products.stones}, ' ') ILIKE ${`%${q}%`}`, ilike(products.subtitle, `%${q}%`))!);
+  // Porównanie bez rozróżniania wielkości liter i polskich znaków (collation utf8mb4_unicode_ci); JSON z kamieniami ma collation binarne — stąd COLLATE.
+  if (q) filters.push(or(like(products.name, `%${q}%`), sql`${products.stones} COLLATE utf8mb4_unicode_ci LIKE ${`%${q}%`}`, like(products.subtitle, `%${q}%`))!);
   if (params.kategoria) filters.push(eq(products.categoryId, Number(params.kategoria)));
   if (params.stan === "niski") filters.push(lte(products.stock, 2));
   const [rows, categoryRows] = await Promise.all([

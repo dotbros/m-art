@@ -111,3 +111,17 @@ Nowe testy:
 
 Nowe: format treści (akapity, śródtytuły), walidacja podstrony, treści z migracji 0007; E2E — strona główna → /pracownia, stopka → /pielegnacja; panel: zajawka z osobnym zdjęciem, zdjęcie nagłówkowe + 2 w galerii, powiększenie i przewijanie galerii; karuzela kamieni w pętli (wstecz z pierwszego → ostatni, dalej z ostatniego → pierwszy; kopie niewidoczne dla czytników); ikony nagłówka ≥ 25 px i krótkie etykiety filtrów na telefonach; równe pola wyboru w panelu.
 Błędy testów poprawione w trakcie: zależność od kolejności urządzeń (wspólna baza testowa), przejście do formularza przed końcem logowania, liczenie linków poza karuzelą.
+
+---
+
+## T-006 · 2026-11-25 · przejście na MariaDB 10.11 (D-018)
+
+| Zestaw | Wynik |
+|---|---|
+| `typecheck` | ✅ 0 błędów |
+| Vitest — 10 plików (na lokalnej MariaDB, osobna baza na plik) | ✅ **76 / 76** |
+| Playwright — 3 urządzenia (build produkcyjny na bazie `mart_e2e`) | ✅ **83 / 83**, 4 pominięte (gesty dotyku poza Chromium; testy tylko dla telefonu) |
+
+Zmienione/nowe testy: konfiguracja bazy (adres mysql:// i mariadb://, czytelny błąd bez `DATABASE_URL`, hasło ze znakami specjalnymi, gniazdo UNIX hostingu); lista kamieni w JSON (tylko pełna nazwa, polskie znaki i półpauza zachowane po zapisie i odczycie) — zamiast testu funkcji SQL z PostgreSQL.
+Błąd wykryty przez testy w trakcie: brak treści startowych podstron i slajdów (w PostgreSQL wstawiały je migracje 0003/0007) → migracja `0001_tresci_startowe`.
+Przeniesienie danych: 5 kategorii, 9 produktów, 11 kamieni, 2 podstrony, 2 slajdy, konto admina — sprawdzone zapytaniem (listy kamieni i zdjęć, daty).

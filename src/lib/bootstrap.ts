@@ -9,7 +9,8 @@ import { isEmail } from "./validation";
 
 export async function bootstrap() {
   const handle = await getDbHandle();
-  const autoMigrate = process.env.AUTO_MIGRATE ? process.env.AUTO_MIGRATE === "true" : handle.kind === "pglite";
+  // Domyślnie: lokalnie (dev) migracje same; produkcyjnie tylko przy AUTO_MIGRATE=true.
+  const autoMigrate = process.env.AUTO_MIGRATE ? process.env.AUTO_MIGRATE === "true" : process.env.NODE_ENV !== "production";
   if (autoMigrate) await runMigrations(handle);
   if (process.env.SEED_DEMO_DATA === "true" && (await seedDemoData(handle.db))) console.log("[M.art] Wgrano dane demonstracyjne.");
 

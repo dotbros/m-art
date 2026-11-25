@@ -245,3 +245,11 @@ Raport T-004.
   - linia „Małe serie. Niepowtarzalne kamienie.”: → 14 px; przycisk „Zobacz całą kolekcję” bez zmian.
 - Węższe ekrany (761–1100 px): nieco mniejsze rozmiary, żeby menu i korzyści mieściły się w jednym rzędzie.
 - Testy: Vitest 75/75, Playwright 83 zaliczone, 4 pominięte (dotyczą innego urządzenia). Pomiar 1366 i 1024 px: brak poziomego przewijania.
+
+### 2026-11-25 — Przejście z PostgreSQL na MariaDB (przygotowanie do wdrożenia)
+- Rozpoznanie serwera: DirectAdmin + CloudLinux + LiteSpeed, Node.js do v24 (`/opt/alt`), tylko **MariaDB 10.11**, port 5432 na zewnątrz zablokowany → decyzja D-018.
+- **Kopia przed zmianą:** tag i gałąź `wersja-postgresql` na GitHubie; kopia bazy PGlite + eksport JSON + `.env.local` w OneDrive `Backup/baza-postgresql-20261125` (z instrukcją powrotu).
+- Lokalnie: przenośna MariaDB 10.11.11 w `E:\m-art-sklep-db` (port 3307, `npm run db:start`).
+- Kod: schemat MySQL, nowe migracje (`0000_init_mariadb`, `0001_tresci_startowe`), przepisane zapytania (kamienie w JSON, upsert, usuwanie, zamówienia), testy na MariaDB, E2E na bazie `mart_e2e`; usunięte pakiety PGlite/pg.
+- Dane właściciela przeniesione do lokalnej MariaDB (`npm run db:import-pglite`).
+- Testy: Vitest 76/76, Playwright 83 zaliczone / 4 pominięte (T-006).

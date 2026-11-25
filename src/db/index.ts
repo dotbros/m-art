@@ -1,70 +1,52 @@
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
-import path from "node:path";
-import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
-import { PGlite } from "@electric-sql/pglite";
-import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
-import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { drizzle, type MySql2Database } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import * as schema from "./schema";
 
 /**
- * Wspólny typ bazy dla obu sterowników (PGlite lokalnie, PostgreSQL na serwerze).
- * Zapytania Drizzle są identyczne — różni się tylko sposób połączenia.
+ * Baza: MariaDB 10.11 / MySQL 8 — lokalnie (przenośna MariaDB, port 3307) i na serwerze (D-018).
+ * Adres w DATABASE_URL, np. mysql://mart:haslo@127.0.0.1:3307/mart
+ * Opcjonalnie DATABASE_SOCKET=/var/lib/mysql/mysql.sock — połączenie przez gniazdo UNIX (hosting).
  */
-export type Db = PgDatabase<PgQueryResultHKT, typeof schema>;
-export type DbKind = "postgres" | "pglite";
+export type Db = MySql2Database<typeof schema>;
+export type DbKind = "mysql";
 
 type Handle = { db: Db; kind: DbKind; close: () => Promise<void> };
 
-/** Zwraca, z jakiej bazy korzystamy, na podstawie zmiennych środowiskowych. */
 export type Env = Record<string, string | undefined>;
 
 export function resolveDatabaseConfig(env: Env = process.env): { kind: DbKind; target: string } {
   const url = env.DATABASE_URL?.trim();
-  if (url && /^postgres(ql)?:\/\//.test(url)) return { kind: "postgres", target: url };
-  const dir = env.PGLITE_DIR?.trim() || "./data/pglite";
-  return { kind: "pglite", target: dir };
+  if (!url || !/^(mysql|mariadb):\/\//.test(url)) {
+    throw new Error("Brak DATABASE_URL (np. mysql://mart:mart-local@127.0.0.1:3307/mart). Lokalnie uruchom bazę: npm run db:start — szczegóły w SRODOWISKO.md.");
+  }
+  return { kind: "mysql", target: url.replace(/^mariadb:/, "mysql:") };
+}
+
+/** Ustawienia puli połączeń (bez nazwy bazy — używane też do zakładania baz testowych). */
+export function connectionOptions(url: string, env: Env = process.env): mysql.PoolOptions {
+  const u = new URL(url);
+  const socket = env.DATABASE_SOCKET?.trim();
+  return {
+    ...(socket ? { socketPath: socket } : { host: u.hostname, port: Number(u.port || 3306) }),
+    user: decodeURIComponent(u.username),
+    password: decodeURIComponent(u.password),
+    database: decodeURIComponent(u.pathname.replace(/^\//, "")) || undefined,
+    charset: "utf8mb4_unicode_ci",
+    timezone: "Z", // daty zapisujemy i czytamy w UTC
+    connectionLimit: Number(env.DATABASE_POOL_MAX || 5),
+    waitForConnections: true,
+    enableKeepAlive: true,
+  };
 }
 
 /** Tworzy nowe połączenie. Używane przez aplikację (singleton niżej), skrypty i testy. */
 export async function createDb(env: Env = process.env): Promise<Handle> {
-  const config = resolveDatabaseConfig(env);
-  if (config.kind === "postgres") {
-    const pool = new Pool({ connectionString: config.target, max: Number(env.DATABASE_POOL_MAX || 10) });
-    return { kind: "postgres", db: drizzlePg(pool, { schema }) as unknown as Db, close: () => pool.end() };
-  }
-  const inMemory = config.target.startsWith("memory://");
-  const dataDir = inMemory ? config.target : path.resolve(/*turbopackIgnore: true*/ config.target);
-  let releaseLock = () => {};
-  if (!inMemory) {
-    mkdirSync(dataDir, { recursive: true });
-    releaseLock = acquireLock(dataDir);
-  }
-  const client = new PGlite(dataDir);
-  await client.waitReady;
-  return { kind: "pglite", db: drizzlePglite(client, { schema }) as unknown as Db, close: async () => { await client.close(); releaseLock(); } };
-}
-
-/**
- * PGlite może być otwarte tylko przez JEDEN proces naraz. Plik blokady chroni przed
- * uszkodzeniem bazy, gdy np. `npm run db:seed` zostanie uruchomione przy działającym `npm run dev`.
- */
-function acquireLock(dataDir: string): () => void {
-  const lockFile = path.join(/*turbopackIgnore: true*/ path.dirname(dataDir), `${path.basename(dataDir)}.lock`);
-  if (existsSync(lockFile)) {
-    const pid = Number(readFileSync(lockFile, "utf8"));
-    if (pid && pid !== process.pid && isAlive(pid)) {
-      throw new Error(`Baza lokalna (${dataDir}) jest używana przez inny proces (PID ${pid}). Zatrzymaj serwer (npm run dev / npm start) i spróbuj ponownie.`);
-    }
-  }
-  writeFileSync(lockFile, String(process.pid));
-  const release = () => { try { if (readFileSync(lockFile, "utf8") === String(process.pid)) unlinkSync(lockFile); } catch { /* już usunięty */ } };
-  process.once("exit", release);
-  return release;
-}
-
-function isAlive(pid: number) {
-  try { process.kill(pid, 0); return true; } catch (error) { return (error as NodeJS.ErrnoException).code === "EPERM"; }
+  const { target } = resolveDatabaseConfig(env);
+  const pool = mysql.createPool(connectionOptions(target, env));
+  // CURRENT_TIMESTAMP w bazie też w UTC — niezależnie od strefy ustawionej na serwerze hostingu.
+  pool.pool.on("connection", (conn) => { conn.query("SET time_zone = '+00:00'"); });
+  await pool.query("SELECT 1"); // od razu czytelny błąd, gdy baza nie działa
+  return { kind: "mysql", db: drizzle(pool, { schema, mode: "default" }), close: () => pool.end() };
 }
 
 const globalForDb = globalThis as typeof globalThis & { __martDb?: Promise<Handle> };

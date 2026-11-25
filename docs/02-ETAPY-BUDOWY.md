@@ -65,7 +65,7 @@ Legenda: ✅ ukończony · 🔄 w toku · ⏳ zaplanowany
 - [ ] Automatyczna zmiana statusu na „Wysłane” + e-mail z linkiem śledzenia.
 
 ## Etap 8 — Wdrożenie na serwer ⏳
-- [ ] Wybór hostingu (VPS z Node.js + PostgreSQL albo platforma typu Railway/Render/Vercel + zarządzany Postgres).
+- [x] Hosting: DirectAdmin + CloudLinux (Node.js 22, MariaDB 10.11) → przejście aplikacji na MariaDB (D-018).
 - [ ] Konfiguracja domeny, HTTPS, zmiennych środowiskowych, kopii zapasowych bazy.
 - [ ] Przeniesienie zdjęć do trwałego magazynu (dysk serwera lub S3/R2).
 - [ ] Monitoring (`/api/health`), logi błędów.

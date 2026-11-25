@@ -1,6 +1,9 @@
-import { and, arrayContains, asc, eq, sql } from "drizzle-orm";
+import { and, asc, count, eq, sql } from "drizzle-orm";
 import type { Db } from "@/db";
 import { heroSlides, products, stones } from "@/db/schema";
+
+/** Warunek: lista kamieni produktu (JSON) zawiera dokładnie tę nazwę. */
+export const hasStone = (name: string) => sql`JSON_CONTAINS(${products.stones}, ${JSON.stringify(name)})`;
 import { slugify, type Product } from "./catalog";
 import type { Result } from "./validation";
 
@@ -30,7 +33,7 @@ export async function getStonePage(db: Db, slug: string): Promise<{ stone: Stone
   const [row] = await db.select().from(stones).where(and(eq(stones.slug, slug), eq(stones.isActive, true)));
   if (!row) return null;
   const list = await db.select({ id: products.id, name: products.name, subtitle: products.subtitle, price: products.price, compareAtPrice: products.compareAtPrice, image: products.image, stock: products.stock })
-    .from(products).where(and(eq(products.isActive, true), arrayContains(products.stones, [row.name]))).orderBy(asc(products.position), asc(products.name));
+    .from(products).where(and(eq(products.isActive, true), hasStone(row.name))).orderBy(asc(products.position), asc(products.name));
   return { stone: toStone(row), products: list.map((p) => ({ ...p, image: p.image || "/images/necklace-jasper.svg" })) };
 }
 
@@ -50,19 +53,23 @@ export async function ensureStones(db: Db, names: string[]) {
     let slug = slugify(name) || "kamien";
     const [taken] = await db.select({ id: stones.id }).from(stones).where(eq(stones.slug, slug));
     if (taken) slug = `${slug}-${Date.now().toString(36)}`;
-    await db.insert(stones).values({ name, slug }).onConflictDoNothing({ target: stones.name });
+    // Kamień o tej nazwie już jest → nic nie zmieniamy.
+    await db.insert(stones).values({ name, slug }).onDuplicateKeyUpdate({ set: { name: sql`${stones.name}` } });
   }
 }
 
 /** Zmiana nazwy kamienia: aktualizuje też listy kamieni w produktach i kamień w slajdach HERO. */
 export async function renameStoneEverywhere(db: Db, oldName: string, newName: string) {
   if (oldName === newName) return;
-  await db.update(products).set({ stones: sql`array_replace(${products.stones}, ${oldName}, ${newName})` }).where(arrayContains(products.stones, [oldName]));
+  const affected = await db.select({ id: products.id, stones: products.stones }).from(products).where(hasStone(oldName));
+  for (const p of affected) {
+    await db.update(products).set({ stones: [...new Set(p.stones.map((s) => (s === oldName ? newName : s)))] }).where(eq(products.id, p.id));
+  }
   await db.update(heroSlides).set({ stone: newName }).where(eq(heroSlides.stone, oldName));
 }
 
 export async function countProductsWithStone(db: Db, name: string) {
-  const [row] = await db.select({ value: sql<number>`count(*)::int` }).from(products).where(arrayContains(products.stones, [name]));
+  const [row] = await db.select({ value: count() }).from(products).where(hasStone(name));
   return row?.value ?? 0;
 }
 

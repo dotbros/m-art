@@ -1,1 +1,0 @@
-ALTER TABLE "hero_slides" ADD COLUMN "product_ids" text[] DEFAULT '{}'::text[] NOT NULL;

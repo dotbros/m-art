@@ -3,14 +3,14 @@ import { defineConfig, devices } from "@playwright/test";
 const PORT = 3100;
 
 /**
- * Testy E2E uruchamiają PRODUKCYJNY build (`next build && next start`) na osobnej, czystej bazie
- * (./data/pglite-e2e) — tak, jak aplikacja będzie działać na serwerze.
+ * Testy E2E uruchamiają PRODUKCYJNY build (`next build && next start`) na osobnej, czyszczonej bazie
+ * MariaDB `mart_e2e` (lokalna MariaDB musi działać: npm run db:start) — tak, jak aplikacja będzie działać na serwerze.
  * Priorytet: telefony (Pixel 7 = Chrome/Android, iPhone 14 = Safari/WebKit), potem desktop.
  */
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: false,
-  workers: 1, // PGlite obsługuje jeden proces — testy idą po kolei
+  workers: 1, // testy współdzielą jedną bazę i zmieniają jej dane — idą po kolei
   retries: process.env.CI ? 1 : 0,
   reporter: [["list"], ["html", { open: "never" }]],
   timeout: 45_000,
@@ -21,13 +21,12 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1366, height: 860 } } },
   ],
   webServer: {
-    command: `node -e "require('fs').rmSync('data/pglite-e2e',{recursive:true,force:true});require('fs').rmSync('data/pglite-e2e.lock',{force:true});require('fs').rmSync('storage/e2e',{recursive:true,force:true})" && npx next build && npx next start -p ${PORT}`,
+    command: `node -e "require('fs').rmSync('storage/e2e',{recursive:true,force:true})" && npx tsx scripts/reset-db.mts && npx next build && npx next start -p ${PORT}`,
     url: `http://localhost:${PORT}/api/health`,
     timeout: 240_000,
     reuseExistingServer: false,
     env: {
-      PGLITE_DIR: "./data/pglite-e2e",
-      DATABASE_URL: "",
+      DATABASE_URL: process.env.E2E_DATABASE_URL || "mysql://mart:mart-local@127.0.0.1:3307/mart_e2e",
       UPLOAD_DIR: "./storage/e2e",
       SEED_DEMO_DATA: "true",
       AUTO_MIGRATE: "true",

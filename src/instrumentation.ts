@@ -1,8 +1,8 @@
 /**
  * Uruchamiane raz przy starcie serwera Next.js.
- * Lokalnie (PGlite) automatycznie aplikuje migracje, wgrywa dane demo do pustej bazy
+ * W trybie dev automatycznie aplikuje migracje, wgrywa dane demo do pustej bazy (SEED_DEMO_DATA=true)
  * i tworzy konto admina z ADMIN_EMAIL / ADMIN_PASSWORD, jeśli żadnego jeszcze nie ma.
- * Na serwerze z PostgreSQL migracje uruchamia się jawnie: `npm run db:migrate`.
+ * Na serwerze migracje: `npm run db:migrate` albo AUTO_MIGRATE=true.
  */
 export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;

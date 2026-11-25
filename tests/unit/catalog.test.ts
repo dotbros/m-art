@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { COURIER_PRICE, money, productCountLabel, shippingCost, slugify } from "@/lib/catalog";
-import { resolveDatabaseConfig } from "@/db";
+import { connectionOptions, resolveDatabaseConfig } from "@/db";
 
 describe("catalog", () => {
   it("formatuje kwoty w groszach jako złotówki", () => {
@@ -31,11 +31,17 @@ describe("liczba produktów (odmiana)", () => {
 });
 
 describe("konfiguracja bazy", () => {
-  it("bez DATABASE_URL używa lokalnego PGlite", () => {
-    expect(resolveDatabaseConfig({})).toEqual({ kind: "pglite", target: "./data/pglite" });
+  it("bez DATABASE_URL (albo z innym adresem) zgłasza czytelny błąd", () => {
+    expect(() => resolveDatabaseConfig({})).toThrow(/DATABASE_URL/);
+    expect(() => resolveDatabaseConfig({ DATABASE_URL: "postgres://u:p@h/db" })).toThrow(/DATABASE_URL/);
   });
-  it("z adresem postgres:// używa PostgreSQL", () => {
-    expect(resolveDatabaseConfig({ DATABASE_URL: "postgres://u:p@h/db" }).kind).toBe("postgres");
-    expect(resolveDatabaseConfig({ DATABASE_URL: "postgresql://u:p@h/db" }).kind).toBe("postgres");
+  it("adres mysql:// lub mariadb:// → MariaDB/MySQL", () => {
+    expect(resolveDatabaseConfig({ DATABASE_URL: "mysql://u:p@h/db" })).toEqual({ kind: "mysql", target: "mysql://u:p@h/db" });
+    expect(resolveDatabaseConfig({ DATABASE_URL: "mariadb://u:p@h/db" }).target).toBe("mysql://u:p@h/db");
+  });
+  it("hasło ze znakami specjalnymi i gniazdo UNIX z hostingu", () => {
+    const o = connectionOptions("mysql://user_1:p%40ss%3Aw0rd@localhost:3306/marthmcl_sklep", { DATABASE_SOCKET: "/var/lib/mysql/mysql.sock" });
+    expect(o).toMatchObject({ user: "user_1", password: "p@ss:w0rd", database: "marthmcl_sklep", socketPath: "/var/lib/mysql/mysql.sock", timezone: "Z" });
+    expect(o.host).toBeUndefined();
   });
 });

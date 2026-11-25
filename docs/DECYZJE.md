@@ -73,3 +73,14 @@ Każda decyzja: **kontekst → decyzja → konsekwencje**. Nowe decyzje dopisuje
 
 ### D-017 · Wyłączona trwała pamięć podręczna `next dev` (2026-11-24)
 **Kontekst / decyzja:** `experimental.turbopackFileSystemCacheForDev: false` — nieaktualna pamięć po zmianach kodu przy wyłączonym serwerze powodowała pętlę przeładowań (iPhone). Koszt: wolniejszy start serwera deweloperskiego.
+
+### D-018 · Baza danych: MariaDB zamiast PostgreSQL (2026-11-25) — zastępuje bazę z D-001/D-002
+**Kontekst:** hosting (DirectAdmin, CloudLinux) ma tylko **MariaDB 10.11**; PostgreSQL brak, a połączenia wychodzące na port 5432 są zablokowane (zewnętrzny Postgres odpada bez dodatkowego sterownika przez HTTPS).
+**Decyzja:** cała aplikacja na **MariaDB/MySQL** (Drizzle `mysql-core`, sterownik `mysql2`) — lokalnie przenośna MariaDB 10.11 (port 3307, ten sam `sql_mode` co na serwerze), w testach osobna baza na każdy plik testów (`mart_t_…`), w E2E baza `mart_e2e`. PGlite usunięte (dwa dialekty = podwójny schemat i testy).
+- listy (kamienie, zdjęcia, produkty kolekcji) → kolumny **JSON** z własnym typem `list` (MariaDB zwraca JSON jako tekst); wyszukiwanie kamienia `JSON_CONTAINS` (dokładna nazwa);
+- daty → `DATETIME(3)` w **UTC** (`timezone: "Z"` + `SET time_zone='+00:00'` na każdym połączeniu);
+- klucze i pola unikalne → `VARCHAR`; tabele jawnie `utf8mb4_unicode_ci` (porównania bez rozróżniania wielkości liter i polskich znaków — np. „Perła” = „perła” w nazwach kamieni);
+- `RETURNING` → odczyt przed usunięciem / `affectedRows`; `ON CONFLICT` → `ON DUPLICATE KEY UPDATE`;
+- migracje od nowa: `0000_init_mariadb` + `0001_tresci_startowe` (podstrony i slajdy jak w dawnych 0003/0007).
+**Powrót:** tag/gałąź `wersja-postgresql` (commit `ee7acc9`), kopia bazy i instrukcja w OneDrive `Backup/baza-postgresql-20261125`.
+**Konsekwencje:** prostsze wdrożenie na obecny hosting; lokalnie trzeba uruchomić MariaDB (`npm run db:start`).

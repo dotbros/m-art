@@ -64,8 +64,8 @@ export async function createOrder(db: Db, input: OrderInput) {
       await tx.insert(orderItems).values({ orderId: id, productId: product.id, productName: product.name, quantity: item.quantity, unitPrice: product.price });
       // Warunek `stock >= quantity` chroni przed sprzedażą „na minus” przy równoległych zamówieniach.
       const updated = await tx.update(products).set({ stock: sql`${products.stock} - ${item.quantity}` })
-        .where(and(eq(products.id, product.id), gte(products.stock, item.quantity))).returning({ id: products.id });
-      if (!updated.length) throw new OrderError(`Produkt „${product.name}” właśnie się wyprzedał.`);
+        .where(and(eq(products.id, product.id), gte(products.stock, item.quantity)));
+      if (updated[0].affectedRows !== 1) throw new OrderError(`Produkt „${product.name}” właśnie się wyprzedał.`);
     }
     return { id, number, subtotal, shipping, total: subtotal + shipping };
   });

@@ -127,7 +127,8 @@ export async function deleteProductAction(_prev: FormState, form: FormData): Pro
     refreshStorefront();
     return { message: "Produkt występuje w zamówieniach, więc został ukryty zamiast usunięty." };
   }
-  const [deleted] = await db.delete(products).where(eq(products.id, id)).returning({ image: products.image, images: products.images });
+  const [deleted] = await db.select({ image: products.image, images: products.images }).from(products).where(eq(products.id, id));
+  if (deleted) await db.delete(products).where(eq(products.id, id));
   if (deleted) for (const file of new Set([...deleted.images, deleted.image])) if (file) await deleteMedia(file);
   refreshStorefront();
   redirect("/admin/produkty?usunieto=1");
@@ -223,7 +224,9 @@ export async function toggleHeroSlideAction(form: FormData) {
 export async function deleteHeroSlideAction(_prev: FormState, form: FormData): Promise<FormState> {
   await requireAdmin();
   const id = Number(form.get("id"));
-  const [deleted] = await (await getDb()).delete(heroSlides).where(eq(heroSlides.id, id)).returning();
+  const db = await getDb();
+  const [deleted] = await db.select().from(heroSlides).where(eq(heroSlides.id, id));
+  if (deleted) await db.delete(heroSlides).where(eq(heroSlides.id, id));
   if (deleted) for (const file of [deleted.mediaUrl, deleted.posterUrl]) if (file) await deleteMedia(file);
   refreshStorefront();
   redirect("/admin/strona?usunieto=1");

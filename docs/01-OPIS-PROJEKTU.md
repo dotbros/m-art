@@ -41,15 +41,15 @@ Przeglądarka (telefon) ──► Next.js (App Router, React 19)
                              └─ /media/* — zdjęcia produktów z UPLOAD_DIR
                                    │
                      Drizzle ORM (jeden schemat, migracje SQL w ./drizzle)
-                        ├─ lokalnie: PGlite  (./data/pglite)
-                        └─ serwer:   PostgreSQL (DATABASE_URL)
+                        ├─ lokalnie: MariaDB 10.11 (przenośna, port 3307)
+                        └─ serwer:   MariaDB 10.11 hostingu (DATABASE_URL)
 ```
 
 | Warstwa | Technologia |
 |---|---|
 | Framework | Next.js 16 (App Router, Server Actions) |
 | UI | React 19, CSS (mobile-first), Tailwind 4 dostępny |
-| Baza | PostgreSQL przez Drizzle ORM; lokalnie PGlite |
+| Baza | MariaDB 10.11 / MySQL przez Drizzle ORM (D-018) |
 | Autoryzacja | własna: scrypt + sesje w bazie + ciasteczko httpOnly |
 | Testy | Vitest (unit + integracja), Playwright (E2E: Pixel 7, iPhone 14, desktop) |
 | Repozytorium | Git + GitHub |

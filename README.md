@@ -1,6 +1,6 @@
 # M.art — sklep internetowy pracowni biżuterii
 
-Sklep z ręcznie robioną biżuterią z naturalnych kamieni i panel administracyjny do zarządzania produktami, kategoriami i zamówieniami. Projekt jest **mobile-first**. Zbudowany na Next.js 16, React 19, Drizzle ORM i PostgreSQL (lokalnie PGlite — bez instalowania bazy).
+Sklep z ręcznie robioną biżuterią z naturalnych kamieni i panel administracyjny do zarządzania produktami, kategoriami i zamówieniami. Projekt jest **mobile-first**. Zbudowany na Next.js 16, React 19, Drizzle ORM i MariaDB 10.11 / MySQL (lokalnie przenośna MariaDB — patrz SRODOWISKO.md).
 
 ## Szybki start
 

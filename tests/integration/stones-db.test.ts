@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { heroSlides, products, stones } from "@/db/schema";
 import { countProductsWithStone, ensureStones, getActiveStones, getHomeStones, getStoneNames, getStonePage, renameStoneEverywhere } from "@/lib/stones";
 import { createTestDb } from "../helpers/db";
@@ -53,8 +53,14 @@ describe("słownik kamieni", () => {
     expect(slide.stone).toBe("Perła słodkowodna");
   });
 
-  it("adresy kamieni z polskimi znakami (wzór z migracji 0006)", async () => {
-    const result = await handle.db.execute(sql`select trim(both '-' from regexp_replace(lower(translate(${"Perełki ozdobne – Żółty Kwarc"}, 'ąćęłńóśźżĄĆĘŁŃÓŚŹŻ', 'acelnoszzACELNOSZZ')), '[^a-z0-9]+', '-', 'g')) as slug`);
-    expect((result as unknown as { rows: { slug: string }[] }).rows[0].slug).toBe("perelki-ozdobne-zolty-kwarc");
+  it("lista kamieni (JSON): dopasowanie tylko pełnej nazwy, polskie znaki zachowane", async () => {
+    expect(await countProductsWithStone(handle.db, "Perła")).toBe(0); // fragment nazwy to nie kamień
+    await ensureStones(handle.db, ["Żółty kwarc – ćma"]);
+    expect(await getStoneNames(handle.db)).toContain("Żółty kwarc – ćma");
+    const [p] = await handle.db.select().from(products).limit(1);
+    await handle.db.update(products).set({ stones: ["Żółty kwarc – ćma"] }).where(eq(products.id, p.id));
+    const [back] = await handle.db.select({ stones: products.stones }).from(products).where(eq(products.id, p.id));
+    expect(back.stones).toEqual(["Żółty kwarc – ćma"]);
+    expect(await countProductsWithStone(handle.db, "Żółty kwarc – ćma")).toBe(1);
   });
 });

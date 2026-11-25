@@ -13,9 +13,10 @@ export type AdminUser = { id: number; email: string; name: string };
 
 export async function createAdminUser(db: Db, email: string, password: string, name = "") {
   const passwordHash = await hashPassword(password);
-  const [user] = await db.insert(adminUsers).values({ email: email.trim().toLowerCase(), name, passwordHash })
-    .onConflictDoUpdate({ target: adminUsers.email, set: { passwordHash, name } })
-    .returning({ id: adminUsers.id, email: adminUsers.email, name: adminUsers.name });
+  const normalized = email.trim().toLowerCase();
+  // Istniejącemu kontu zmieniamy hasło i nazwę.
+  await db.insert(adminUsers).values({ email: normalized, name, passwordHash }).onDuplicateKeyUpdate({ set: { passwordHash, name } });
+  const [user] = await db.select({ id: adminUsers.id, email: adminUsers.email, name: adminUsers.name }).from(adminUsers).where(eq(adminUsers.email, normalized));
   return user;
 }
 
