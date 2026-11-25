@@ -19,18 +19,39 @@ Panel → **Setup Node.js App** (CloudLinux Node.js Selector):
 - katalog aplikacji np. `~/m-art-sklep`, adres: domena sklepu;
 - plik startowy: `server.js` (tworzony przez build — patrz niżej).
 
-### 3. Kod i build
-Na hostingu współdzielonym `next build` zwykle przekracza limit pamięci, więc **budujemy na komputerze** i wysyłamy gotową paczkę (`output: "standalone"`). Szczegółowe polecenia uzupełnimy przy pierwszym wdrożeniu.
+### 3. Kod i build — aktualizacja sklepu (2 polecenia na komputerze)
+Na hostingu współdzielonym `next build` przekracza limit pamięci, więc **budujemy na komputerze** (`output: "standalone"`) i wysyłamy gotową paczkę:
+```bash
+# PowerShell:  $env:NEXT_PUBLIC_SITE_URL='https://mart.hmcloud.pl'; npm run deploy:build
+bash scripts/deploy-upload.sh      # Git Bash: wysyła, podmienia pliki, restartuje, sprawdza /api/health
+```
+`NEXT_PUBLIC_SITE_URL` jest wpisywany do kodu przy budowaniu — musi wskazywać domenę sklepu.
+Paczka zawiera: `server.js` (wczytuje `.env`, uruchamia `next-server.js`), moduły, `drizzle/` (migracje), `bin/ffmpeg` (Linux), `bin/zmien-haslo.js`.
+Dostęp: klucz `~/.ssh/m-art-deploy` dodany w panelu (**Klucze SSH → Wklej klucz → Autoryzacja**), SSH `h7.hitme.net.pl`, port **10022**.
 
-### 4. Zmienne środowiskowe (w panelu Node.js App lub w `.env` w katalogu aplikacji)
+Pułapki tego hostingu (rozwiązane w skryptach):
+- `node_modules` w katalogu aplikacji to dowiązanie do `~/nodevenv/…` (inny system plików) — tar nie rozpakuje przez nie, więc kopiujemy `cp -a`;
+- Next.js na Windows tworzy w paczce połączenia (junction) — kopiujemy prawdziwe pliki;
+- **nie** klikać „Uruchom NPM Install” w panelu;
+- plik `public_html/index.html` (strona powitalna hostingu) przesłania stronę główną — zmieniono mu nazwę;
+- `localhost` w adresie bazy łączy przez IPv6 (`::1`), a użytkownik bazy ma dostęp tylko przez gniazdo → `DATABASE_SOCKET`.
+
+### 4. Zmienne środowiskowe — plik `~/m-art-sklep/.env` (uprawnienia 600, tylko na serwerze)
 ```
 NODE_ENV=production
-NEXT_PUBLIC_SITE_URL=https://twoja-domena.pl
-DATABASE_URL=mysql://…
+NEXT_PUBLIC_SITE_URL=https://mart.hmcloud.pl
+DATABASE_URL=mysql://UZYTKOWNIK:HASLO@localhost:3306/marthmcl_sklep
+DATABASE_SOCKET=/var/lib/mysql/mysql.sock
 AUTO_MIGRATE=true            # migracje przy starcie aplikacji
 SEED_DEMO_DATA=false
 UPLOAD_DIR=/home/marthmcl/m-art-data/uploads   # POZA katalogiem aplikacji i public_html
-ADMIN_EMAIL=…  ADMIN_PASSWORD=…                # tylko do pierwszego startu, potem usuń
+FFMPEG_BIN=/home/marthmcl/m-art-sklep/bin/ffmpeg
+```
+Po zmianie `.env`: `touch ~/m-art-sklep/tmp/restart.txt` (albo „Uruchom ponownie” w panelu). Błędy aplikacji: `~/m-art-sklep/stderr.log`.
+
+**Hasło administratora** (na serwerze, hasło nie jest wyświetlane):
+```bash
+source ~/nodevenv/m-art-sklep/20/bin/activate && cd ~/m-art-sklep && node bin/zmien-haslo.js
 ```
 
 ### 5. Przeniesienie danych z komputera

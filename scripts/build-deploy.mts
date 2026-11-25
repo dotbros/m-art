@@ -32,6 +32,21 @@ for (const item of ["server.js", "package.json", "node_modules", DIST]) {
 cpSync(path.join(ROOT, DIST, "static"), path.join(OUT, DIST, "static"), { recursive: true });
 cpSync(path.join(ROOT, "public"), path.join(OUT, "public"), { recursive: true });
 cpSync(path.join(ROOT, "drizzle"), path.join(OUT, "drizzle"), { recursive: true }); // migracje (AUTO_MIGRATE=true)
+// Plik startowy dla hostingu: wczytuje .env z katalogu aplikacji (hasła tylko na serwerze), potem serwer Next.js.
+cpSync(path.join(OUT, "server.js"), path.join(OUT, "next-server.js"));
+writeFileSync(path.join(OUT, "server.js"), `// Start aplikacji na hostingu (Passenger / „Setup Node.js App”). Generowane przez scripts/build-deploy.mts.
+const fs = require("node:fs");
+const path = require("node:path");
+const envFile = path.join(__dirname, ".env");
+if (fs.existsSync(envFile)) {
+  for (const line of fs.readFileSync(envFile, "utf8").split(/\\r?\\n/)) {
+    const m = line.match(/^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*(.*)\\s*$/);
+    if (!m || process.env[m[1]] !== undefined) continue;
+    process.env[m[1]] = m[2].replace(/^(['"])(.*)\\1$/, "$2");
+  }
+}
+require("./next-server.js");
+`);
 
 step("ffmpeg dla Linuksa → bin/ffmpeg (na serwerze FFMPEG_BIN=<katalog aplikacji>/bin/ffmpeg)");
 // Usuwamy ffmpeg.exe (Windows, ~80 MB) ze wszystkich kopii pakietu ffmpeg-static.
@@ -50,6 +65,7 @@ if (!existsSync(FFMPEG_CACHE)) {
   writeFileSync(FFMPEG_CACHE, gunzipSync(Buffer.from(await res.arrayBuffer())));
 }
 mkdirSync(path.join(OUT, "bin"), { recursive: true });
+cpSync(path.join(ROOT, "scripts", "server", "zmien-haslo.cjs"), path.join(OUT, "bin", "zmien-haslo.js")); // narzędzia serwisowe
 cpSync(FFMPEG_CACHE, path.join(OUT, "bin", "ffmpeg"));
 chmodSync(path.join(OUT, "bin", "ffmpeg"), 0o755);
 

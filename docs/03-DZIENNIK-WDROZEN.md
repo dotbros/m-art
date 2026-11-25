@@ -253,3 +253,11 @@ Raport T-004.
 - Kod: schemat MySQL, nowe migracje (`0000_init_mariadb`, `0001_tresci_startowe`), przepisane zapytania (kamienie w JSON, upsert, usuwanie, zamówienia), testy na MariaDB, E2E na bazie `mart_e2e`; usunięte pakiety PGlite/pg.
 - Dane właściciela przeniesione do lokalnej MariaDB (`npm run db:import-pglite`).
 - Testy: Vitest 76/76, Playwright 83 zaliczone / 4 pominięte (T-006).
+
+### 2026-11-25 — Pierwsze wdrożenie: https://mart.hmcloud.pl
+- Hosting hitme.pl (DirectAdmin, CloudLinux, LiteSpeed/Passenger), aplikacja Node.js 20.20.2 w `~/m-art-sklep`, baza `marthmcl_sklep` (MariaDB 10.11.19).
+- Paczka budowana na komputerze (`npm run deploy:build`, standalone) i wysyłana skryptem `scripts/deploy-upload.sh` (SSH z kluczem, port 10022).
+- Przeniesione: baza (9 produktów, 11 kamieni, 2 slajdy, podstrony, konto admina; sesje usunięte) i 40 zdjęć/filmów do `~/m-art-data/uploads`.
+- Problemy rozwiązane w trakcie: tar przez dowiązanie `node_modules` (inny system plików), junction z Windows w paczce, strona powitalna hostingu przesłaniająca `/`, połączenie z bazą przez IPv6 zamiast gniazda (`DATABASE_SOCKET`), domyślne kodowanie bazy `utf8mb3` → `utf8mb4`.
+- Sprawdzenie: `/api/health` OK, strona główna na telefonie (Pixel 7): 43 zdjęcia wczytane, 0 błędów HTTP; czasy odpowiedzi 0,1–0,4 s.
+- Narzędzie `bin/zmien-haslo.js` do zmiany hasła admina na serwerze (hasło demo jest w dokumentacji — do zmiany).
