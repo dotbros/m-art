@@ -67,7 +67,7 @@ html:has(.welcome),html:has(.welcome) body{background:#15100b}
 .w-text{font-family:var(--serif);font-size:20px;line-height:1.55;color:var(--w-soft);max-width:330px}
 .w-wish{margin-top:22px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:23px;line-height:1.45;color:var(--w-cream);max-width:330px}
 
-.w-cta{position:relative;overflow:hidden;margin-top:38px;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:56px;padding:0 20px;width:100%;max-width:320px;white-space:nowrap;
+.w-cta{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:56px;padding:0 20px;width:100%;max-width:320px;white-space:nowrap;
   font-family:var(--sans);font-size:clamp(11.5px,3.4vw,13px);font-weight:500;letter-spacing:1.3px;text-transform:uppercase;color:#2b2015;text-decoration:none;
   background:var(--w-gold);background-size:200% 100%;border:1px solid #e6c98f;border-radius:2px;
   box-shadow:0 14px 34px rgba(0,0,0,.45),0 0 0 4px rgba(214,178,116,.12)}
@@ -82,6 +82,51 @@ html:has(.welcome),html:has(.welcome) body{background:#15100b}
 .w-key p{font-family:var(--serif);font-style:italic;font-size:19px;line-height:1.4;letter-spacing:.2px;
   background:var(--w-gold);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
 
+/* „Czarodziejska różdżka” (magic-reveal.tsx): przycisk ukryty do chwili przewinięcia; miejsce zarezerwowane. */
+.w-magic{position:relative;margin-top:38px;width:100%;display:flex;justify-content:center}
+.w-magic .w-cta{opacity:0;visibility:hidden}
+.w-magic.is-on .w-cta{visibility:visible;animation:w-conjure 1.5s cubic-bezier(.2,.7,.2,1) .85s both}
+.w-magic.is-on .w-cta::after{animation-delay:2.4s}
+.w-wand,.w-flash,.w-burst{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:none;z-index:2}
+/* iskra z różdżki: gwiazdka + smuga drobinek lecąca łukiem z lewej góry do środka przycisku */
+.w-wand i{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:#fff6dc;box-shadow:0 0 10px 3px rgba(248,226,170,.85),0 0 24px 8px rgba(233,200,140,.35);opacity:0}
+.w-wand i:first-child{left:-7px;top:-7px;width:14px;height:14px;border-radius:0;background:#fffaf0;clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);box-shadow:none;filter:drop-shadow(0 0 6px #f8e2aa) drop-shadow(0 0 14px rgba(233,200,140,.8))}
+.w-magic.is-on .w-wand i{animation:w-fly .95s cubic-bezier(.45,.05,.35,1) both}
+.w-magic.is-on .w-wand i:nth-child(2){animation-delay:.06s;transform:scale(.8)}
+.w-magic.is-on .w-wand i:nth-child(3){animation-delay:.12s;width:4px;height:4px}
+.w-magic.is-on .w-wand i:nth-child(4){animation-delay:.18s;width:3px;height:3px}
+.w-magic.is-on .w-wand i:nth-child(5){animation-delay:.24s;width:2px;height:2px}
+/* rozbłysk: złoty krąg rozchodzący się z miejsca przycisku */
+.w-flash::before,.w-flash::after{content:"";position:absolute;left:-60px;top:-60px;width:120px;height:120px;border-radius:50%;opacity:0}
+.w-flash::before{background:radial-gradient(circle,rgba(255,246,220,.95) 0%,rgba(241,217,164,.55) 30%,rgba(233,200,140,0) 70%)}
+.w-flash::after{border:1px solid rgba(241,217,164,.9);box-shadow:0 0 18px rgba(241,217,164,.6)}
+.w-magic.is-on .w-flash::before{animation:w-glowburst 1.1s ease-out .8s both}
+.w-magic.is-on .w-flash::after{animation:w-ring 1.3s cubic-bezier(.2,.7,.2,1) .82s both}
+/* drobinki rozsypujące się promieniście */
+.w-burst i{position:absolute;left:-2.5px;top:-2.5px;width:5px;height:5px;border-radius:50%;background:#fbe9bf;box-shadow:0 0 8px 2px rgba(248,226,170,.7);opacity:0;--r:90px}
+.w-burst i:nth-child(3n){left:-5px;top:-5px;width:10px;height:10px;border-radius:0;box-shadow:none;background:#fff6dc;clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);filter:drop-shadow(0 0 5px #f8e2aa)}
+.w-magic.is-on .w-burst i{animation:w-spark 1.3s cubic-bezier(.15,.7,.3,1) .85s both}
+.w-burst i:nth-child(1){--a:0deg;--r:120px}.w-burst i:nth-child(2){--a:26deg;--r:150px}.w-burst i:nth-child(3){--a:51deg;--r:110px}
+.w-burst i:nth-child(4){--a:77deg;--r:85px}.w-burst i:nth-child(5){--a:103deg;--r:95px}.w-burst i:nth-child(6){--a:129deg;--r:140px}
+.w-burst i:nth-child(7){--a:154deg;--r:115px}.w-burst i:nth-child(8){--a:180deg;--r:130px}.w-burst i:nth-child(9){--a:206deg;--r:155px}
+.w-burst i:nth-child(10){--a:231deg;--r:105px}.w-burst i:nth-child(11){--a:257deg;--r:85px}.w-burst i:nth-child(12){--a:283deg;--r:95px}
+.w-burst i:nth-child(13){--a:309deg;--r:145px}.w-burst i:nth-child(14){--a:334deg;--r:120px}
+
+@keyframes w-fly{
+  0%{translate:-150px -190px;opacity:0;scale:.4}
+  12%{opacity:1}
+  40%{translate:-115px -70px;scale:.75}
+  70%{translate:-45px -12px;scale:1}
+  92%{translate:0 0;opacity:1;scale:1.5}
+  100%{translate:0 0;opacity:0;scale:2.2}}
+@keyframes w-glowburst{0%{opacity:0;transform:scale(.2)}25%{opacity:1}100%{opacity:0;transform:scale(2.6)}}
+@keyframes w-ring{0%{opacity:0;transform:scale(.1)}8%{opacity:.9}100%{opacity:0;transform:scale(3.2)}}
+@keyframes w-spark{0%{opacity:0;transform:rotate(var(--a)) translateY(0) scale(.4)}15%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateY(calc(-1 * var(--r))) scale(.3)}}
+@keyframes w-conjure{
+  0%{opacity:0;transform:scale(.88);filter:blur(12px) brightness(1.7)}
+  35%{opacity:1;filter:blur(3px) brightness(1.5);box-shadow:0 0 60px 12px rgba(241,217,164,.55),0 0 0 4px rgba(214,178,116,.12)}
+  100%{opacity:1;transform:none;filter:none;box-shadow:0 14px 34px rgba(0,0,0,.45),0 0 0 4px rgba(214,178,116,.12)}}
+
 /* Pojawianie się po kolei (opóźnienie w --d) */
 .w-in{animation:w-up 1.4s cubic-bezier(.2,.7,.2,1) var(--d,0s) both}
 
@@ -95,5 +140,6 @@ html:has(.welcome),html:has(.welcome) body{background:#15100b}
 
 @media (prefers-reduced-motion:reduce){
   .welcome *,.welcome *::before,.welcome *::after{animation:none!important}
-  .w-sparks{display:none}
+  .w-sparks,.w-wand,.w-flash,.w-burst{display:none}
+  .w-magic.is-on .w-cta{opacity:1}
 }

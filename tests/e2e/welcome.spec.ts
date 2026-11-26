@@ -10,6 +10,11 @@ test.describe("Powitanie właścicielki (/witaj)", () => {
     await expect(page.getByText(/ten prezent pozwoli Ci jeszcze bardziej się zrealizować/)).toBeVisible();
     await expect(page.getByText(/Wewnątrz ramki znajdziesz klucz/)).toBeVisible();
     const cta = page.getByRole("link", { name: "Wejdź do swojego sklepu" });
+    // Przycisk pojawia się „za dotknięciem różdżki” dopiero po przewinięciu do końca
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect(page.locator(".w-magic")).toHaveAttribute("data-shown", "true");
+    await expect(cta).toBeVisible();
+    await expect.poll(() => cta.evaluate((e) => getComputedStyle(e).opacity), { timeout: 5000 }).toBe("1");
     // Napis przycisku w jednej linii
     expect((await cta.boundingBox())!.height).toBeLessThanOrEqual(60);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(1);

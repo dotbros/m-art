@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { MagicReveal } from "./magic-reveal";
 import "./witaj.css";
 
 /**
@@ -62,10 +63,13 @@ export default function WelcomePage() {
           Wierzymy, że ten prezent pozwoli Ci jeszcze bardziej się zrealizować w&nbsp;tym, co robisz najlepiej!
         </p>
 
-        <Link href="/" className="w-cta w-in" style={{ "--d": "3.4s" } as React.CSSProperties}>
-          <span>Wejdź do swojego sklepu</span>
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><path d="M4 12h15M14 6.5 19.5 12 14 17.5" /></svg>
-        </Link>
+        {/* Przycisk pojawia się „za dotknięciem różdżki”, gdy klientka do niego przewinie */}
+        <MagicReveal minDelay={3600}>
+          <Link href="/" className="w-cta">
+            <span>Wejdź do swojego sklepu</span>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><path d="M4 12h15M14 6.5 19.5 12 14 17.5" /></svg>
+          </Link>
+        </MagicReveal>
 
         <footer className="w-key w-in" style={{ "--d": "4s" } as React.CSSProperties}>
           <span className="w-key-icon"><KeyIcon /></span>
