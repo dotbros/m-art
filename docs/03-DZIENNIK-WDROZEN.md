@@ -261,3 +261,9 @@ Raport T-004.
 - Problemy rozwiązane w trakcie: tar przez dowiązanie `node_modules` (inny system plików), junction z Windows w paczce, strona powitalna hostingu przesłaniająca `/`, połączenie z bazą przez IPv6 zamiast gniazda (`DATABASE_SOCKET`), domyślne kodowanie bazy `utf8mb3` → `utf8mb4`.
 - Sprawdzenie: `/api/health` OK, strona główna na telefonie (Pixel 7): 43 zdjęcia wczytane, 0 błędów HTTP; czasy odpowiedzi 0,1–0,4 s.
 - Narzędzie `bin/zmien-haslo.js` do zmiany hasła admina na serwerze (hasło demo jest w dokumentacji — do zmiany).
+
+### 2026-11-26 — Strona powitalna dla właścicielki (/witaj)
+- Osobna strona-prezent, projektowana wyłącznie na telefon (na komputerze kolumna szerokości telefonu): ciemne tło „szkatułki”, podwójna złota ramka z narożnikami, złote logo (kształt z `logo.svg` wypełniony gradientem), teksty pojawiające się po kolei, unoszące się złote drobinki, złoty przycisk „Wejdź do swojego sklepu” → `/`, na dole klucz i napis „Wewnątrz ramki znajdziesz klucz do Twojego królestwa”.
+- Niewidoczna dla wyszukiwarek (`noindex`), niepodlinkowana w sklepie; animacje wyłączone przy ustawieniu „ogranicz ruch”.
+- Sprawdzone na Pixel 7, iPhone 14 i iPhone SE: brak przewijania w bok, napis przycisku w jednej linii.
+- Testy: Vitest 76/76, Playwright 86 zaliczone / 4 pominięte (nowy `welcome.spec.ts` × 3 urządzenia).
