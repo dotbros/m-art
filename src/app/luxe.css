@@ -173,7 +173,7 @@
 /* Zdjęcie w całości (bez przycinania) w ramce 4:5; wolne miejsce — to samo zdjęcie rozmyte i przyciemnione */
 .product-modal .product-detail-image{min-height:0;height:auto;aspect-ratio:4/5;align-self:start;background:#2b2118;overflow:hidden}
 .pd-single-wrap{position:absolute;inset:0}
-.pd-slide{position:relative;flex:0 0 100%;width:100%;height:100%;overflow:hidden;scroll-snap-align:start}
+.pd-slide{position:relative;flex:0 0 100%;width:100%;height:100%;overflow:hidden;scroll-snap-align:start;scroll-snap-stop:always}/* always: szybki ruch palcem nie przeskakuje kilku zdjęć */
 .pd-single-wrap>.pd-slide{position:absolute;inset:0}
 .pd-blur{position:absolute;inset:-8%;width:116%;height:116%;object-fit:cover;filter:blur(26px) saturate(1.15) brightness(.82);transform:translateZ(0)}
 .pd-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 24px rgba(20,12,4,.28))}

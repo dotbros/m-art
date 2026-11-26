@@ -274,3 +274,6 @@ Raport T-004.
 - Certyfikat Let's Encrypt (z *.mart-bizuteria.pl), aplikacja przepięta w panelu Node.js, przebudowa z nowym `NEXT_PUBLIC_SITE_URL`.
 - Przekierowania 301: www → bez www, http → https, mart.hmcloud.pl/* → mart-bizuteria.pl/* (sprawdzone m.in. dla /witaj).
 - Sprawdzenie: /, /witaj, /pracownia, /admin/login — 200; wszystkie warianty adresów kończą na https://mart-bizuteria.pl.
+
+### 2026-11-26 — Galeria produktu: zatrzymanie na każdym zdjęciu
+- Szybkie przesunięcie palcem przeskakiwało 2–3 zdjęcia naraz → `scroll-snap-stop: always` na slajdach galerii (`luxe.css`). Test E2E sprawdza ustawienie. Playwright 86/4 pominięte.
