@@ -22,7 +22,7 @@ Panel → **Setup Node.js App** (CloudLinux Node.js Selector):
 ### 3. Kod i build — aktualizacja sklepu (2 polecenia na komputerze)
 Na hostingu współdzielonym `next build` przekracza limit pamięci, więc **budujemy na komputerze** (`output: "standalone"`) i wysyłamy gotową paczkę:
 ```bash
-# PowerShell:  $env:NEXT_PUBLIC_SITE_URL='https://mart.hmcloud.pl'; npm run deploy:build
+# PowerShell:  $env:NEXT_PUBLIC_SITE_URL='https://mart-bizuteria.pl'; npm run deploy:build
 bash scripts/deploy-upload.sh      # Git Bash: wysyła, podmienia pliki, restartuje, sprawdza /api/health
 ```
 `NEXT_PUBLIC_SITE_URL` jest wpisywany do kodu przy budowaniu — musi wskazywać domenę sklepu.
@@ -39,7 +39,7 @@ Pułapki tego hostingu (rozwiązane w skryptach):
 ### 4. Zmienne środowiskowe — plik `~/m-art-sklep/.env` (uprawnienia 600, tylko na serwerze)
 ```
 NODE_ENV=production
-NEXT_PUBLIC_SITE_URL=https://mart.hmcloud.pl
+NEXT_PUBLIC_SITE_URL=https://mart-bizuteria.pl
 DATABASE_URL=mysql://UZYTKOWNIK:HASLO@localhost:3306/marthmcl_sklep
 DATABASE_SOCKET=/var/lib/mysql/mysql.sock
 AUTO_MIGRATE=true            # migracje przy starcie aplikacji
@@ -88,3 +88,10 @@ Caddy: `twoja-domena.pl { reverse_proxy 127.0.0.1:3000; request_body { max_size 
 - [ ] Regulamin, polityka prywatności, dane sprzedawcy uzupełnione.
 - [ ] Klucze płatności/wysyłek produkcyjne (nie sandbox) — tylko w zmiennych środowiskowych.
 - [ ] `/api/health` podpięte do monitoringu (np. UptimeRobot).
+
+### Domena (2026-11-26)
+- Sklep: **https://mart-bizuteria.pl** (DNS hitme, certyfikat Let's Encrypt `mart-bizuteria.pl` + `*.mart-bizuteria.pl`, odnawiany automatycznie przez panel).
+- `www.` → bez www (panel: Domeny → Modyfikuj → „Wymuś przekierowanie”), http → https („Wymuś SSL”).
+- Stary adres `mart.hmcloud.pl` → 301 na nową domenę z zachowaniem ścieżki (`~/domains/mart.hmcloud.pl/public_html/.htaccess`).
+- Aplikacja Node.js przypięta do domeny w panelu (Node.js → URL aplikacji). Zmiana domeny = zmiana URL w panelu + `NEXT_PUBLIC_SITE_URL` w `.env` na serwerze i przy `npm run deploy:build`.
+- Do włączenia później: HSTS (panel: Domeny → Modyfikuj), gdy wszystko działa stabilnie.

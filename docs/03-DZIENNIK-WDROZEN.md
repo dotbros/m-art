@@ -269,3 +269,8 @@ Raport T-004.
 - Testy: Vitest 76/76, Playwright 86 zaliczone / 4 pominięte (nowy `welcome.spec.ts` × 3 urządzenia).
 - Poprawka (na życzenie): przycisk „Wejdź do swojego sklepu” pojawia się dopiero po przewinięciu do niego — „czarodziejska różdżka”: iskra ze smugą leci łukiem, rozbłysk i złoty krąg, rozsypujące się gwiazdki, przycisk wyłania się z blasku (rozmyty → ostry). Miejsce zarezerwowane (bez skoku układu); przy „ogranicz ruch” widoczny od razu. Test E2E: ukryty do przewinięcia, potem widoczny. Playwright 86/4 pominięte.
 - Poprawka: efekt „różdżki” startuje 1 s po przewinięciu do przycisku (wcześniej 0,25 s). Test /witaj 3/3.
+
+### 2026-11-26 — Własna domena: https://mart-bizuteria.pl
+- Certyfikat Let's Encrypt (z *.mart-bizuteria.pl), aplikacja przepięta w panelu Node.js, przebudowa z nowym `NEXT_PUBLIC_SITE_URL`.
+- Przekierowania 301: www → bez www, http → https, mart.hmcloud.pl/* → mart-bizuteria.pl/* (sprawdzone m.in. dla /witaj).
+- Sprawdzenie: /, /witaj, /pracownia, /admin/login — 200; wszystkie warianty adresów kończą na https://mart-bizuteria.pl.
