@@ -20,7 +20,8 @@ export function MagicReveal({ children, minDelay = 0 }: { children: ReactNode; m
     const io = new IntersectionObserver((entries) => {
       if (!entries.some((e) => e.isIntersecting)) return;
       io.disconnect();
-      timer = setTimeout(() => setShown(true), Math.max(250, minDelay - performance.now()));
+      // 1 s pauzy po przewinięciu — chwila oczekiwania przed „czarem”.
+      timer = setTimeout(() => setShown(true), Math.max(1000, minDelay - performance.now()));
     }, { threshold: 0.75 });
     io.observe(el);
     return () => { io.disconnect(); if (timer) clearTimeout(timer); };
